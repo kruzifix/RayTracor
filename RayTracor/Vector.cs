@@ -18,6 +18,7 @@ namespace RayTracor.RayTracor
         public double Z { get; set; }
 
         public double Length { get { return Math.Sqrt(X * X + Y * Y + Z * Z); } }
+        public Vector Normalized { get { return new Vector(X / Length, Y / Length, Z / Length); } }
 
         public Vector() { X = 0; Y = 0; Z = 0; }
 
@@ -35,12 +36,7 @@ namespace RayTracor.RayTracor
             Y /= len;
             Z /= len;
         }
-
-        public Vector Normalized()
-        {
-            return new Vector(X / Length, Y / Length, Z / Length);
-        }
-
+        
         public static double DotProduct(Vector u, Vector v)
         {
             return u.X * v.X + u.Y * v.Y + u.Z * v.Z;
