@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +25,8 @@ namespace RayTracor.RayTracor
 
         public Vector(double x, double y, double z) { X = x; Y = y; Z = z; }
 
+        public Vector(Color color) { X = color.R; Y = color.G; Z = color.B; }
+
         public override string ToString()
         {
             return string.Format("[{0}, {1}, {2}]", X, Y, Z);
@@ -35,6 +38,11 @@ namespace RayTracor.RayTracor
             X /= len;
             Y /= len;
             Z /= len;
+        }
+
+        public Color ToColor()
+        {
+            return Color.FromArgb(X.ClampToInt(0, 255), Y.ClampToInt(0, 255), Z.ClampToInt(0, 255));
         }
         
         public static double DotProduct(Vector u, Vector v)
@@ -64,6 +72,11 @@ namespace RayTracor.RayTracor
         public static Vector operator *(Vector v1, double k)
         {
             return new Vector(v1.X * k, v1.Y * k, v1.Z * k);
+        }
+
+        public static Vector operator /(Vector v1, double k)
+        {
+            return new Vector(v1.X / k, v1.Y / k, v1.Z / k);
         }
     }
 }

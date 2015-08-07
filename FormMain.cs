@@ -16,12 +16,14 @@ namespace RayTracor
         public FormMain()
         {
             InitializeComponent();
+            this.Load += FormMain_Load;
+        }
 
-            Vector u = Vector.UnitX * 2.0;
-            Vector v = Vector.UnitY * 5.0;
-            Vector w = Vector.CrossProduct(u, v);
-            Vector l = u - v;
-            
+        void FormMain_Load(object sender, EventArgs e)
+        {
+            Scene s = new Scene();
+            pictureBox1.Image = s.Render(pictureBox1.Width, pictureBox1.Height);
+            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
         }
     }
 }

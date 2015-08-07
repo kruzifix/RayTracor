@@ -10,8 +10,8 @@ namespace RayTracor.RayTracor
     {
         public double Radius { get; set; }
 
-        public Sphere(Vector position, double radius)
-            : base(position)
+        public Sphere(Vector position, double radius, Material material)
+            : base(position, material)
         {
             Radius = radius;
         }
@@ -19,7 +19,7 @@ namespace RayTracor.RayTracor
         public override IntersectionResult Intersects(Ray ray)
         {
             Vector rayToCenter = Position - ray.Start;
-            double v = Vector.DotProduct(rayToCenter, ray.Start);
+            double v = Vector.DotProduct(rayToCenter, ray.Direction);
             double eoDot = Vector.DotProduct(rayToCenter, rayToCenter);
             double discriminant = Radius * Radius - eoDot + v * v;
 
@@ -30,7 +30,7 @@ namespace RayTracor.RayTracor
 
         public override Vector Normal(Vector point)
         {
-            return (point - Position).Normalized();
+            return (point - Position).Normalized;
         }
     }
 }

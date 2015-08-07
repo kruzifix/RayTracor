@@ -16,12 +16,22 @@ namespace RayTracor.RayTracor
         public Ray(Vector start, Vector direction)
         {
             Start = start;
-            Direction = direction;
+            Direction = direction.Normalized;
         }
 
         public Vector PointAt(double k)
         {
             return Start + Direction * k;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("<{0}, {1}>", Start, Direction);
+        }
+
+        public static Ray FromTo(Vector from, Vector to)
+        {
+            return new Ray(from, to - from);
         }
     }
 
@@ -40,12 +50,12 @@ namespace RayTracor.RayTracor
     public class SceneIntersectionResult
     {
         public Object Object { get; set; }
-        public IntersectionResult Distance { get; set; }
+        public IntersectionResult Result { get; set; }
 
-        public SceneIntersectionResult(Object obj, IntersectionResult dist)
+        public SceneIntersectionResult(Object obj, IntersectionResult res)
         {
-            Object = interObj;
-            Distance = dist;
+            Object = obj;
+            Result = res;
         }
     }
 }
