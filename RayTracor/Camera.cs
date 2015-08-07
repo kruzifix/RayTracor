@@ -23,7 +23,7 @@ namespace RayTracor.RayTracor
 
         public static Camera CreateLookAt(Vector position, Vector target, double fov)
         {
-            return new Camera(position, (target - position).Normalized(), fov);
+            return new Camera(position, (target - position).Normalized, fov);
         }
     }
 }
