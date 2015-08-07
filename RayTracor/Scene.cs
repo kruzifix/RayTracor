@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace RayTracor.RayTracor
 {
@@ -57,6 +58,7 @@ namespace RayTracor.RayTracor
                 }
             }
 
+            Marshal.Copy(pixelData, 0, bmpData.Scan0, pixelData.Length);
 
             bmp.UnlockBits(bmpData);
             return bmp;
@@ -87,15 +89,7 @@ namespace RayTracor.RayTracor
 
                 if (res.Intersects)
                 {
-                    if (closestDist.Intersects)
-                    {
-                        if (res.Distance < closestDist.Distance)
-                        {
-                            closestDist.Distance = res.Distance;
-                            closestObj = o;
-                        }
-                    }
-                    else
+                    if ((res.Distance < closestDist.Distance) || !closestDist.Intersects)
                     {
                         closestDist.Intersects = true;
                         closestDist.Distance = res.Distance;
