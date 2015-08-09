@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RayTracor.RayTracor
+namespace RayTracor.RayTracorLib
 {
     public abstract class Object
     {
@@ -16,6 +16,7 @@ namespace RayTracor.RayTracor
 
         public abstract IntersectionResult Intersects(Ray ray);
         public abstract Vector Normal(Vector point);
+        public abstract Vector EvalMaterial(Vector point, double lambertAmount);
     }
 
     public class Material

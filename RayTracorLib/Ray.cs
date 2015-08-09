@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RayTracor.RayTracor
+namespace RayTracor.RayTracorLib
 {
     public class Ray
     {
@@ -22,6 +22,11 @@ namespace RayTracor.RayTracor
         public Vector PointAt(double k)
         {
             return Start + Direction * k;
+        }
+
+        public Ray Reflect(Vector point, Vector normal)
+        {
+            return new Ray(point, Direction - normal * 2.0 * Vector.DotProduct(Direction, normal));
         }
 
         public override string ToString()

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RayTracor.RayTracor
+namespace RayTracor.RayTracorLib
 {
     public class Vector
     {
@@ -13,13 +13,13 @@ namespace RayTracor.RayTracor
         public static readonly Vector UnitX = new Vector(1, 0, 0);
         public static readonly Vector UnitY = new Vector(0, 1, 0);
         public static readonly Vector UnitZ = new Vector(0, 0, 1);
-
+        
         public double X { get; set; }
         public double Y { get; set; }
         public double Z { get; set; }
 
         public double Length { get { return Math.Sqrt(X * X + Y * Y + Z * Z); } }
-        public Vector Normalized { get { return new Vector(X / Length, Y / Length, Z / Length); } }
+        public Vector Normalized { get { double len = Length; return new Vector(X / len, Y / len, Z / len); } }
 
         public Vector() { X = 0; Y = 0; Z = 0; }
 
@@ -73,7 +73,7 @@ namespace RayTracor.RayTracor
         {
             return new Vector(v1.X * k, v1.Y * k, v1.Z * k);
         }
-
+        
         public static Vector operator /(Vector v1, double k)
         {
             return new Vector(v1.X / k, v1.Y / k, v1.Z / k);
