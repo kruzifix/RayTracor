@@ -43,7 +43,7 @@ namespace RayTracor.RayTracorLib
 
             Vector col = Material.Color.ToVector();
             if (x % 2 == 0 ^ y % 2 == 0)
-                col = Color.Black.ToVector();
+                col *= 0.5;
             return col * lambertAmount * Material.Lambert + col * Material.Ambient;
         }
     }

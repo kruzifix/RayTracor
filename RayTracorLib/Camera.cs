@@ -25,6 +25,9 @@ namespace RayTracor.RayTracorLib
         public Vector Right { get { return right; } }
         public Vector Up { get { return up; } }
 
+        public int Width { get { return width; } }
+        public int Height { get { return height; } }
+
         public Camera() 
         { 
             pos = Vector.Zero; 

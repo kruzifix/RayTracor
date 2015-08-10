@@ -24,7 +24,7 @@ namespace RayTracor.RayTracorLib
         public Scene()
         {
             //camera = Camera.CreateLookAt(new Vector(0, 1.8, 10), new Vector(0, 3, 0), new Vector(0,1,0), 45.0 * Math.PI / 180.0);
-            camera = Camera.CreateLookAt(new Vector(0, 3, 12), new Vector(0, 2, 0), new Vector(0, 1, 0), 45.0 * Math.PI / 180.0);
+            camera = Camera.CreateLookAt(new Vector(0, 3, 12), new Vector(0, 0, 0), new Vector(0, 1, 0), 45.0 * Math.PI / 180.0);
             lights = new List<Light>();
             objects = new List<Object>();
 
@@ -58,50 +58,50 @@ namespace RayTracor.RayTracorLib
             //        Lambert = 0.7
             //    }));
 
-            //objects.Add(new Sphere(new Vector(0, 0, 0), 2,
-            //    new Material
-            //    {
-            //        Ambient = 0.1,
-            //        Specular = 0.0,
-            //        Color = Color.FromArgb(222, 194, 102),
-            //        Lambert = 0.7
-            //    }));
-
-            //int numSpheres = 10;
-            //Random rand = new Random();
-            //for (int i = 0; i < numSpheres; i++)
-            //{
-            //    double x = rand.NextDouble(-3, 3);
-            //    double y = rand.NextDouble(-2, 2);
-            //    double z = rand.NextDouble(-5, 2);
-
-            //    double radius = rand.NextDouble(0.3, 1.5);
-
-            //    objects.Add(new Sphere(new Vector(x, y, z), radius,
-            //        new Material
-            //        {
-            //            Ambient = 0.1,
-            //            Specular = 0.0,
-            //            Color = Extensions.ColorFromHSV(rand.NextDouble() * 360.0, 0.7, 0.8),
-            //            Lambert = 0.7
-            //        }));
-            //}
-
-            Random rand = new Random();
-            for (int x = 0; x < 5; x++)
-            {
-                for (int y = 0; y < 5; y++)
+            objects.Add(new Sphere(new Vector(0, 0, 0), 2,
+                new Material
                 {
-                    for (int z = 0; z < 5; z++)
+                    Ambient = 0.1,
+                    Specular = 0.0,
+                    Color = Color.FromArgb(222, 194, 102),
+                    Lambert = 0.7
+                }));
+
+            int numSpheres = 10;
+            Random rand = new Random();
+            for (int i = 0; i < numSpheres; i++)
+            {
+                double x = rand.NextDouble(-3, 3);
+                double y = rand.NextDouble(-2, 2);
+                double z = rand.NextDouble(-5, 2);
+
+                double radius = rand.NextDouble(0.3, 1.5);
+
+                objects.Add(new Sphere(new Vector(x, y, z), radius,
+                    new Material
                     {
-                        objects.Add(new Sphere(
-                            new Vector(x - 2, y, z - 2), 0.25, new Material
-                            {
-                                Ambient = 0.1, Specular = 0, Color = Extensions.ColorFromHSV(rand.NextDouble() * 360.0, 0.7, 0.8), Lambert = 0.7
-                            }));
-                    }
-                }
+                        Ambient = 0.1,
+                        Specular = 0.0,
+                        Color = Extensions.ColorFromHSV(rand.NextDouble() * 360.0, 0.7, 0.8),
+                        Lambert = 0.7
+                    }));
             }
+
+            //Random rand = new Random();
+            //for (int x = 0; x < 5; x++)
+            //{
+            //    for (int y = 0; y < 5; y++)
+            //    {
+            //        for (int z = 0; z < 5; z++)
+            //        {
+            //            objects.Add(new Sphere(
+            //                new Vector(x - 2, y, z - 2), 0.25, new Material
+            //                {
+            //                    Ambient = 0.1, Specular = 0, Color = Extensions.ColorFromHSV(rand.NextDouble() * 360.0, 0.7, 0.8), Lambert = 0.7
+            //                }));
+            //        }
+            //    }
+            //}
 
             //objects.Add(new Plane(new Vector(0,0,0), new Vector(0,-1,0), new Material { Ambient = 0.1, Specular = 0.0, Color = Color.FromArgb(50, 155, 30), Lambert = 0.7 }));
             objects.Add(new Plane(new Vector(0, -2, 0), new Vector(0, 1, 0), new Material { Ambient = 0.1, Specular = 0.0, Color = Color.White, Lambert = 0.7 }));
@@ -139,6 +139,35 @@ namespace RayTracor.RayTracorLib
 
             bmp.UnlockBits(bmpData);
             return bmp;
+        }
+
+        public void SetResolution(int width, int height)
+        {
+            camera.SetResolution(width, height);
+        }
+
+        public byte[] Render(int x, int y, int width, int height)
+        { 
+            byte[] pixels = new byte[width * 3 * height];
+
+            int stride = width * 3;
+            
+            for (int xx = 0; xx < width; xx++)
+            {
+                for (int yy = 0; yy < height; yy++)
+                {
+                    Ray pixelRay = camera.CastRay(xx + x, yy + y);
+                    Color? pixelColor = Trace(pixelRay, 0);
+                    Color colr = Color.Magenta;
+                    if (pixelColor.HasValue)
+                        colr = pixelColor.Value;
+                    pixels[(yy * stride + xx * 3) + 0] = colr.B;
+                    pixels[(yy * stride + xx * 3) + 1] = colr.G;
+                    pixels[(yy * stride + xx * 3) + 2] = colr.R;
+                }
+            }
+
+            return pixels;
         }
 
         private Color? Trace(Ray ray, int depth)
