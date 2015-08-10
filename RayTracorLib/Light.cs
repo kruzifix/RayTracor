@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace RayTracor.RayTracorLib
 {
@@ -20,6 +21,30 @@ namespace RayTracor.RayTracorLib
             Position = position;
             Color = color;
             Strength = strength;
+        }
+
+        public virtual bool IsVisibleFrom(Vector position)
+        {
+            return true;
+        }
+
+        public virtual void Serialize(XmlDocument doc)
+        {
+            XmlNode lNode = doc.CreateElement("Light");
+
+            XmlNode posNode = Position.Serialize(doc, "Position");
+            lNode.AppendChild(posNode);
+
+            XmlNode colNode = Color.Serialize(doc, "Color");
+            lNode.AppendChild(colNode);
+
+            XmlNode fovNode = doc.CreateElement("Strength");
+            XmlAttribute fovAtr = doc.CreateAttribute("Value");
+            fovAtr.Value = Strength.ToString();
+            fovNode.Attributes.Append(fovAtr);
+            lNode.AppendChild(fovNode);
+
+            doc.SelectSingleNode("//Scene/Lights").AppendChild(lNode);
         }
     }
 }

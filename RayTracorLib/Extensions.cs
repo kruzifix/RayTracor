@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace RayTracor.RayTracorLib
 {
@@ -31,6 +32,16 @@ namespace RayTracor.RayTracorLib
             if (value > max)
                 return max;
             return value;
+        }
+
+        public static double ToRadians(this double value)
+        {
+            return value * Math.PI / 180.0;
+        }
+
+        public static double ToDegrees(this double value)
+        {
+            return value * 180.0 / Math.PI;
         }
 
         public static void DrawLine(this Graphics g, Pen pen, double x1, double y1, double x2, double y2)
@@ -75,6 +86,26 @@ namespace RayTracor.RayTracorLib
             else if (hi == 4)
                 return Color.FromArgb(255, t, p, v);
             return Color.FromArgb(255, v, p, q);
+        }
+
+        public static XmlNode Serialize(this Color color, XmlDocument doc, string name)
+        {
+            XmlNode node = doc.CreateElement(name);
+            XmlAttribute atrA = doc.CreateAttribute("A");
+            atrA.Value = color.A.ToString();
+            XmlAttribute atrR = doc.CreateAttribute("R");
+            atrR.Value = color.R.ToString();
+            XmlAttribute atrG = doc.CreateAttribute("G");
+            atrG.Value = color.G.ToString();
+            XmlAttribute atrB = doc.CreateAttribute("B");
+            atrB.Value = color.B.ToString();
+
+            node.Attributes.Append(atrA);
+            node.Attributes.Append(atrR);
+            node.Attributes.Append(atrG);
+            node.Attributes.Append(atrB);
+
+            return node;
         }
     }
 }

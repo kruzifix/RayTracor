@@ -114,7 +114,7 @@ namespace RayTracor
         private void DrawCamera()
         {
             Vector2 start = new Vector2(camera.Position.X, camera.Position.Z);
-            Vector2 dir = new Vector2(camera.Direction.X, camera.Direction.Z);
+            Vector2 dir = new Vector2(camera.Direction.X, camera.Direction.Z).Normalized;
             Vector2 orth = new Vector2(-dir.Y, dir.X);
 
             Vector2 left = dir - orth * camera.Tan;
@@ -127,7 +127,6 @@ namespace RayTracor
             DrawLine(cpen, start, start + left * 2.0);
             DrawLine(cpen, start, start + right * 2.0);
             DrawLine(cpen, start + left * 2.0, start + right * 2.0);
-            
         }
 
         private void DrawLight(Light l)
@@ -141,6 +140,22 @@ namespace RayTracor
             Rectangle rect = new Rectangle((int)(pc.X - crossSize * 0.6), (int)(pc.Y - crossSize * 0.6), (int)(crossSize * 1.2), (int)(crossSize * 1.2));
             g.FillEllipse(new SolidBrush(l.Color), rect);
             g.DrawEllipse(Pens.Black, rect);
+
+            if (l is SpotLight)
+            { 
+                SpotLight s = l as SpotLight;
+                Vector2 dir = new Vector2(s.Direction.X, s.Direction.Z);
+                if (dir.Length == 0.0)
+                    return;
+                dir.Normalize();
+                Vector2 orth = new Vector2(-dir.Y, dir.X) * Math.Tan(s.Angle.ToRadians());
+
+                Vector2 left = dir - orth;
+                Vector2 right = dir + orth;
+
+                DrawLine(Pens.Blue, center, center + left * 50.0);
+                DrawLine(Pens.Blue, center, center + right * 50.0);
+            }
         }
 
         private void DrawObject(RayTracorLib.Object obj)

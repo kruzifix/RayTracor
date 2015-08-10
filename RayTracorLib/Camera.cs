@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace RayTracor.RayTracorLib
 {
@@ -19,7 +20,7 @@ namespace RayTracor.RayTracorLib
         public Vector Position { get { return pos; } set { pos = value; UpdateRightUp(); } }
         public Vector Direction { get { return dir; } set { dir = value; UpdateRightUp(); } }
         public Vector GlobalUp { get { return gup; } set { gup = value; UpdateRightUp(); } }
-        public double FOV { get { return fov; } set { fov = value; tan = Math.Tan(FOV / 2.0); } }
+        public double FOV { get { return fov; } set { fov = value; tan = Math.Tan(FOV.ToRadians() / 2.0); } }
         public double Tan { get { return tan; } }
 
         public Vector Right { get { return right; } }
@@ -90,6 +91,35 @@ namespace RayTracor.RayTracorLib
             double yy = y * ys - 1.0;
 
             return new Ray(pos, dir + right * xx * tan - up * yy * tanratio);
+        }
+
+        public void Serialize(XmlDocument doc)
+        {
+            XmlNode cam = doc.CreateElement("Camera");
+
+            XmlNode posNode = Position.Serialize(doc, "Position");
+            cam.AppendChild(posNode);
+            XmlNode dirNode = Direction.Serialize(doc, "Direction");
+            cam.AppendChild(dirNode);
+            XmlNode gupNode = GlobalUp.Serialize(doc, "GlobalUp");
+            cam.AppendChild(gupNode);
+            XmlNode fovNode = doc.CreateElement("FOV");
+            XmlAttribute fovAtr = doc.CreateAttribute("Value");
+            fovAtr.Value = fov.ToString();
+            fovNode.Attributes.Append(fovAtr);
+            cam.AppendChild(fovNode);
+
+            doc.SelectSingleNode("//Scene").AppendChild(cam);
+        }
+
+        public static Camera Parse(XmlNode camNode)
+        {
+            Vector pos = Vector.Parse(camNode["Position"]);
+            Vector dir = Vector.Parse(camNode["Direction"]);
+            Vector gup = Vector.Parse(camNode["GlobalUp"]);
+            double fov = double.Parse(camNode["FOV"].Attributes["Value"].Value);
+
+            return new Camera(pos, dir, gup, fov);
         }
 
         public static Camera CreateLookAt(Vector position, Vector target, Vector up, double fov)

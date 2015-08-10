@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace RayTracor.RayTracorLib
 {
@@ -44,6 +45,23 @@ namespace RayTracor.RayTracorLib
         {
             return Color.FromArgb(X.ClampToInt(0, 255), Y.ClampToInt(0, 255), Z.ClampToInt(0, 255));
         }
+
+        public XmlNode Serialize(XmlDocument doc, string name)
+        {
+            XmlNode node = doc.CreateElement(name);
+            XmlAttribute atrX = doc.CreateAttribute("X");
+            atrX.Value = X.ToString();
+            XmlAttribute atrY = doc.CreateAttribute("Y");
+            atrY.Value = Y.ToString();
+            XmlAttribute atrZ = doc.CreateAttribute("Z");
+            atrZ.Value = Z.ToString();
+
+            node.Attributes.Append(atrX);
+            node.Attributes.Append(atrY);
+            node.Attributes.Append(atrZ);
+
+            return node;
+        }
         
         public static double DotProduct(Vector u, Vector v)
         {
@@ -57,6 +75,15 @@ namespace RayTracor.RayTracorLib
                 u.Z * v.X - u.X * v.Z,
                 u.X * v.Y - u.Y * v.X
                 );
+        }
+
+        public static Vector Parse(XmlElement node)
+        {
+            double x = double.Parse(node.Attributes["X"].Value);
+            double y = double.Parse(node.Attributes["Y"].Value);
+            double z = double.Parse(node.Attributes["Z"].Value);
+
+            return new Vector(x, y, z);
         }
 
         public static Vector operator +(Vector v1, Vector v2)

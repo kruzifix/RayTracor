@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using System.Xml;
 
 namespace RayTracor.RayTracorLib
 {
@@ -23,13 +24,15 @@ namespace RayTracor.RayTracorLib
 
         public Scene()
         {
-            //camera = Camera.CreateLookAt(new Vector(0, 1.8, 10), new Vector(0, 3, 0), new Vector(0,1,0), 45.0 * Math.PI / 180.0);
-            camera = Camera.CreateLookAt(new Vector(0, 3, 12), new Vector(0, 0, 0), new Vector(0, 1, 0), 45.0 * Math.PI / 180.0);
+            //camera = Camera.CreateLookAt(new Vector(0, 1.8, 10), new Vector(0, 3, 0), new Vector(0,1,0), 45.0);
+            //camera = Camera.CreateLookAt(new Vector(0, 3, 12), new Vector(0, 0, 0), new Vector(0, 1, 0), 45.0);
             lights = new List<Light>();
             objects = new List<Object>();
 
             //lights.Add(new Light(new Vector(-30, -10, 20), Color.White, 1));
             lights.Add(new Light(new Vector(7, 10, 7), Color.White, 1));
+            //lights.Add(new SpotLight(new Vector(0, 10, 0), Color.White, 1, new Vector(0, -1, 0), 20.0));
+            lights.Add(SpotLight.FromTo(new Vector(0, 10, 5), new Vector(0,0,0), Color.White, 1, 20.0));
 
             //objects.Add(new Sphere(new Vector(0, 3.5, -3), 3,
             //    new Material
@@ -58,34 +61,35 @@ namespace RayTracor.RayTracorLib
             //        Lambert = 0.7
             //    }));
 
-            objects.Add(new Sphere(new Vector(0, 0, 0), 2,
-                new Material
-                {
-                    Ambient = 0.1,
-                    Specular = 0.0,
-                    Color = Color.FromArgb(222, 194, 102),
-                    Lambert = 0.7
-                }));
+            //objects.Add(new Sphere(new Vector(0, 1, -4), 2,
+            //    new Material
+            //    {
+            //        Ambient = 0.1,
+            //        Specular = 0.0,
+            //        Color = Color.GreenYellow,
+            //        Lambert = 0.7, Textured = true
+            //    }));
 
-            int numSpheres = 10;
-            Random rand = new Random();
-            for (int i = 0; i < numSpheres; i++)
-            {
-                double x = rand.NextDouble(-3, 3);
-                double y = rand.NextDouble(-2, 2);
-                double z = rand.NextDouble(-5, 2);
+            //int numSpheres = 10;
+            //Random rand = new Random();
+            //for (int i = 0; i < numSpheres; i++)
+            //{
+            //    double x = rand.NextDouble(-3, 3);
+            //    double y = rand.NextDouble(-1, 1);
+            //    double z = rand.NextDouble(-5, 2);
 
-                double radius = rand.NextDouble(0.3, 1.5);
+            //    double radius = rand.NextDouble(0.3, 1.3);
 
-                objects.Add(new Sphere(new Vector(x, y, z), radius,
-                    new Material
-                    {
-                        Ambient = 0.1,
-                        Specular = 0.0,
-                        Color = Extensions.ColorFromHSV(rand.NextDouble() * 360.0, 0.7, 0.8),
-                        Lambert = 0.7
-                    }));
-            }
+            //    objects.Add(new Sphere(new Vector(x, y, z), radius,
+            //        new Material
+            //        {
+            //            Ambient = 0.1,
+            //            Specular = 0.0,
+            //            Color = Extensions.ColorFromHSV(rand.NextDouble() * 360.0, 0.7, 0.8),
+            //            Lambert = 0.7,
+            //            Textured = true
+            //        }));
+            //}
 
             //Random rand = new Random();
             //for (int x = 0; x < 5; x++)
@@ -104,7 +108,7 @@ namespace RayTracor.RayTracorLib
             //}
 
             //objects.Add(new Plane(new Vector(0,0,0), new Vector(0,-1,0), new Material { Ambient = 0.1, Specular = 0.0, Color = Color.FromArgb(50, 155, 30), Lambert = 0.7 }));
-            objects.Add(new Plane(new Vector(0, -2, 0), new Vector(0, 1, 0), new Material { Ambient = 0.1, Specular = 0.0, Color = Color.White, Lambert = 0.7 }));
+            //objects.Add(new Plane(new Vector(0, 0, 0), new Vector(0, 1, 0), new Material { Ambient = 0.1, Specular = 0.4, Color = Color.White, Lambert = 0.7, Textured = false }));
 
             backgroundColor = Color.White;
         }
@@ -196,15 +200,13 @@ namespace RayTracor.RayTracorLib
 
             lambertAmount = Math.Min(1, lambertAmount);
 
-            //Vector col = new Vector(sir.Object.Material.Color);
-            //double lambert = sir.Object.Material.Lambert;
-            //double ambient = sir.Object.Material.Ambient;
             double specular = sir.Object.Material.Specular;
-            //Vector result = col * lambertAmount * lambert + col * ambient;
-            Vector result = sir.Object.EvalMaterial(point, lambertAmount);
+            Vector result = sir.Object.EvalMaterial(point, normal, lambertAmount);
+            
             if (specular != 0.0)
             {
                 Ray reflected = ray.Reflect(point, normal);
+                reflected.Start += reflected.Direction * 0.01;
 
                 Color? reflectColor = Trace(reflected, depth + 1);
                 if (reflectColor.HasValue)
@@ -234,6 +236,9 @@ namespace RayTracor.RayTracorLib
 
         private bool IsLightVisible(Vector point, Light light)
         {
+            if (!light.IsVisibleFrom(point))
+                return false;
+
             Ray ray = Ray.FromTo(point, light.Position);
 
             foreach (Object o in objects)
@@ -243,6 +248,41 @@ namespace RayTracor.RayTracorLib
                     return false;
             }
             return true;
+        }
+
+        public XmlDocument Serialize()
+        {
+            XmlDocument doc = new XmlDocument();
+            XmlNode root = doc.CreateElement("Scene");
+            doc.AppendChild(root);
+
+            // camera
+            camera.Serialize(doc);
+
+            // lights
+            XmlNode lightsNode = doc.CreateElement("Lights");
+            root.AppendChild(lightsNode);
+            foreach (Light l in lights)
+            {
+                l.Serialize(doc);
+            }
+
+            // objects
+
+            return doc;
+        }
+
+        public static Scene Parse(XmlNode doc)
+        {
+            Scene s = new Scene();
+            Camera cam = Camera.Parse(doc["Camera"]);
+            s.camera = cam;
+            
+            // lights
+
+            // objects
+
+            return s;
         }
     }
 }

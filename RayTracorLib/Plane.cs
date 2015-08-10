@@ -36,14 +36,17 @@ namespace RayTracor.RayTracorLib
             return normal;
         }
 
-        public override Vector EvalMaterial(Vector point, double lambertAmount)
+        public override Vector EvalMaterial(Vector point, Vector normal, double lambertAmount)
         {
-            double x = Math.Floor(point.X);
-            double y = Math.Floor(point.Z);
-
             Vector col = Material.Color.ToVector();
-            if (x % 2 == 0 ^ y % 2 == 0)
-                col *= 0.5;
+            if (Material.Textured)
+            {
+                double x = Math.Floor(point.X);
+                double y = Math.Floor(point.Z);
+
+                if (x % 2 == 0 ^ y % 2 == 0)
+                    col *= 0.5;
+            }
             return col * lambertAmount * Material.Lambert + col * Material.Ambient;
         }
     }

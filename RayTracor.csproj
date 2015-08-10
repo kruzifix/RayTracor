@@ -66,6 +66,7 @@
     <Compile Include="RayTracorLib\Ray.cs" />
     <Compile Include="RayTracorLib\Scene.cs" />
     <Compile Include="RayTracorLib\Sphere.cs" />
+    <Compile Include="RayTracorLib\SpotLight.cs" />
     <Compile Include="RayTracorLib\Vector.cs" />
     <Compile Include="RayTracorLib\Vector2.cs" />
     <Compile Include="RayTracorLib\RenderControl.cs">

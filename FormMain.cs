@@ -13,6 +13,7 @@ using System.IO;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Xml;
 
 namespace RayTracor
 {
@@ -48,7 +49,13 @@ namespace RayTracor
             //}
 
             scene = new Scene();
+            scene.camera = Camera.CreateLookAt(new Vector(0, 3, 12), new Vector(0, 0, 0), new Vector(0, 1, 0), 60);
+            scene.Serialize().Save("scene.xml");
 
+            XmlDocument doc = new XmlDocument();
+            doc.Load("scene.xml");
+            scene = Scene.Parse(doc["Scene"]);
+            
             renderControl.camera = scene.camera;
             renderControl.objects.AddRange(scene.objects);
             renderControl.lights.AddRange(scene.lights);

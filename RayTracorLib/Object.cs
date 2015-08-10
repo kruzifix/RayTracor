@@ -11,12 +11,12 @@ namespace RayTracor.RayTracorLib
     {
         public Vector Position { get; set; }
         public Material Material { get; set; }
-
+        
         protected Object(Vector position, Material material) { Position = position; Material = material; }
 
         public abstract IntersectionResult Intersects(Ray ray);
         public abstract Vector Normal(Vector point);
-        public abstract Vector EvalMaterial(Vector point, double lambertAmount);
+        public abstract Vector EvalMaterial(Vector point, Vector normal, double lambertAmount);
     }
 
     public class Material
@@ -25,6 +25,7 @@ namespace RayTracor.RayTracorLib
         public double Lambert { get; set; }
         public double Ambient { get; set; }
         public Color Color { get; set; }
+        public bool Textured { get; set; }
 
         public Material() { }
     }
