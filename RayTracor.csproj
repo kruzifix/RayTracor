@@ -61,6 +61,7 @@
     <Compile Include="RayTracorLib\Camera.cs" />
     <Compile Include="RayTracorLib\Extensions.cs" />
     <Compile Include="RayTracorLib\Light.cs" />
+    <Compile Include="RayTracorLib\Material.cs" />
     <Compile Include="RayTracorLib\Object.cs" />
     <Compile Include="RayTracorLib\Plane.cs" />
     <Compile Include="RayTracorLib\Ray.cs" />
@@ -105,6 +106,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="roadmap.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

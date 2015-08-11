@@ -35,12 +35,5 @@ namespace RayTracor
             else
                 e.Graphics.DrawImage(bmp, 0, 0, (int)width, pBox.Height);
         }
-
-        private void pBox_DoubleClick(object sender, EventArgs e)
-        {
-            this.Width = pBox.Image.Width + 16;
-            this.Height = pBox.Image.Height + 39;
-            this.CenterToScreen();
-        }
     }
 }

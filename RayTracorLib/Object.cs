@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace RayTracor.RayTracorLib
 {
@@ -17,16 +18,13 @@ namespace RayTracor.RayTracorLib
         public abstract IntersectionResult Intersects(Ray ray);
         public abstract Vector Normal(Vector point);
         public abstract Vector EvalMaterial(Vector point, Vector normal, double lambertAmount);
-    }
 
-    public class Material
-    {
-        public double Specular { get; set; }
-        public double Lambert { get; set; }
-        public double Ambient { get; set; }
-        public Color Color { get; set; }
-        public bool Textured { get; set; }
+        public abstract void Serialize(XmlDocument doc, XmlNode parent);
 
-        public Material() { }
+        protected void SerializeBase(XmlDocument doc, XmlNode parent)
+        {
+            parent.AppendChild(Position.Serialize(doc, "position"));
+            Material.Serialize(doc, parent);
+        }
     }
 }

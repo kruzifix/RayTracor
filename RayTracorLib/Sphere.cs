@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace RayTracor.RayTracorLib
 {
@@ -92,6 +93,25 @@ namespace RayTracor.RayTracorLib
                 col *= pattern ? 0.5 : 1;
             }
             return col * lambertAmount * Material.Lambert + col * Material.Ambient;
+        }
+
+        public override void Serialize(XmlDocument doc, XmlNode parent)
+        {
+            XmlNode node = doc.CreateElement("sphere");
+
+            SerializeBase(doc, node);
+            node.AppendChild(Radius.Serialize(doc, "radius"));
+            
+            parent.AppendChild(node);
+        }
+
+        public static Sphere Parse(XmlNode node)
+        {
+            Vector pos = Vector.Parse(node["position"]);
+            Material mat = Material.Parse(node["material"]);
+            double radius = node["radius"].ParseDouble();
+
+            return new Sphere(pos, radius, mat);
         }
     }
 }

@@ -41,7 +41,6 @@
             this.pBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pBox.TabIndex = 0;
             this.pBox.TabStop = false;
-            this.pBox.DoubleClick += new System.EventHandler(this.pBox_DoubleClick);
             // 
             // FormShowRender
             // 
