@@ -49,11 +49,11 @@ namespace RayTracor.RayTracorLib
         public XmlNode Serialize(XmlDocument doc, string name)
         {
             XmlNode node = doc.CreateElement(name);
-            XmlAttribute atrX = doc.CreateAttribute("X");
+            XmlAttribute atrX = doc.CreateAttribute("x");
             atrX.Value = X.ToString();
-            XmlAttribute atrY = doc.CreateAttribute("Y");
+            XmlAttribute atrY = doc.CreateAttribute("y");
             atrY.Value = Y.ToString();
-            XmlAttribute atrZ = doc.CreateAttribute("Z");
+            XmlAttribute atrZ = doc.CreateAttribute("z");
             atrZ.Value = Z.ToString();
 
             node.Attributes.Append(atrX);
@@ -79,9 +79,9 @@ namespace RayTracor.RayTracorLib
 
         public static Vector Parse(XmlElement node)
         {
-            double x = double.Parse(node.Attributes["X"].Value);
-            double y = double.Parse(node.Attributes["Y"].Value);
-            double z = double.Parse(node.Attributes["Z"].Value);
+            double x = double.Parse(node.Attributes["x"].Value);
+            double y = double.Parse(node.Attributes["y"].Value);
+            double z = double.Parse(node.Attributes["z"].Value);
 
             return new Vector(x, y, z);
         }

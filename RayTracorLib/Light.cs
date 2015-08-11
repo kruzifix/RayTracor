@@ -23,28 +23,29 @@ namespace RayTracor.RayTracorLib
             Strength = strength;
         }
 
-        public virtual bool IsVisibleFrom(Vector position)
+        public virtual double LightVisibility(Vector position)
         {
-            return true;
+            return 1.0;
         }
 
-        public virtual void Serialize(XmlDocument doc)
+        public virtual void Serialize(XmlDocument doc, XmlNode parent)
         {
-            XmlNode lNode = doc.CreateElement("Light");
+            XmlNode lNode = doc.CreateElement("light");
 
-            XmlNode posNode = Position.Serialize(doc, "Position");
-            lNode.AppendChild(posNode);
+            lNode.AppendChild(Position.Serialize(doc, "position"));
+            lNode.AppendChild(Color.Serialize(doc, "color"));
+            lNode.AppendChild(Strength.Serialize(doc, "strength"));
 
-            XmlNode colNode = Color.Serialize(doc, "Color");
-            lNode.AppendChild(colNode);
+            parent.AppendChild(lNode);
+        }
 
-            XmlNode fovNode = doc.CreateElement("Strength");
-            XmlAttribute fovAtr = doc.CreateAttribute("Value");
-            fovAtr.Value = Strength.ToString();
-            fovNode.Attributes.Append(fovAtr);
-            lNode.AppendChild(fovNode);
+        public static Light Parse(XmlNode li)
+        {
+            Vector pos = Vector.Parse(li["position"]);
+            Color color = li["color"].ParseColor();
+            double strength = li["strength"].ParseDouble();
 
-            doc.SelectSingleNode("//Scene/Lights").AppendChild(lNode);
+            return new Light(pos, color, strength);
         }
     }
 }

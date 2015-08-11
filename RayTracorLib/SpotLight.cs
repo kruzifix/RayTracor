@@ -24,42 +24,48 @@ namespace RayTracor.RayTracorLib
             Angle = angle;
         }
 
-        public override bool IsVisibleFrom(Vector position)
+        public SpotLight(Light lbase, Vector direction, double angle)
+            : base(lbase.Position, lbase.Color, lbase.Strength)
+        {
+            Direction = direction;
+            Angle = angle;
+        }
+
+        public override double LightVisibility(Vector position)
         {
             double a = Vector.DotProduct(Direction, (position - Position).Normalized);
             double b = Math.Acos(a);
 
-            if (b > Angle.ToRadians())
-                return false;
-            return true;
+            double margin = Angle * 0.05;
+
+            if (b < (Angle - margin).ToRadians())
+                return 1.0;
+            if (b > (Angle + margin).ToRadians())
+                return 0.0;
+            return Math.Tanh((Angle - b.ToDegrees()) / margin * 3.0) * 0.5 + 0.5;
         }
 
-        public override void Serialize(System.Xml.XmlDocument doc)
+        public override void Serialize(XmlDocument doc, XmlNode parent)
         {
-            XmlNode lNode = doc.CreateElement("SpotLight");
+            XmlNode lNode = doc.CreateElement("spotlight");
 
-            XmlNode posNode = Position.Serialize(doc, "Position");
-            lNode.AppendChild(posNode);
+            lNode.AppendChild(Position.Serialize(doc, "position"));
+            lNode.AppendChild(Direction.Serialize(doc, "direction"));
+            lNode.AppendChild(Angle.Serialize(doc, "angle"));
+            lNode.AppendChild(Color.Serialize(doc, "color"));
+            lNode.AppendChild(Strength.Serialize(doc, "strength"));
 
-            XmlNode dirNode = Direction.Serialize(doc, "Direction");
-            lNode.AppendChild(dirNode);
-            
-            XmlNode anglNode = doc.CreateElement("Angle");
-            XmlAttribute anglAtr = doc.CreateAttribute("Value");
-            anglAtr.Value = Angle.ToString();
-            anglNode.Attributes.Append(anglAtr);
-            lNode.AppendChild(anglNode);
+            parent.AppendChild(lNode);
+        }
 
-            XmlNode colNode = Color.Serialize(doc, "Color");
-            lNode.AppendChild(colNode);
+        public static new SpotLight Parse(XmlNode li)
+        {
+            Vector dir = Vector.Parse(li["direction"]);
+            double angle = li["angle"].ParseDouble();
 
-            XmlNode fovNode = doc.CreateElement("Strength");
-            XmlAttribute fovAtr = doc.CreateAttribute("Value");
-            fovAtr.Value = Strength.ToString();
-            fovNode.Attributes.Append(fovAtr);
-            lNode.AppendChild(fovNode);
+            Light lbase = Light.Parse(li);
 
-            doc.SelectSingleNode("//Scene/Lights").AppendChild(lNode);
+            return new SpotLight(lbase, dir, angle);
         }
 
         public static SpotLight FromTo(Vector position, Vector point, Color color, double strength, double angle)

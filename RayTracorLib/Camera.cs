@@ -95,29 +95,22 @@ namespace RayTracor.RayTracorLib
 
         public void Serialize(XmlDocument doc)
         {
-            XmlNode cam = doc.CreateElement("Camera");
+            XmlNode cam = doc.CreateElement("camera");
 
-            XmlNode posNode = Position.Serialize(doc, "Position");
-            cam.AppendChild(posNode);
-            XmlNode dirNode = Direction.Serialize(doc, "Direction");
-            cam.AppendChild(dirNode);
-            XmlNode gupNode = GlobalUp.Serialize(doc, "GlobalUp");
-            cam.AppendChild(gupNode);
-            XmlNode fovNode = doc.CreateElement("FOV");
-            XmlAttribute fovAtr = doc.CreateAttribute("Value");
-            fovAtr.Value = fov.ToString();
-            fovNode.Attributes.Append(fovAtr);
-            cam.AppendChild(fovNode);
+            cam.AppendChild(Position.Serialize(doc, "position"));
+            cam.AppendChild(Direction.Serialize(doc, "direction"));
+            cam.AppendChild(GlobalUp.Serialize(doc, "globalup"));
+            cam.AppendChild(fov.Serialize(doc, "fov"));
 
-            doc.SelectSingleNode("//Scene").AppendChild(cam);
+            doc.SelectSingleNode("//scene").AppendChild(cam);
         }
 
         public static Camera Parse(XmlNode camNode)
         {
-            Vector pos = Vector.Parse(camNode["Position"]);
-            Vector dir = Vector.Parse(camNode["Direction"]);
-            Vector gup = Vector.Parse(camNode["GlobalUp"]);
-            double fov = double.Parse(camNode["FOV"].Attributes["Value"].Value);
+            Vector pos = Vector.Parse(camNode["position"]);
+            Vector dir = Vector.Parse(camNode["direction"]);
+            Vector gup = Vector.Parse(camNode["globalup"]);
+            double fov = camNode["fov"].ParseDouble();
 
             return new Camera(pos, dir, gup, fov);
         }

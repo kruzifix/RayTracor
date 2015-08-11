@@ -88,24 +88,55 @@ namespace RayTracor.RayTracorLib
             return Color.FromArgb(255, v, p, q);
         }
 
+        public static string ToHexString(this Color color)
+        {
+            return string.Format("{0:X2}{1:X2}{2:X2}{3:X2}", color.A, color.R, color.G, color.B);
+        }
+
+        public static Color ColorFromHexString(this string s)
+        {
+            int a = int.Parse(s.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
+            int r = int.Parse(s.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+            int g = int.Parse(s.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+            int b = int.Parse(s.Substring(6, 2), System.Globalization.NumberStyles.HexNumber);
+
+            return Color.FromArgb(a, r, g, b);
+        }
+
         public static XmlNode Serialize(this Color color, XmlDocument doc, string name)
         {
             XmlNode node = doc.CreateElement(name);
-            XmlAttribute atrA = doc.CreateAttribute("A");
-            atrA.Value = color.A.ToString();
-            XmlAttribute atrR = doc.CreateAttribute("R");
-            atrR.Value = color.R.ToString();
-            XmlAttribute atrG = doc.CreateAttribute("G");
-            atrG.Value = color.G.ToString();
-            XmlAttribute atrB = doc.CreateAttribute("B");
-            atrB.Value = color.B.ToString();
-
-            node.Attributes.Append(atrA);
-            node.Attributes.Append(atrR);
-            node.Attributes.Append(atrG);
-            node.Attributes.Append(atrB);
-
+            node.InnerText = color.ToHexString();
             return node;
+        }
+
+        public static XmlNode Serialize(this double val, XmlDocument doc, string name)
+        {
+            XmlNode node = doc.CreateElement(name);
+            node.InnerText = val.ToString();
+            return node;
+        }
+
+        public static XmlNode Serialize(this bool b, XmlDocument doc, string name)
+        {
+            XmlNode node = doc.CreateElement(name);
+            node.InnerText = b.ToString().ToLower();
+            return node;
+        }
+
+        public static bool ParseBool(this XmlNode node)
+        {
+            return bool.Parse(node.InnerText);
+        }
+
+        public static double ParseDouble(this XmlNode node)
+        {
+            return double.Parse(node.InnerText);
+        }
+        
+        public static Color ParseColor(this XmlNode node)
+        {
+            return node.InnerText.ColorFromHexString();
         }
     }
 }

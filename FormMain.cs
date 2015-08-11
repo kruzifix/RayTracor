@@ -49,16 +49,48 @@ namespace RayTracor
             //}
 
             scene = new Scene();
-            scene.camera = Camera.CreateLookAt(new Vector(0, 3, 12), new Vector(0, 0, 0), new Vector(0, 1, 0), 60);
-            scene.Serialize().Save("scene.xml");
+            //scene.camera = Camera.CreateLookAt(new Vector(0, 3, 12), new Vector(0, 0, 0), new Vector(0, 1, 0), 60);
+            //scene.lights.Add(new Light(new Vector(7, 10, 7), Color.White, 1));
+            //scene.lights.Add(SpotLight.FromTo(new Vector(0, 10, 5), new Vector(0,0,0), Color.White, 1, 20.0));
 
-            XmlDocument doc = new XmlDocument();
-            doc.Load("scene.xml");
-            scene = Scene.Parse(doc["Scene"]);
+            //scene.objects.Add(new Sphere(new Vector(0, 3.5, -3), 3,
+            //    new Material
+            //    {
+            //        Ambient = 0.1,
+            //        Specular = 0.2,
+            //        Color = Color.FromArgb(222, 194, 102),
+            //        Lambert = 0.7
+            //    }));
+
+            //scene.objects.Add(new Sphere(new Vector(0, 5, 1), 0.2,
+            //    new Material
+            //    {
+            //        Ambient = 0.0,
+            //        Specular = 0.1,
+            //        Color = Color.FromArgb(88, 123, 237),
+            //        Lambert = 0.9
+            //    }));
+
+            //scene.objects.Add(new Sphere(new Vector(4, 3, -1), 0.1,
+            //    new Material
+            //    {
+            //        Ambient = 0.1,
+            //        Specular = 0.2,
+            //        Color = Color.FromArgb(155, 155, 155),
+            //        Lambert = 0.7
+            //    }));
+
+            //scene.objects.Add(new Sphere(new Vector(0, 1, -4), 2,
+            //    new Material
+            //    {
+            //        Ambient = 0.1,
+            //        Specular = 0.0,
+            //        Color = Color.GreenYellow,
+            //        Lambert = 0.7,
+            //        Textured = true
+            //    }));
             
-            renderControl.camera = scene.camera;
-            renderControl.objects.AddRange(scene.objects);
-            renderControl.lights.AddRange(scene.lights);
+            UpdateRenderControl();
 
             for (int i = 0; i < 6; i++)
                 cBoxTasks.Items.Add((int)Math.Pow(2, i));
@@ -66,6 +98,16 @@ namespace RayTracor
 
             cBoxResolution.Items.AddRange(new object[] { "320x240", "640x360", "640x480", "960x540", "1024x768", "1280x720", "1920x1080", "2560x1440", "3840x2160" });
             cBoxResolution.Text = cBoxResolution.Items[0].ToString();
+        }
+
+        private void UpdateRenderControl()
+        {
+            renderControl.camera = scene.camera;
+            renderControl.objects.Clear();
+            renderControl.objects.AddRange(scene.objects);
+            renderControl.lights.Clear();
+            renderControl.lights.AddRange(scene.lights);
+            renderControl.Invalidate();
         }
 
         private void bRender_Click(object sender, EventArgs e)
@@ -180,6 +222,20 @@ namespace RayTracor
         private void renderControl_Click(object sender, EventArgs e)
         {
             renderControl.Focus();
+        }
+
+        private void bSave_Click(object sender, EventArgs e)
+        {
+            scene.Serialize().Save("scene.xml");
+        }
+
+        private void bLoad_Click(object sender, EventArgs e)
+        {
+            XmlDocument doc = new XmlDocument();
+            doc.Load("scene.xml");
+            scene = Scene.Parse(doc["scene"]);
+
+            UpdateRenderControl();
         }
     }
 

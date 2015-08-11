@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace RayTracor.RayTracorLib
 {
@@ -11,7 +12,7 @@ namespace RayTracor.RayTracorLib
     {
         Vector normal;
 
-        public Plane(Vector position, Vector normal, Material material)
+        public Plane(Vector position, Material material, Vector normal)
             :base(position, material)
         {
             this.normal = normal.Normalized;
@@ -22,8 +23,6 @@ namespace RayTracor.RayTracorLib
             double denom = Vector.DotProduct(normal, ray.Direction);
             if (Math.Abs(denom) > 0.0001)
             {
-                //float t = (center - ray.origin).dot(normal) / denom;
-                //if (t >= 0) return true; // you might want to allow an epsilon here too
                 double t = Vector.DotProduct(Position - ray.Start, normal) / denom;
                 if (t > 0.0005)
                     return new IntersectionResult(true, t);
@@ -48,6 +47,25 @@ namespace RayTracor.RayTracorLib
                     col *= 0.5;
             }
             return col * lambertAmount * Material.Lambert + col * Material.Ambient;
+        }
+
+        public override void Serialize(XmlDocument doc, XmlNode parent)
+        {
+            XmlNode node = doc.CreateElement("plane");
+
+            SerializeBase(doc, node);
+            node.AppendChild(normal.Serialize(doc, "normal"));
+
+            parent.AppendChild(node);
+        }
+
+        public static Plane Parse(XmlNode node)
+        {
+            Vector pos = Vector.Parse(node["position"]);
+            Material mat = Material.Parse(node["material"]);
+            Vector normal = Vector.Parse(node["normal"]);
+
+            return new Plane(pos, mat, normal);
         }
     }
 }

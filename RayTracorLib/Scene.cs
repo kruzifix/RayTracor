@@ -26,13 +26,14 @@ namespace RayTracor.RayTracorLib
         {
             //camera = Camera.CreateLookAt(new Vector(0, 1.8, 10), new Vector(0, 3, 0), new Vector(0,1,0), 45.0);
             //camera = Camera.CreateLookAt(new Vector(0, 3, 12), new Vector(0, 0, 0), new Vector(0, 1, 0), 45.0);
+            camera = new Camera();
             lights = new List<Light>();
             objects = new List<Object>();
 
             //lights.Add(new Light(new Vector(-30, -10, 20), Color.White, 1));
-            lights.Add(new Light(new Vector(7, 10, 7), Color.White, 1));
+            //lights.Add(new Light(new Vector(7, 10, 7), Color.White, 1));
             //lights.Add(new SpotLight(new Vector(0, 10, 0), Color.White, 1, new Vector(0, -1, 0), 20.0));
-            lights.Add(SpotLight.FromTo(new Vector(0, 10, 5), new Vector(0,0,0), Color.White, 1, 20.0));
+            //lights.Add(SpotLight.FromTo(new Vector(0, 10, 5), new Vector(0,0,0), Color.White, 1, 20.0));
 
             //objects.Add(new Sphere(new Vector(0, 3.5, -3), 3,
             //    new Material
@@ -190,12 +191,13 @@ namespace RayTracor.RayTracorLib
             double lambertAmount = 0;
             foreach (Light l in lights)
             {
-                if (!IsLightVisible(point, l))
+                double vis = LightVisibility(point, l);
+                if (vis <= 0.0)
                     continue;
 
                 double contribution = Vector.DotProduct((l.Position - point).Normalized, normal);
                 if (contribution > 0)
-                    lambertAmount += contribution;
+                    lambertAmount += contribution * vis;
             }
 
             lambertAmount = Math.Min(1, lambertAmount);
@@ -234,10 +236,11 @@ namespace RayTracor.RayTracorLib
             return new SceneIntersectionResult(closestObj, closestDist);
         }
 
-        private bool IsLightVisible(Vector point, Light light)
+        private double LightVisibility(Vector point, Light light)
         {
-            if (!light.IsVisibleFrom(point))
-                return false;
+            double vis = light.LightVisibility(point);
+            if (vis <= 0.0)
+                return 0.0;
 
             Ray ray = Ray.FromTo(point, light.Position);
 
@@ -245,29 +248,34 @@ namespace RayTracor.RayTracorLib
             {
                 IntersectionResult r = o.Intersects(ray);
                 if (r.Intersects && r.Distance > -0.0005)
-                    return false;
+                    return 0.0;
             }
-            return true;
+            return vis;
         }
 
         public XmlDocument Serialize()
         {
             XmlDocument doc = new XmlDocument();
-            XmlNode root = doc.CreateElement("Scene");
+            XmlNode root = doc.CreateElement("scene");
             doc.AppendChild(root);
+            
+            // background color
+            root.AppendChild(backgroundColor.Serialize(doc, "backgroundcolor"));
 
             // camera
             camera.Serialize(doc);
 
             // lights
-            XmlNode lightsNode = doc.CreateElement("Lights");
+            XmlNode lightsNode = doc.CreateElement("lights");
             root.AppendChild(lightsNode);
             foreach (Light l in lights)
-            {
-                l.Serialize(doc);
-            }
+                l.Serialize(doc, lightsNode);
 
             // objects
+            XmlNode objectsNode = doc.CreateElement("objects");
+            root.AppendChild(objectsNode);
+            foreach (Object o in objects)
+                o.Serialize(doc, objectsNode);
 
             return doc;
         }
@@ -275,12 +283,45 @@ namespace RayTracor.RayTracorLib
         public static Scene Parse(XmlNode doc)
         {
             Scene s = new Scene();
-            Camera cam = Camera.Parse(doc["Camera"]);
+            Camera cam = Camera.Parse(doc["camera"]);
             s.camera = cam;
             
             // lights
+            XmlNode lights = doc.SelectSingleNode("//scene/lights");
+            foreach (XmlNode li in lights.SelectNodes("light"))
+                s.lights.Add(Light.Parse(li));
+            foreach (XmlNode sli in lights.SelectNodes("spotlight"))
+                s.lights.Add(SpotLight.Parse(sli));
 
             // objects
+            XmlNode objects = doc.SelectSingleNode("//scene/objects");
+            foreach (XmlNode n in objects.SelectNodes("sphere"))
+                s.objects.Add(Sphere.Parse(n));
+            foreach (XmlNode n in objects.SelectNodes("plane"))
+                s.objects.Add(Plane.Parse(n));
+
+            //int numSpheres = 10;
+            //Random rand = new Random();
+            //for (int i = 0; i < numSpheres; i++)
+            //{
+            //    double x = rand.NextDouble(-3, 3);
+            //    double y = rand.NextDouble(-1, 1);
+            //    double z = rand.NextDouble(-5, 2);
+
+            //    double radius = rand.NextDouble(0.3, 1.3);
+
+            //    s.objects.Add(new Sphere(new Vector(x, y, z), radius,
+            //        new Material
+            //        {
+            //            Ambient = 0.1,
+            //            Specular = 0.0,
+            //            Color = Extensions.ColorFromHSV(rand.NextDouble() * 360.0, 0.7, 0.8),
+            //            Lambert = 0.7,
+            //            Textured = true
+            //        }));
+            //}
+
+            //s.objects.Add(new Plane(new Vector(0, 0, 0), new Vector(0, 1, 0), new Material { Ambient = 0.1, Specular = 0.4, Color = Color.White, Lambert = 0.7, Textured = false }));
 
             return s;
         }
