@@ -194,7 +194,6 @@ namespace RayTracor.RayTracorLib
                 double vis = LightVisibility(point, l);
                 if (vis <= 0.0)
                     continue;
-
                 double contribution = Vector.DotProduct((l.Position - point).Normalized, normal);
                 if (contribution > 0)
                     lambertAmount += contribution * vis;
@@ -204,11 +203,13 @@ namespace RayTracor.RayTracorLib
 
             double specular = sir.Object.Material.Specular;
             Vector result = sir.Object.EvalMaterial(point, normal, lambertAmount);
-            
+            if (sir.Object is Triangle)
+                result = (sir.Object as Triangle).EvalMaterial((sir.Result as IntersectionResultVector2).Vector, lambertAmount);
+
             if (specular != 0.0)
             {
                 Ray reflected = ray.Reflect(point, normal);
-                reflected.Start += reflected.Direction * 0.01;
+                reflected.Start += reflected.Direction * 0.001;
 
                 Color? reflectColor = Trace(reflected, depth + 1);
                 if (reflectColor.HasValue)
@@ -243,6 +244,7 @@ namespace RayTracor.RayTracorLib
                 return 0.0;
 
             Ray ray = Ray.FromTo(point, light.Position);
+            ray.Start += ray.Direction * 0.001;
 
             foreach (Object o in objects)
             {
@@ -299,6 +301,8 @@ namespace RayTracor.RayTracorLib
                 s.objects.Add(Sphere.Parse(n));
             foreach (XmlNode n in objects.SelectNodes("plane"))
                 s.objects.Add(Plane.Parse(n));
+            foreach (XmlNode n in objects.SelectNodes("triangle"))
+                s.objects.Add(Triangle.Parse(n));
 
             //int numSpheres = 10;
             //Random rand = new Random();

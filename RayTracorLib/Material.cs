@@ -18,6 +18,11 @@ namespace RayTracor.RayTracorLib
 
         public Material() { }
 
+        public Vector AddAmbientLambert(Vector col, double lambert)
+        {
+            return col * lambert * Lambert + col * Ambient;
+        }
+
         public void Serialize(XmlDocument doc, XmlNode parent)
         {
             XmlNode node = doc.CreateElement("material");

@@ -4,6 +4,9 @@ things to add:
 
 new object types (cubes, torus?, geometry)
 fog
-anti-aliasing
+anti-aliasing (super sampling)
 material scripting ?
 post processing (depth of field, focus?)
+triangles
+quads
+error checking when loading

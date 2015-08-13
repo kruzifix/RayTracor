@@ -108,8 +108,8 @@ namespace RayTracor.RayTracorLib
         public static Camera Parse(XmlNode camNode)
         {
             Vector pos = Vector.Parse(camNode["position"]);
-            Vector dir = Vector.Parse(camNode["direction"]);
-            Vector gup = Vector.Parse(camNode["globalup"]);
+            Vector dir = Vector.Parse(camNode["direction"]).Normalized;
+            Vector gup = Vector.Parse(camNode["globalup"]).Normalized;
             double fov = camNode["fov"].ParseDouble();
 
             return new Camera(pos, dir, gup, fov);

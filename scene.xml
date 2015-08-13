@@ -7,54 +7,66 @@
     <fov>45</fov>
   </camera>
   <lights>
-    <!-- <light>
+    <light>
       <position x="7" y="10" z="7" />
       <color>FFFFFFFF</color>
       <strength>1</strength>
-    </light> -->
-    <spotlight>
+    </light>
+    <!--<spotlight>
       <position x="0" y="10" z="5" />
       <direction x="0" y="-0.894427190999916" z="-0.447213595499958" />
       <angle>20</angle>
       <color>FFFFFFFF</color>
       <strength>1</strength>
-    </spotlight>
+      <edgesmoothed>true</edgesmoothed>
+    </spotlight>-->
   </lights>
   <objects>
-    <sphere>
+   <sphere>
       <position x="0" y="0" z="0" />
       <material>
         <specular>0</specular>
         <lambert>0.7</lambert>
         <ambient>0.1</ambient>
         <color>FFC2DE66</color>
-        <textured>false</textured>
+        <textured>true</textured>
       </material>
       <radius>2</radius>
-    </sphere>
-    <sphere>
-      <position x="-2.5" y="1" z="2.5" />
+   </sphere>
+    <!--<sphere>
+      <position x="0" y="-3" z="0" />
       <material>
         <specular>0</specular>
         <lambert>0.9</lambert>
         <ambient>0</ambient>
-        <color>FF587BED</color>
+        <color>FFFFFFFF</color>
         <textured>false</textured>
       </material>
-      <radius>0.5</radius>
+      <radius>0.25</radius>
     </sphere>
-    <sphere>
-      <position x="4" y="2" z="0" />
+   <sphere>
+      <position x="3" y="0" z="0" />
       <material>
         <specular>0</specular>
         <lambert>0.7</lambert>
         <ambient>0.1</ambient>
-        <color>FF9B9B9B</color>
+        <color>FFFFFFFF</color>
         <textured>false</textured>
       </material>
-      <radius>0.75</radius>
+      <radius>0.25</radius>
     </sphere>
-	<plane>
+    <sphere>
+      <position x="0" y="0" z="0" />
+      <material>
+        <specular>0</specular>
+        <lambert>0.7</lambert>
+        <ambient>0.1</ambient>
+        <color>FFFFFFFF</color>
+        <textured>false</textured>
+      </material>
+      <radius>0.25</radius>
+    </sphere>-->
+	  <plane>
       <position x="0" y="-3" z="0" />
       <material>
         <specular>0</specular>
@@ -65,5 +77,28 @@
       </material>
       <normal x="0" y="1" z="0" />
     </plane>
+    <triangle>
+      <vertex0 x="0" y="2" z="0"/>
+      <vertex1 x="4" y="-2" z="0"/>
+      <vertex2 x="-4" y="-2" z="0"/>
+      <material>
+        <specular>0</specular>
+        <lambert>0.7</lambert>
+        <ambient>0.1</ambient>
+        <color>FF22FF34</color>
+        <textured>false</textured>
+      </material>
+    </triangle>
+    <!--<plane>
+      <position x="0" y="-3" z="-5" />
+      <normal x="0.1" y="1" z="0.5" />
+      <material>
+        <specular>0</specular>
+        <lambert>0.7</lambert>
+        <ambient>0.1</ambient>
+        <color>FF55FF55</color>
+        <textured>true</textured>
+      </material>
+    </plane>-->
   </objects>
 </scene>

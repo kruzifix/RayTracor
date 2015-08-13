@@ -46,7 +46,7 @@ namespace RayTracor.RayTracorLib
                 if (x % 2 == 0 ^ y % 2 == 0)
                     col *= 0.5;
             }
-            return col * lambertAmount * Material.Lambert + col * Material.Ambient;
+            return Material.AddAmbientLambert(col, lambertAmount);
         }
 
         public override void Serialize(XmlDocument doc, XmlNode parent)
@@ -63,7 +63,7 @@ namespace RayTracor.RayTracorLib
         {
             Vector pos = Vector.Parse(node["position"]);
             Material mat = Material.Parse(node["material"]);
-            Vector normal = Vector.Parse(node["normal"]);
+            Vector normal = Vector.Parse(node["normal"]).Normalized;
 
             return new Plane(pos, mat, normal);
         }

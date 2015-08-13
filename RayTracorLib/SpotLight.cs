@@ -12,6 +12,7 @@ namespace RayTracor.RayTracorLib
     {
         public Vector Direction { get; set; }
         public double Angle { get; set; }
+        public bool EdgeSmoothed { get; set; }
 
         public SpotLight()
             : base()
@@ -38,11 +39,15 @@ namespace RayTracor.RayTracorLib
 
             double margin = Angle * 0.05;
 
-            if (b < (Angle - margin).ToRadians())
-                return 1.0;
-            if (b > (Angle + margin).ToRadians())
-                return 0.0;
-            return Math.Tanh((Angle - b.ToDegrees()) / margin * 3.0) * 0.5 + 0.5;
+            if (EdgeSmoothed)
+            {
+                if (b < (Angle - margin).ToRadians())
+                    return 1.0;
+                if (b > (Angle + margin).ToRadians())
+                    return 0.0;
+                return Math.Tanh((Angle - b.ToDegrees()) / margin * 3.0) * 0.5 + 0.5;
+            }
+            return b < Angle.ToRadians() ? 1.0 : 0.0;
         }
 
         public override void Serialize(XmlDocument doc, XmlNode parent)
@@ -54,18 +59,25 @@ namespace RayTracor.RayTracorLib
             lNode.AppendChild(Angle.Serialize(doc, "angle"));
             lNode.AppendChild(Color.Serialize(doc, "color"));
             lNode.AppendChild(Strength.Serialize(doc, "strength"));
+            lNode.AppendChild(EdgeSmoothed.Serialize(doc, "edgesmoothed"));
 
             parent.AppendChild(lNode);
         }
 
         public static new SpotLight Parse(XmlNode li)
         {
-            Vector dir = Vector.Parse(li["direction"]);
+            Vector dir = Vector.Parse(li["direction"]).Normalized;
             double angle = li["angle"].ParseDouble();
-
+            
             Light lbase = Light.Parse(li);
+            SpotLight spl = new SpotLight(lbase, dir, angle);
+            try
+            {
+                spl.EdgeSmoothed = li["edgesmoothed"].ParseBool();
+            }
+            catch { }
 
-            return new SpotLight(lbase, dir, angle);
+            return spl;
         }
 
         public static SpotLight FromTo(Vector position, Vector point, Color color, double strength, double angle)

@@ -52,6 +52,17 @@ namespace RayTracor.RayTracorLib
         }
     }
 
+    public class IntersectionResultVector2 : IntersectionResult
+    {
+        public Vector2 Vector { get; set; }
+
+        public IntersectionResultVector2(bool intersects, double distance, Vector2 vec)
+            :base(intersects, distance)
+        {
+            Vector = vec;
+        }
+    }
+
     public class SceneIntersectionResult
     {
         public Object Object { get; set; }

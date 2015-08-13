@@ -91,8 +91,15 @@ namespace RayTracor.RayTracorLib
 
                 bool pattern = ((xtex * scale) % 1.0 > 0.5) ^ ((ytex * scale) % 1.0 > 0.5);
                 col *= pattern ? 0.5 : 1;
+
+                //int x = (int)(Math.Abs(point.X) * 255.0);
+                //int y = (int)(Math.Abs(point.Y) * 255.0);
+                //int z = (int)(Math.Abs(point.Z) * 255.0);
+                //int c = x ^ y ^ z;
+
+                //col = Extensions.ColorFromHSV(c / 255.0 * 360.0, 0.8, 0.7).ToVector();
             }
-            return col * lambertAmount * Material.Lambert + col * Material.Ambient;
+            return Material.AddAmbientLambert(col, lambertAmount);
         }
 
         public override void Serialize(XmlDocument doc, XmlNode parent)
