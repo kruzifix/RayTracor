@@ -112,9 +112,9 @@ namespace RayTracor
 
         private void bRender_Click(object sender, EventArgs e)
         {
-            bRender.Enabled = false;
+            SetRenderButtons(false);
             Stopwatch sw = Stopwatch.StartNew();
-            Bitmap bmp = scene.Render(resolution.width, resolution.height);
+            Bitmap bmp = scene.RenderSuperSample(resolution.width, resolution.height);
             sw.Stop();
             Console.WriteLine("Render time: {0} ms", sw.ElapsedMilliseconds);
 
@@ -123,8 +123,7 @@ namespace RayTracor
             FormShowRender fsr = new FormShowRender(bmp);
             fsr.Text = string.Format("Render {0}; Time: {1}ms", number, sw.ElapsedMilliseconds);
             fsr.Show();
-
-            bRender.Enabled = true;
+            SetRenderButtons(true);
         }
 
         private void RenderParallel(int width, int height, int tasks)
@@ -145,7 +144,7 @@ namespace RayTracor
                 taskArray[y] = Task.Factory.StartNew((x) =>
                     {
                         int i = (int)x;
-                        byte[] b = scene.Render(0, i * h, width, h);
+                        byte[] b = scene.RenderSuperSample(0, i * h, width, h);
                         Array.Copy(b, 0, pixels, 0 + i * h * data.Stride, b.Length);   
                     }, y);
             }
@@ -159,7 +158,7 @@ namespace RayTracor
 
             int number = SaveBmp(bmp, sw.ElapsedMilliseconds, tasks);
 
-            this.UI(() => bRenderParallel.Enabled = true);
+            this.UI(() => SetRenderButtons(true));
 
             this.UI(() =>
             {
@@ -184,7 +183,7 @@ namespace RayTracor
         private void bRenderParallel_Click(object sender, EventArgs e)
         {
             int tasks = (int)cBoxTasks.SelectedItem;
-            bRenderParallel.Enabled = false;
+            SetRenderButtons(false);
             Thread t = new Thread(new ThreadStart(() => RenderParallel(resolution.width, resolution.height, tasks)));
             t.Start();
         }
@@ -236,6 +235,31 @@ namespace RayTracor
             scene = Scene.Parse(doc["scene"]);
 
             UpdateRenderControl();
+        }
+
+        private void bRenderDepth_Click(object sender, EventArgs e)
+        {
+            SetRenderButtons(false);
+
+            Stopwatch sw = Stopwatch.StartNew();
+            Bitmap bmp = scene.RenderDepth(resolution.width, resolution.height, 40.0);
+            sw.Stop();
+            Console.WriteLine("Render time: {0} ms", sw.ElapsedMilliseconds);
+
+            int number = SaveBmp(bmp, sw.ElapsedMilliseconds, 1);
+
+            FormShowRender fsr = new FormShowRender(bmp);
+            fsr.Text = string.Format("Render {0}; Time: {1}ms", number, sw.ElapsedMilliseconds);
+            fsr.Show();
+
+            SetRenderButtons(true);
+        }
+
+        private void SetRenderButtons(bool b)
+        {
+            bRender.Enabled = b;
+            bRenderDepth.Enabled = b;
+            bRenderParallel.Enabled = b;
         }
     }
 

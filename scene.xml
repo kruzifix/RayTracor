@@ -8,7 +8,7 @@
   </camera>
   <lights>
     <light>
-      <position x="7" y="10" z="7" />
+      <position x="4" y="10" z="10" />
       <color>FFFFFFFF</color>
       <strength>1</strength>
     </light>
@@ -77,7 +77,7 @@
       </material>
       <normal x="0" y="1" z="0" />
     </plane>
-    <triangle>
+    <!--<triangle>
       <vertex0 x="0" y="2" z="0"/>
       <vertex1 x="4" y="-2" z="0"/>
       <vertex2 x="-4" y="-2" z="0"/>
@@ -88,7 +88,7 @@
         <color>FF22FF34</color>
         <textured>false</textured>
       </material>
-    </triangle>
+    </triangle>-->
     <!--<plane>
       <position x="0" y="-3" z="-5" />
       <normal x="0.1" y="1" z="0.5" />

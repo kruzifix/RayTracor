@@ -116,10 +116,28 @@ namespace RayTracor.RayTracorLib
 
         public Bitmap Render(int width, int height)
         {
+            return RenderFunc(width, height, (x, y) => { return Trace(camera.CastRay(x, y), 0); });
+        }
+
+        public Bitmap RenderSuperSample(int width, int height)
+        {
+            int samples = 4;
+            return RenderFunc(width, height, (x, y) =>
+            {
+                Vector col = Vector.Zero;
+                double delta = 1.0 / samples;
+                for (int i = 0; i < samples; i++)
+                    for (int j = 0; j < samples; j++)
+                        col += Trace(camera.CastRay(x + (i - samples * 0.5) * delta, y + (j - samples * 0.5) * delta), 0).ToVector();
+                col /= samples * samples;
+                return col.ToColor();
+            });
+        }
+
+        private Bitmap RenderFunc(int width, int height, Func<int, int, Color> func)
+        {
             Bitmap bmp = new Bitmap(width, height);
-            BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, width, height),
-                System.Drawing.Imaging.ImageLockMode.WriteOnly,
-                System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
             byte[] pixelData = new byte[bmpData.Stride * bmpData.Height];
 
             camera.SetResolution(width, height);
@@ -128,18 +146,42 @@ namespace RayTracor.RayTracorLib
             {
                 for (int y = 0; y < height; y++)
                 {
-                    Ray pixelRay = camera.CastRay(x, y);
-
-                    Color? pixelColor = Trace(pixelRay, 0);
-                    Color colr = Color.Magenta;
-                    if (pixelColor.HasValue)
-                        colr = pixelColor.Value;
-                    pixelData[y * bmpData.Stride + x * 3 + 0] = colr.B;
-                    pixelData[y * bmpData.Stride + x * 3 + 1] = colr.G;
-                    pixelData[y * bmpData.Stride + x * 3 + 2] = colr.R;
+                    Color pixelColor = func(x, y);
+                    pixelData[y * bmpData.Stride + x * 3 + 0] = pixelColor.B;
+                    pixelData[y * bmpData.Stride + x * 3 + 1] = pixelColor.G;
+                    pixelData[y * bmpData.Stride + x * 3 + 2] = pixelColor.R;
                 }
             }
 
+            Marshal.Copy(pixelData, 0, bmpData.Scan0, pixelData.Length);
+
+            bmp.UnlockBits(bmpData);
+            return bmp;
+        }
+
+        public Bitmap RenderDepth(int width, int height, double maxDepth)
+        {
+            Bitmap bmp = new Bitmap(width, height);
+            BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+            byte[] pixelData = new byte[bmpData.Stride * bmpData.Height];
+
+            camera.SetResolution(width, height);
+            
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    Ray pixelRay = camera.CastRay(x, y);
+                    double depth = GetDepth(pixelRay);
+
+                    if (depth > maxDepth)
+                        depth = maxDepth;
+                    byte col = (byte)(255.0 - depth / maxDepth * 255.0);
+                    int i = y * bmpData.Stride + x * 3;
+                    pixelData[i + 0] = pixelData[i + 1] = pixelData[i + 2] = col;
+                }
+            }
+            
             Marshal.Copy(pixelData, 0, bmpData.Scan0, pixelData.Length);
 
             bmp.UnlockBits(bmpData);
@@ -162,23 +204,46 @@ namespace RayTracor.RayTracorLib
                 for (int yy = 0; yy < height; yy++)
                 {
                     Ray pixelRay = camera.CastRay(xx + x, yy + y);
-                    Color? pixelColor = Trace(pixelRay, 0);
-                    Color colr = Color.Magenta;
-                    if (pixelColor.HasValue)
-                        colr = pixelColor.Value;
-                    pixels[(yy * stride + xx * 3) + 0] = colr.B;
-                    pixels[(yy * stride + xx * 3) + 1] = colr.G;
-                    pixels[(yy * stride + xx * 3) + 2] = colr.R;
+                    Color pixelColor = Trace(pixelRay, 0);
+                    pixels[(yy * stride + xx * 3) + 0] = pixelColor.B;
+                    pixels[(yy * stride + xx * 3) + 1] = pixelColor.G;
+                    pixels[(yy * stride + xx * 3) + 2] = pixelColor.R;
                 }
             }
 
             return pixels;
         }
 
-        private Color? Trace(Ray ray, int depth)
+        public byte[] RenderSuperSample(int x, int y, int width, int height)
+        {
+            byte[] pixels = new byte[width * 3 * height];
+            int stride = width * 3;
+            int samples = 4;
+            double delta = 1.0 / samples;
+
+            for (int xx = 0; xx < width; xx++)
+            {
+                for (int yy = 0; yy < height; yy++)
+                {
+                    Vector col = Vector.Zero;
+                    for (int i = 0; i < samples; i++)
+                        for (int j = 0; j < samples; j++)
+                            col += Trace(camera.CastRay(x + xx + (i - samples * 0.5) * delta, y + yy + (j - samples * 0.5) * delta), 0).ToVector();
+                    col /= samples * samples;
+                    Color pixelColor = col.ToColor();
+                    pixels[(yy * stride + xx * 3) + 0] = pixelColor.B;
+                    pixels[(yy * stride + xx * 3) + 1] = pixelColor.G;
+                    pixels[(yy * stride + xx * 3) + 2] = pixelColor.R;
+                }
+            }
+
+            return pixels;
+        }
+
+        private Color Trace(Ray ray, int depth)
         {
             if (depth > 3)
-                return null;
+                return Color.Empty;
 
             SceneIntersectionResult sir = IntersectScene(ray);
             if (!sir.Result.Intersects)
@@ -216,6 +281,14 @@ namespace RayTracor.RayTracorLib
                     result += new Vector(reflectColor.Value) * specular;
             }
             return result.ToColor();
+        }
+
+        private double GetDepth(Ray ray)
+        {
+            SceneIntersectionResult res = IntersectScene(ray);
+            if (res.Result.Intersects)
+                return res.Result.Distance;
+            return -1;
         }
 
         private SceneIntersectionResult IntersectScene(Ray ray)

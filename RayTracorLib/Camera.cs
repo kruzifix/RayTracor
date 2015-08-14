@@ -67,7 +67,7 @@ namespace RayTracor.RayTracorLib
             ys = 2.0 / (height - 1);
         }
 
-        public Ray CastRay(int x, int y)
+        public Ray CastRay(double x, double y)
         {
             //double hwr = height / (double)width;
             //double hw = Math.Tan(FOV / 2.0);
