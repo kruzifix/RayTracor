@@ -1,12 +1,15 @@
-﻿
-
-things to add:
+﻿things to add:
 
 new object types (cubes, torus?, geometry)
 fog
 anti-aliasing (super sampling)
 material scripting ?
-post processing (depth of field, focus?)
+depth of field
 triangles
 quads
 error checking when loading
+rework material (phong shading)
+area lights (soft shadows)
+gloss
+texturing, bumpmapping
+render depth
