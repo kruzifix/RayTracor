@@ -162,7 +162,7 @@ namespace RayTracor.RayTracorLib
         public Bitmap RenderDepth(int width, int height, double maxDepth)
         {
             Bitmap bmp = new Bitmap(width, height);
-            BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+            BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppRgb);
             byte[] pixelData = new byte[bmpData.Stride * bmpData.Height];
 
             camera.SetResolution(width, height);
@@ -174,11 +174,15 @@ namespace RayTracor.RayTracorLib
                     Ray pixelRay = camera.CastRay(x, y);
                     double depth = GetDepth(pixelRay);
 
-                    if (depth > maxDepth)
-                        depth = maxDepth;
-                    byte col = (byte)(255.0 - depth / maxDepth * 255.0);
-                    int i = y * bmpData.Stride + x * 3;
-                    pixelData[i + 0] = pixelData[i + 1] = pixelData[i + 2] = col;
+                    //if (depth > maxDepth)
+                    //    depth = maxDepth;
+
+                    float fdepth = (float)depth;
+                    byte[] bdepth = BitConverter.GetBytes(fdepth);
+                    //byte col = (byte)(255.0 - depth / maxDepth * 255.0);
+                    int i = y * bmpData.Stride + x * 4;
+                    //pixelData[i + 0] = pixelData[i + 1] = pixelData[i + 2] = col;
+                    Array.Copy(bdepth, 0, pixelData, i, 4);
                 }
             }
             
@@ -245,12 +249,13 @@ namespace RayTracor.RayTracorLib
             if (depth > 3)
                 return Color.Empty;
 
-            SceneIntersectionResult sir = IntersectScene(ray);
-            if (!sir.Result.Intersects)
+            Object obj;
+            IntersectionResult res = IntersectScene(ray, out obj);
+            if (!res.Intersects)
                 return backgroundColor;
 
-            Vector point = ray.PointAt(sir.Result.Distance);
-            Vector normal = sir.Object.Normal(point);
+            Vector point = ray.PointAt(res.Distance);
+            Vector normal = obj.Normal(point);
 
             // lights!
             double lambertAmount = 0;
@@ -266,10 +271,10 @@ namespace RayTracor.RayTracorLib
 
             lambertAmount = Math.Min(1, lambertAmount);
 
-            double specular = sir.Object.Material.Specular;
-            Vector result = sir.Object.EvalMaterial(point, normal, lambertAmount);
-            if (sir.Object is Triangle)
-                result = (sir.Object as Triangle).EvalMaterial((sir.Result as IntersectionResultVector2).Vector, lambertAmount);
+            double specular = obj.Material.Specular;
+            Vector result = obj.EvalMaterial(point, normal, lambertAmount);
+            if (obj is Triangle)
+                result = (obj as Triangle).EvalMaterial((res as IntersectionResultVector2).Vector, lambertAmount);
 
             if (specular != 0.0)
             {
@@ -285,16 +290,17 @@ namespace RayTracor.RayTracorLib
 
         private double GetDepth(Ray ray)
         {
-            SceneIntersectionResult res = IntersectScene(ray);
-            if (res.Result.Intersects)
-                return res.Result.Distance;
+            Object obj;
+            IntersectionResult res = IntersectScene(ray, out obj);
+            if (res.Intersects)
+                return res.Distance;
             return -1;
         }
 
-        private SceneIntersectionResult IntersectScene(Ray ray)
+        private IntersectionResult IntersectScene(Ray ray, out Object obj)
         {
             IntersectionResult closestDist = new IntersectionResult(false, double.MaxValue);
-            Object closestObj = null;
+            obj = null;
 
             foreach (Object o in objects)
             {
@@ -303,11 +309,11 @@ namespace RayTracor.RayTracorLib
                 if (res.Intersects && res.Distance < closestDist.Distance)
                 {
                     closestDist = res;
-                    closestObj = o;
+                    obj = o;
                 }
             }
 
-            return new SceneIntersectionResult(closestObj, closestDist);
+            return closestDist;
         }
 
         private double LightVisibility(Vector point, Light light)

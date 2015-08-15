@@ -62,16 +62,4 @@ namespace RayTracor.RayTracorLib
             Vector = vec;
         }
     }
-
-    public class SceneIntersectionResult
-    {
-        public Object Object { get; set; }
-        public IntersectionResult Result { get; set; }
-
-        public SceneIntersectionResult(Object obj, IntersectionResult res)
-        {
-            Object = obj;
-            Result = res;
-        }
-    }
 }

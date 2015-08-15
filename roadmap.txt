@@ -1,15 +1,17 @@
 ﻿things to add:
 -new object types (cubes, torus?, geometry)
 -fog
--anti-aliasing (super sampling)
+-stochastic (random) super sampling
+-rework materials (phong shading)
 -material scripting ?
 -depth of field
 -quads
 -error checking when loading
--rework material (phong shading)
 -area lights (soft shadows)
 -gloss
 -texturing, bumpmapping
+-meshes
+-different backgrounds (patterns)
 
 things added:
 -triangles
