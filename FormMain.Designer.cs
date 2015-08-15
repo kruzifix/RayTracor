@@ -37,7 +37,8 @@
             this.renderControl = new RayTracor.RenderControl();
             this.bSave = new System.Windows.Forms.Button();
             this.bLoad = new System.Windows.Forms.Button();
-            this.bRenderDepth = new System.Windows.Forms.Button();
+            this.bDepthMap = new System.Windows.Forms.Button();
+            this.bNormalMap = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // bRender
@@ -128,22 +129,33 @@
             this.bLoad.UseVisualStyleBackColor = true;
             this.bLoad.Click += new System.EventHandler(this.bLoad_Click);
             // 
-            // bRenderDepth
+            // bDepthMap
             // 
-            this.bRenderDepth.Location = new System.Drawing.Point(207, 41);
-            this.bRenderDepth.Name = "bRenderDepth";
-            this.bRenderDepth.Size = new System.Drawing.Size(83, 23);
-            this.bRenderDepth.TabIndex = 8;
-            this.bRenderDepth.Text = "Render Depth";
-            this.bRenderDepth.UseVisualStyleBackColor = true;
-            this.bRenderDepth.Click += new System.EventHandler(this.bRenderDepth_Click);
+            this.bDepthMap.Location = new System.Drawing.Point(207, 41);
+            this.bDepthMap.Name = "bDepthMap";
+            this.bDepthMap.Size = new System.Drawing.Size(75, 23);
+            this.bDepthMap.TabIndex = 8;
+            this.bDepthMap.Text = "Depth Map";
+            this.bDepthMap.UseVisualStyleBackColor = true;
+            this.bDepthMap.Click += new System.EventHandler(this.bDepthMap_Click);
+            // 
+            // bNormalMap
+            // 
+            this.bNormalMap.Location = new System.Drawing.Point(288, 41);
+            this.bNormalMap.Name = "bNormalMap";
+            this.bNormalMap.Size = new System.Drawing.Size(75, 23);
+            this.bNormalMap.TabIndex = 9;
+            this.bNormalMap.Text = "Normal Map";
+            this.bNormalMap.UseVisualStyleBackColor = true;
+            this.bNormalMap.Click += new System.EventHandler(this.bNormalMap_Click);
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(551, 419);
-            this.Controls.Add(this.bRenderDepth);
+            this.Controls.Add(this.bNormalMap);
+            this.Controls.Add(this.bDepthMap);
             this.Controls.Add(this.bLoad);
             this.Controls.Add(this.bSave);
             this.Controls.Add(this.cBoxResolution);
@@ -171,7 +183,8 @@
         private System.Windows.Forms.ComboBox cBoxResolution;
         private System.Windows.Forms.Button bSave;
         private System.Windows.Forms.Button bLoad;
-        private System.Windows.Forms.Button bRenderDepth;
+        private System.Windows.Forms.Button bDepthMap;
+        private System.Windows.Forms.Button bNormalMap;
     }
 }
 

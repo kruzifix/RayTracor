@@ -119,7 +119,7 @@ namespace RayTracor.RayTracorLib
             return RenderFunc(width, height, (x, y) => { return Trace(camera.CastRay(x, y), 0); });
         }
 
-        public Bitmap RenderSuperSample(int width, int height)
+        public Bitmap RenderDeterministicSuperSample(int width, int height)
         {
             int samples = 4;
             return RenderFunc(width, height, (x, y) =>
@@ -136,9 +136,9 @@ namespace RayTracor.RayTracorLib
 
         private Bitmap RenderFunc(int width, int height, Func<int, int, Color> func)
         {
-            Bitmap bmp = new Bitmap(width, height);
-            BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
-            byte[] pixelData = new byte[bmpData.Stride * bmpData.Height];
+            Bitmap bmp;
+            BitmapData data;
+            byte[] pixels = CreateAndLockBitmap(width, height, PixelFormat.Format24bppRgb, out bmp, out data);
 
             camera.SetResolution(width, height);
 
@@ -147,23 +147,35 @@ namespace RayTracor.RayTracorLib
                 for (int y = 0; y < height; y++)
                 {
                     Color pixelColor = func(x, y);
-                    pixelData[y * bmpData.Stride + x * 3 + 0] = pixelColor.B;
-                    pixelData[y * bmpData.Stride + x * 3 + 1] = pixelColor.G;
-                    pixelData[y * bmpData.Stride + x * 3 + 2] = pixelColor.R;
+                    pixels[y * data.Stride + x * 3 + 0] = pixelColor.B;
+                    pixels[y * data.Stride + x * 3 + 1] = pixelColor.G;
+                    pixels[y * data.Stride + x * 3 + 2] = pixelColor.R;
                 }
             }
 
-            Marshal.Copy(pixelData, 0, bmpData.Scan0, pixelData.Length);
+            CopyAndUnLock(bmp, data, pixels);
 
-            bmp.UnlockBits(bmpData);
             return bmp;
         }
 
-        public Bitmap RenderDepth(int width, int height, double maxDepth)
+        public static byte[] CreateAndLockBitmap(int width, int height, PixelFormat pFormat, out Bitmap bmp, out BitmapData data)
         {
-            Bitmap bmp = new Bitmap(width, height);
-            BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppRgb);
-            byte[] pixelData = new byte[bmpData.Stride * bmpData.Height];
+            bmp = new Bitmap(width, height);
+            data = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, pFormat);
+            return new byte[data.Stride * data.Height];
+        }
+
+        public static void CopyAndUnLock(Bitmap bmp, BitmapData data, byte[] pixels)
+        {
+            Marshal.Copy(pixels, 0, data.Scan0, pixels.Length);
+            bmp.UnlockBits(data);
+        }
+
+        public Bitmap RenderDepthMap(int width, int height)
+        {
+            Bitmap bmp;
+            BitmapData data;
+            byte[] pixels = CreateAndLockBitmap(width, height, PixelFormat.Format32bppRgb, out bmp, out data);
 
             camera.SetResolution(width, height);
             
@@ -171,25 +183,24 @@ namespace RayTracor.RayTracorLib
             {
                 for (int y = 0; y < height; y++)
                 {
-                    Ray pixelRay = camera.CastRay(x, y);
-                    double depth = GetDepth(pixelRay);
-
-                    //if (depth > maxDepth)
-                    //    depth = maxDepth;
-
-                    float fdepth = (float)depth;
+                    Ray ray = camera.CastRay(x, y);
+                    float fdepth = (float)GetDepth(ray);
                     byte[] bdepth = BitConverter.GetBytes(fdepth);
-                    //byte col = (byte)(255.0 - depth / maxDepth * 255.0);
-                    int i = y * bmpData.Stride + x * 4;
-                    //pixelData[i + 0] = pixelData[i + 1] = pixelData[i + 2] = col;
-                    Array.Copy(bdepth, 0, pixelData, i, 4);
+                    int i = y * data.Stride + x * 4;
+                    Array.Copy(bdepth, 0, pixels, i, 4);
                 }
             }
-            
-            Marshal.Copy(pixelData, 0, bmpData.Scan0, pixelData.Length);
 
-            bmp.UnlockBits(bmpData);
+            CopyAndUnLock(bmp, data, pixels);
             return bmp;
+        }
+
+        public Bitmap RenderNormalMap(int width, int height)
+        {
+            return RenderFunc(width, height, (x, y) => {
+                Vector normal = GetNormal(camera.CastRay(x, y));
+                return (normal * 255.0).ToColor();
+            });
         }
 
         public void SetResolution(int width, int height)
@@ -295,6 +306,15 @@ namespace RayTracor.RayTracorLib
             if (res.Intersects)
                 return res.Distance;
             return -1;
+        }
+
+        private Vector GetNormal(Ray ray)
+        {
+            Object obj;
+            IntersectionResult res = IntersectScene(ray, out obj);
+            if (res.Intersects)
+                return obj.Normal(ray.PointAt(res.Distance));
+            return Vector.Zero;
         }
 
         private IntersectionResult IntersectScene(Ray ray, out Object obj)

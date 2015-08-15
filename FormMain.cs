@@ -114,7 +114,7 @@ namespace RayTracor
         {
             SetRenderButtons(false);
             Stopwatch sw = Stopwatch.StartNew();
-            Bitmap bmp = scene.RenderSuperSample(resolution.width, resolution.height);
+            Bitmap bmp = scene.Render(resolution.width, resolution.height);
             sw.Stop();
             Console.WriteLine("Render time: {0} ms", sw.ElapsedMilliseconds);
 
@@ -237,12 +237,12 @@ namespace RayTracor
             UpdateRenderControl();
         }
 
-        private void bRenderDepth_Click(object sender, EventArgs e)
+        private void bDepthMap_Click(object sender, EventArgs e)
         {
             SetRenderButtons(false);
 
             Stopwatch sw = Stopwatch.StartNew();
-            Bitmap bmp = scene.RenderDepth(resolution.width, resolution.height, 40.0);
+            Bitmap bmp = scene.RenderDepthMap(resolution.width, resolution.height);
             sw.Stop();
             Console.WriteLine("Render time: {0} ms", sw.ElapsedMilliseconds);
 
@@ -258,8 +258,26 @@ namespace RayTracor
         private void SetRenderButtons(bool b)
         {
             bRender.Enabled = b;
-            bRenderDepth.Enabled = b;
+            bDepthMap.Enabled = b;
             bRenderParallel.Enabled = b;
+        }
+
+        private void bNormalMap_Click(object sender, EventArgs e)
+        {
+            SetRenderButtons(false);
+
+            Stopwatch sw = Stopwatch.StartNew();
+            Bitmap bmp = scene.RenderNormalMap(resolution.width, resolution.height);
+            sw.Stop();
+            Console.WriteLine("Render time: {0} ms", sw.ElapsedMilliseconds);
+
+            int number = SaveBmp(bmp, sw.ElapsedMilliseconds, 1);
+
+            FormShowRender fsr = new FormShowRender(bmp);
+            fsr.Text = string.Format("Render {0}; Time: {1}ms", number, sw.ElapsedMilliseconds);
+            fsr.Show();
+
+            SetRenderButtons(true);
         }
     }
 

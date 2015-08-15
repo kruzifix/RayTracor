@@ -16,4 +16,5 @@
 things added:
 -triangles
 -render depth
--added deterministic supersampling
+-deterministic supersampling
+-render normal map
