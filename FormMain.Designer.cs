@@ -78,6 +78,7 @@
             this.cBoxTasks.Name = "cBoxTasks";
             this.cBoxTasks.Size = new System.Drawing.Size(69, 21);
             this.cBoxTasks.TabIndex = 4;
+            this.cBoxTasks.SelectedIndexChanged += new System.EventHandler(this.cBoxTasks_SelectedIndexChanged);
             // 
             // label2
             // 

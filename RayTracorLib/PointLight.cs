@@ -8,15 +8,15 @@ using System.Xml;
 
 namespace RayTracor.RayTracorLib
 {
-    public class Light
+    public class PointLight
     {
         public Vector Position { get; set; }
         public Color Color { get; set; }
         public double Strength { get; set; }
 
-        public Light() { Position = Vector.Zero; Color = Color.White; Strength = 1; }
+        public PointLight() { Position = Vector.Zero; Color = Color.White; Strength = 1; }
 
-        public Light(Vector position, Color color, double strength)
+        public PointLight(Vector position, Color color, double strength)
         {
             Position = position;
             Color = color;
@@ -30,7 +30,7 @@ namespace RayTracor.RayTracorLib
 
         public virtual void Serialize(XmlDocument doc, XmlNode parent)
         {
-            XmlNode lNode = doc.CreateElement("light");
+            XmlNode lNode = doc.CreateElement("pointlight");
 
             lNode.AppendChild(Position.Serialize(doc, "position"));
             lNode.AppendChild(Color.Serialize(doc, "color"));
@@ -39,13 +39,13 @@ namespace RayTracor.RayTracorLib
             parent.AppendChild(lNode);
         }
 
-        public static Light Parse(XmlNode li)
+        public static PointLight Parse(XmlNode li)
         {
             Vector pos = Vector.Parse(li["position"]);
             Color color = li["color"].ParseColor();
             double strength = li["strength"].ParseDouble();
 
-            return new Light(pos, color, strength);
+            return new PointLight(pos, color, strength);
         }
     }
 }

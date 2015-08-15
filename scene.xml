@@ -1,17 +1,23 @@
 <scene>
-  <backgroundcolor>FFFFFFFF</backgroundcolor>
-  <camera>
+	<backgroundcolor>FFFFFFFF</backgroundcolor>
+  <!--<camera>
     <position x="0" y="3" z="12" />
     <direction x="0" y="-0.242535625036333" z="-0.970142500145332" />
     <globalup x="0" y="1" z="0" />
     <fov>45</fov>
-  </camera>
-  <lights>
-    <light>
-      <position x="4" y="10" z="10" />
-      <color>FFFFFFFF</color>
-      <strength>1</strength>
-    </light>
+  </camera>-->
+	<!--<camera>
+		<position x="12" y="3" z="0" />
+		<direction x="-0.970142500145332" y="-0.242535625036333" z="0" />
+		<globalup x="0" y="1" z="0" />
+		<fov>45</fov>
+	</camera>-->
+	<lights>
+		<!--<light>
+			<position x="8" y="10" z="3" />
+			<color>FFFFFFFF</color>
+			<strength>1</strength>
+		</light>-->
     <!--<spotlight>
       <position x="0" y="10" z="5" />
       <direction x="0" y="-0.894427190999916" z="-0.447213595499958" />
@@ -20,9 +26,21 @@
       <strength>1</strength>
       <edgesmoothed>true</edgesmoothed>
     </spotlight>-->
-  </lights>
-  <objects>
-   <sphere>
+	</lights>
+	<objects>
+		<!--<triangle>
+			<vertex0 x="-0.440157" y="1.897921" z="1.0"/>
+			<vertex1 x="0.440157" y="0.102079" z="1.0"/>
+			<vertex2 x="-0.440157" y="1.897921" z="-1.0"/>
+				<material>
+					<specular>0</specular>
+					<lambert>0.7</lambert>
+					<ambient>0.1</ambient>
+					<color>FF22FF34</color>
+					<textured>false</textured>
+				</material>
+		</triangle>-->
+   <!--<sphere>
       <position x="0" y="0" z="0" />
       <material>
         <specular>0</specular>
@@ -32,7 +50,7 @@
         <textured>true</textured>
       </material>
       <radius>2</radius>
-   </sphere>
+   </sphere>-->
     <!--<sphere>
       <position x="0" y="-3" z="0" />
       <material>
@@ -66,7 +84,7 @@
       </material>
       <radius>0.25</radius>
     </sphere>-->
-	  <plane>
+	<!--<plane>
       <position x="0" y="-3" z="0" />
       <material>
         <specular>0</specular>
@@ -76,7 +94,7 @@
         <textured>true</textured>
       </material>
       <normal x="0" y="1" z="0" />
-    </plane>
+    </plane>-->
     <!--<triangle>
       <vertex0 x="0" y="2" z="0"/>
       <vertex1 x="4" y="-2" z="0"/>
@@ -100,5 +118,5 @@
         <textured>true</textured>
       </material>
     </plane>-->
-  </objects>
+	</objects>
 </scene>

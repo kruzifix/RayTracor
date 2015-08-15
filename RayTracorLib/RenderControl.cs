@@ -17,7 +17,7 @@ namespace RayTracor
         public Camera camera;
         public List<Ray> rays = new List<Ray>();
         public List<RayTracorLib.Object> objects = new List<RayTracorLib.Object>();
-        public List<Light> lights = new List<Light>();
+        public List<PointLight> lights = new List<PointLight>();
 
         double areaSize = 15.0;
         Vector2 offset = new Vector2();
@@ -52,7 +52,7 @@ namespace RayTracor
                 DrawRay(Color.Red, r);
             foreach (RayTracorLib.Object o in objects)
                 DrawObject(o);
-            foreach (Light l in lights)
+            foreach (PointLight l in lights)
                 DrawLight(l);
             if (camera != null)
                 DrawCamera();
@@ -129,7 +129,7 @@ namespace RayTracor
             DrawLine(cpen, start + left * 2.0, start + right * 2.0);
         }
 
-        private void DrawLight(Light l)
+        private void DrawLight(PointLight l)
         {
             Vector2 center = new Vector2(l.Position.X, l.Position.Z);
             double crossSize = 500.0 / areaSize;
@@ -170,6 +170,18 @@ namespace RayTracor
                 Rectangle rect = new Rectangle((int)(pc.X - radius), (int)(pc.Y - radius), (int)(radius * 2.0), (int)(radius * 2.0));
                 g.FillEllipse(new SolidBrush(Color.FromArgb(64, s.Material.Color)), rect);
                 g.DrawEllipse(new Pen(s.Material.Color, 1.5f), rect);
+            }
+            if (obj is RayTracorLib.Triangle)
+            {
+                Triangle tri = obj as Triangle;
+
+                Vector2 v0 = new Vector2(tri.Vertex0.X, tri.Vertex0.Z);
+                Vector2 v1 = new Vector2(tri.Vertex1.X, tri.Vertex1.Z);
+                Vector2 v2 = new Vector2(tri.Vertex2.X, tri.Vertex2.Z);
+
+                DrawLine(Pens.Black, v0, v1);
+                DrawLine(Pens.Black, v1, v2);
+                DrawLine(Pens.Black, v2, v0);
             }
         }
 

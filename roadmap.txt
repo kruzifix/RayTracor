@@ -10,7 +10,7 @@
 -area lights (soft shadows)
 -gloss
 -texturing, bumpmapping
--meshes
+-meshes (.obj loader)
 -different backgrounds (patterns)
 
 things added:

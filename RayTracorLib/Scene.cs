@@ -17,7 +17,7 @@ namespace RayTracor.RayTracorLib
         // Objects
 
         public Camera camera;
-        public List<Light> lights;
+        public List<PointLight> lights;
         public List<Object> objects;
 
         Color backgroundColor;
@@ -27,7 +27,7 @@ namespace RayTracor.RayTracorLib
             //camera = Camera.CreateLookAt(new Vector(0, 1.8, 10), new Vector(0, 3, 0), new Vector(0,1,0), 45.0);
             //camera = Camera.CreateLookAt(new Vector(0, 3, 12), new Vector(0, 0, 0), new Vector(0, 1, 0), 45.0);
             camera = new Camera();
-            lights = new List<Light>();
+            lights = new List<PointLight>();
             objects = new List<Object>();
 
             //lights.Add(new Light(new Vector(-30, -10, 20), Color.White, 1));
@@ -119,9 +119,8 @@ namespace RayTracor.RayTracorLib
             return RenderFunc(width, height, (x, y) => { return Trace(camera.CastRay(x, y), 0); });
         }
 
-        public Bitmap RenderDeterministicSuperSample(int width, int height)
+        public Bitmap RenderDeterministicSuperSample(int width, int height, int samples)
         {
-            int samples = 4;
             return RenderFunc(width, height, (x, y) =>
             {
                 Vector col = Vector.Zero;
@@ -133,6 +132,21 @@ namespace RayTracor.RayTracorLib
                 return col.ToColor();
             });
         }
+
+        //public Bitmap RenderStochasticSuperSample(int width, int height)
+        //{
+        //    int samples = 64;
+        //    uint hash = (uint)this.GetHashCode();
+        //    MwcRng.SetSeed(hash);
+        //    return RenderFunc(width, height, (x, y) =>
+        //    {
+        //        Vector col = Vector.Zero;
+        //        for (int i = 0; i < samples; i++)
+        //                col += Trace(camera.CastRay(x + MwcRng.GetUniform() - 0.5, y + MwcRng.GetUniform() - 0.5), 0).ToVector();
+        //        col /= samples;
+        //        return col.ToColor();
+        //    });
+        //}
 
         private Bitmap RenderFunc(int width, int height, Func<int, int, Color> func)
         {
@@ -178,7 +192,7 @@ namespace RayTracor.RayTracorLib
             byte[] pixels = CreateAndLockBitmap(width, height, PixelFormat.Format32bppRgb, out bmp, out data);
 
             camera.SetResolution(width, height);
-            
+
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
@@ -197,9 +211,46 @@ namespace RayTracor.RayTracorLib
 
         public Bitmap RenderNormalMap(int width, int height)
         {
-            return RenderFunc(width, height, (x, y) => {
+            return RenderFunc(width, height, (x, y) =>
+            {
                 Vector normal = GetNormal(camera.CastRay(x, y));
                 return (normal * 255.0).ToColor();
+            });
+        }
+
+        public Bitmap RenderAmbientOcclusion(int width, int height, int rays)
+        {
+            return RenderFunc(width, height, (x, y) =>
+            {
+                Object obj;
+                Ray ray = camera.CastRay(x, y);
+                IntersectionResult res = IntersectScene(ray, out obj);
+                if (!res.Intersects)
+                    return Color.White;
+
+                MwcRng.SetSeed((uint)GetHashCode());
+
+                Vector point = ray.PointAt(res.Distance);
+                Vector normal = obj.Normal(point);
+                //point += normal * 0.001;
+                double theta = Math.Atan2(normal.Y, normal.X);
+                double phi = Math.Acos(normal.Z);
+
+                int notblocked = 0;
+                for (int i = 0; i < rays; i++)
+                {
+                    double newtheta = theta + MwcRng.GetUniformRange(-Math.PI / 2.0, Math.PI / 2.0);
+                    double newphi = phi + MwcRng.GetUniformRange(0, Math.PI * 2.0);
+
+                    Vector newnormal = new Vector(Math.Cos(newtheta), Math.Sin(newtheta), Math.Cos(newphi));
+                    Ray newray = new Ray(point, newnormal);
+                    Object dum;
+                    if (!IntersectScene(newray, out dum).Intersects)
+                        notblocked++;
+                }
+
+                int col = (int)(notblocked * 255.0 / rays);
+                return Color.FromArgb(col, col, col);
             });
         }
 
@@ -209,11 +260,11 @@ namespace RayTracor.RayTracorLib
         }
 
         public byte[] Render(int x, int y, int width, int height)
-        { 
+        {
             byte[] pixels = new byte[width * 3 * height];
 
             int stride = width * 3;
-            
+
             for (int xx = 0; xx < width; xx++)
             {
                 for (int yy = 0; yy < height; yy++)
@@ -270,7 +321,7 @@ namespace RayTracor.RayTracorLib
 
             // lights!
             double lambertAmount = 0;
-            foreach (Light l in lights)
+            foreach (PointLight l in lights)
             {
                 double vis = LightVisibility(point, l);
                 if (vis <= 0.0)
@@ -336,7 +387,7 @@ namespace RayTracor.RayTracorLib
             return closestDist;
         }
 
-        private double LightVisibility(Vector point, Light light)
+        private double LightVisibility(Vector point, PointLight light)
         {
             double vis = light.LightVisibility(point);
             if (vis <= 0.0)
@@ -359,7 +410,7 @@ namespace RayTracor.RayTracorLib
             XmlDocument doc = new XmlDocument();
             XmlNode root = doc.CreateElement("scene");
             doc.AppendChild(root);
-            
+
             // background color
             root.AppendChild(backgroundColor.Serialize(doc, "backgroundcolor"));
 
@@ -369,7 +420,7 @@ namespace RayTracor.RayTracorLib
             // lights
             XmlNode lightsNode = doc.CreateElement("lights");
             root.AppendChild(lightsNode);
-            foreach (Light l in lights)
+            foreach (PointLight l in lights)
                 l.Serialize(doc, lightsNode);
 
             // objects
@@ -386,11 +437,11 @@ namespace RayTracor.RayTracorLib
             Scene s = new Scene();
             Camera cam = Camera.Parse(doc["camera"]);
             s.camera = cam;
-            
+
             // lights
             XmlNode lights = doc.SelectSingleNode("//scene/lights");
             foreach (XmlNode li in lights.SelectNodes("light"))
-                s.lights.Add(Light.Parse(li));
+                s.lights.Add(PointLight.Parse(li));
             foreach (XmlNode sli in lights.SelectNodes("spotlight"))
                 s.lights.Add(SpotLight.Parse(sli));
 

@@ -8,7 +8,7 @@ using System.Xml;
 
 namespace RayTracor.RayTracorLib
 {
-    public class SpotLight : Light
+    public class SpotLight : PointLight
     {
         public Vector Direction { get; set; }
         public double Angle { get; set; }
@@ -25,7 +25,7 @@ namespace RayTracor.RayTracorLib
             Angle = angle;
         }
 
-        public SpotLight(Light lbase, Vector direction, double angle)
+        public SpotLight(PointLight lbase, Vector direction, double angle)
             : base(lbase.Position, lbase.Color, lbase.Strength)
         {
             Direction = direction;
@@ -69,7 +69,7 @@ namespace RayTracor.RayTracorLib
             Vector dir = Vector.Parse(li["direction"]).Normalized;
             double angle = li["angle"].ParseDouble();
             
-            Light lbase = Light.Parse(li);
+            PointLight lbase = PointLight.Parse(li);
             SpotLight spl = new SpotLight(lbase, dir, angle);
             try
             {

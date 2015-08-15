@@ -11,11 +11,13 @@ namespace RayTracor.RayTracorLib
     public class Plane : Object
     {
         Vector normal;
+        double size;
 
-        public Plane(Vector position, Material material, Vector normal)
+        public Plane(Vector position, Material material, Vector normal, double size)
             :base(position, material)
         {
             this.normal = normal.Normalized;
+            this.size = size;
         }
 
         public override IntersectionResult Intersects(Ray ray)
@@ -25,7 +27,13 @@ namespace RayTracor.RayTracorLib
             {
                 double t = Vector.DotProduct(Position - ray.Start, normal) / denom;
                 if (t > 0.0005)
-                    return new IntersectionResult(true, t);
+                {
+                    Vector dist = ray.PointAt(t) - Position;
+                    if (size < 0)
+                        return new IntersectionResult(true, t);
+                    if (Math.Abs(dist.X) < size && Math.Abs(dist.Z) < size)
+                        return new IntersectionResult(true, t);
+                }
             }
             return new IntersectionResult(false, 0.0);
         }
@@ -64,8 +72,11 @@ namespace RayTracor.RayTracorLib
             Vector pos = Vector.Parse(node["position"]);
             Material mat = Material.Parse(node["material"]);
             Vector normal = Vector.Parse(node["normal"]).Normalized;
+            double size = -1;
+            if (node["size"] != null)
+                size = node["size"].ParseDouble();
 
-            return new Plane(pos, mat, normal);
+            return new Plane(pos, mat, normal, size);
         }
     }
 }
