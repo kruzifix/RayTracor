@@ -25,16 +25,11 @@ namespace RayTracor.RayTracorLib
             {
                 double t = Vector.DotProduct(Position - ray.Start, normal) / denom;
                 if (t > 0.0005)
-                    return new IntersectionResult(true, t);
+                    return new IntersectionResult(true, t, this, normal, null);
             }
-            return new IntersectionResult(false, 0.0);
+            return new IntersectionResult(false, 0.0, null, null, null);
         }
-
-        public override Vector Normal(Vector point)
-        {
-            return normal;
-        }
-
+        
         public override Vector EvalMaterial(Vector point, Vector normal, double lambertAmount)
         {
             Vector col = Material.Color.ToVector();
@@ -64,11 +59,8 @@ namespace RayTracor.RayTracorLib
             Vector pos = Vector.Parse(node["position"]);
             Material mat = Material.Parse(node["material"]);
             Vector normal = Vector.Parse(node["normal"]).Normalized;
-            double size = -1;
-            if (node["size"] != null)
-                size = node["size"].ParseDouble();
 
-            return new Plane(pos, mat, normal, size);
+            return new Plane(pos, mat, normal);
         }
     }
 }
