@@ -26,24 +26,36 @@ namespace RayTracor.RayTracorLib
             Vertex3 = v3;
 
             T1 = new Triangle(Vertex0, Vertex1, Vertex3, material);
-            T2 = new Triangle(Vertex1, Vertex2, Vertex3, material);
+            T2 = new Triangle(Vertex2, Vertex3, Vertex1, material);
         }
 
         public override Intersection Intersects(Ray ray)
         {
             Intersection interT1 = T1.Intersects(ray);
             Intersection interT2 = T2.Intersects(ray);
+            Intersection res = Intersection.False;
 
+            if (!interT1.Intersects && !interT2.Intersects)
+                return res;
             if (interT1.Intersects && !interT2.Intersects)
-                return interT1;
+                res = interT1;
             if (!interT1.Intersects && interT2.Intersects)
-                return interT2;
-            return interT1.Distance < interT2.Distance ? interT1 : interT2;
+                res = interT2;
+            res = interT1.Distance < interT2.Distance ? interT1 : interT2;
+            
+            if (res.Object == T2)
+            {
+                res.BaryCoords.X = 1.0 - res.BaryCoords.X;
+                res.BaryCoords.Y = 1.0 - res.BaryCoords.Y;
+            }
+
+            res.Object = this;
+            return res;
         }
 
         public override Vector EvalMaterial(Intersection intersec, double lambertAmount)
         {
-            return intersec.Object.EvalMaterial(intersec, lambertAmount);
+            return new Vector(intersec.BaryCoords.X, intersec.BaryCoords.Y, 0) * 255.0;
         }
 
         public override void Serialize(XmlDocument doc, XmlNode parent)

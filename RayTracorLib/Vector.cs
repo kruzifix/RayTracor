@@ -11,6 +11,7 @@ namespace RayTracor.RayTracorLib
     public class Vector
     {
         public static readonly Vector Zero = new Vector(0, 0, 0);
+        public static readonly Vector One = new Vector(1, 1, 1);
         public static readonly Vector UnitX = new Vector(1, 0, 0);
         public static readonly Vector UnitY = new Vector(0, 1, 0);
         public static readonly Vector UnitZ = new Vector(0, 0, 1);
@@ -21,8 +22,11 @@ namespace RayTracor.RayTracorLib
 
         public double Length { get { return Math.Sqrt(X * X + Y * Y + Z * Z); } }
         public Vector Normalized { get { double len = Length; return new Vector(X / len, Y / len, Z / len); } }
+        public Vector Negated { get { return new Vector(-X, -Y, -Z); } }
 
         public Vector() { X = 0; Y = 0; Z = 0; }
+
+        public Vector(double v) { X = Y = Z = v; }
 
         public Vector(double x, double y, double z) { X = x; Y = y; Z = z; }
 

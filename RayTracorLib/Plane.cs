@@ -25,7 +25,7 @@ namespace RayTracor.RayTracorLib
             {
                 double t = Vector.DotProduct(Position - ray.Start, normal) / denom;
                 if (t > 0.0005)
-                    return new Intersection(true, t, ray.PointAt(t), this, normal, null);
+                    return new Intersection(t, ray.PointAt(t), this, normal, null);
             }
             return Intersection.False;
         }

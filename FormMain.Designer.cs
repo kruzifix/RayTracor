@@ -179,7 +179,7 @@
             this.Controls.Add(this.bRender);
             this.Controls.Add(this.renderControl);
             this.Name = "FormMain";
-            this.Text = "Form1";
+            this.Text = "Ray Tracor";
             this.ResumeLayout(false);
             this.PerformLayout();
 

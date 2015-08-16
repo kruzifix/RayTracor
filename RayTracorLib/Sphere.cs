@@ -28,52 +28,56 @@ namespace RayTracor.RayTracorLib
             //    return new IntersectionResult(false, 0);
             //return new IntersectionResult(true, v - Math.Sqrt(discriminant));
 
-            //double a = Vector.DotProduct(ray.Direction, ray.Direction);
-            //double b = 2 * Vector.DotProduct(ray.Direction, ray.Start - Position);
-            //Vector rayToCenter = ray.Start - Position;
-            //double c = Vector.DotProduct(rayToCenter, rayToCenter) - Radius * Radius;
-
-            //double dis = b * b - 4 * a * c;
-
-            //if (dis >= 0.0)
-            //    return new IntersectionResult(true, (-Math.Sqrt(dis) - b) / (2.0 * a));
-            //return new IntersectionResult(false, 0.0);
-
-            Vector L = ray.Start - Position;
             double a = Vector.DotProduct(ray.Direction, ray.Direction);
-            double b = 2 * Vector.DotProduct(ray.Direction, L);
-            double c = Vector.DotProduct(L, L) - Radius * Radius;
+            double b = 2 * Vector.DotProduct(ray.Direction, ray.Start - Position);
+            Vector rayToCenter = ray.Start - Position;
+            double c = Vector.DotProduct(rayToCenter, rayToCenter) - Radius * Radius;
 
-            double t0, t1;
+            double dis = b * b - 4 * a * c;
 
-            double discr = b * b - 4 * a * c;
-            if (discr < 0)
-                return Intersection.False;
-            else if (discr == 0)
-                t0 = t1 = -0.5 * b / a;
-            else
+            if (dis >= 0.0)
             {
-                double q = (b > 0) ?
-                    -0.5 * (b + Math.Sqrt(discr)) :
-                    -0.5 * (b - Math.Sqrt(discr));
-                t0 = q / a;
-                t1 = c / q;
+                double t = (-Math.Sqrt(dis) - b) / (2.0 * a);
+                Vector point = ray.PointAt(t);
+                return new Intersection(t, point, this, (point - Position).Normalized, null);
             }
-            if (t0 > t1)
-            {
-                double t = t0;
-                t0 = t1;
-                t1 = t;
-            }
-            if (t0 < 0)
-            {
-                t0 = t1;
-                if (t0 < 0.0001)
-                    return Intersection.False;
-            }
+            return Intersection.False;
 
-            Vector point = ray.PointAt(t0);
-            return new Intersection(true, t0, point, this, (point - Position).Normalized, null);
+            //Vector L = ray.Start - Position;
+            //double a = Vector.DotProduct(ray.Direction, ray.Direction);
+            //double b = 2 * Vector.DotProduct(ray.Direction, L);
+            //double c = Vector.DotProduct(L, L) - Radius * Radius;
+
+            //double t0, t1;
+
+            //double discr = b * b - 4 * a * c;
+            //if (discr < 0)
+            //    return Intersection.False;
+            //else if (discr == 0)
+            //    t0 = t1 = -0.5 * b / a;
+            //else
+            //{
+            //    double q = (b > 0) ?
+            //        -0.5 * (b + Math.Sqrt(discr)) :
+            //        -0.5 * (b - Math.Sqrt(discr));
+            //    t0 = q / a;
+            //    t1 = c / q;
+            //}
+            //if (t0 > t1)
+            //{
+            //    double t = t0;
+            //    t0 = t1;
+            //    t1 = t;
+            //}
+            //if (t0 < 0)
+            //{
+            //    t0 = t1;
+            //    if (t0 < 0.0001)
+            //        return Intersection.False;
+            //}
+
+            //Vector point = ray.PointAt(t0);
+            //return new Intersection(t0, point, this, (point - Position).Normalized, null);
         }
         
         public override Vector EvalMaterial(Intersection intersec, double lambertAmount)

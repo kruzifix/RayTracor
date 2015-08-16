@@ -132,6 +132,7 @@ namespace RayTracor
                 bRenderParallel.Enabled = b;
                 bDepthMap.Enabled = b;
                 bNormalMap.Enabled = b;
+                bAO.Enabled = b;
             });
         }
 
@@ -196,7 +197,7 @@ namespace RayTracor
 
         private void bDepthMap_Click(object sender, EventArgs e)
         {
-            Render(() => scene.RenderDepthMap(settings.width, settings.height), 1);
+            Render(() => scene.RenderGreyScaleDepthMap(settings.width, settings.height), 1);
         }
         
         private void bNormalMap_Click(object sender, EventArgs e)
@@ -206,7 +207,7 @@ namespace RayTracor
         
         private void bAO_Click(object sender, EventArgs e)
         {
-            Render(() => scene.RenderAmbientOcclusion(settings.width, settings.height, 8), 1);
+            Render(() => scene.RenderAmbientOcclusion(settings.width, settings.height, 16), 1);
         }
     }
 

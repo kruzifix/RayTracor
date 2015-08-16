@@ -197,8 +197,11 @@ namespace RayTracor.RayTracorLib
             {
                 for (int y = 0; y < height; y++)
                 {
-                    Ray ray = camera.CastRay(x, y);
-                    float fdepth = (float)GetDepth(ray);
+                    Intersection res = IntersectScene(camera.CastRay(x, y));
+                    float fdepth = -1;
+                    if (res.Intersects)
+                        fdepth = (float)res.Distance;
+
                     byte[] bdepth = BitConverter.GetBytes(fdepth);
                     int i = y * data.Stride + x * 4;
                     Array.Copy(bdepth, 0, pixels, i, 4);
@@ -209,12 +212,27 @@ namespace RayTracor.RayTracorLib
             return bmp;
         }
 
+        public Bitmap RenderGreyScaleDepthMap(int width, int height)
+        {
+            double maxDist = 20.0;
+
+            return RenderFunc(width, height,  (x,y)=> {
+                Intersection res = IntersectScene(camera.CastRay(x, y));
+                if (!res.Intersects || res.Distance > maxDist)
+                    return Color.Black;
+                int col = 255 - (int)(res.Distance / maxDist * 255.0);
+                return Color.FromArgb(col, col, col);
+            });
+        }
+
         public Bitmap RenderNormalMap(int width, int height)
         {
             return RenderFunc(width, height, (x, y) =>
             {
-                Vector normal = GetNormal(camera.CastRay(x, y));
-                return (normal * 255.0).ToColor();
+                Intersection res = IntersectScene(camera.CastRay(x, y));
+                if (res.Intersects)
+                    return (res.Normal * 127.0 + new Vector(128.0)).ToColor();
+                return Color.Black;
             });
         }
 
@@ -225,24 +243,42 @@ namespace RayTracor.RayTracorLib
                 Ray ray = camera.CastRay(x, y);
                 Intersection res = IntersectScene(ray);
                 if (!res.Intersects)
-                    return Color.White;
+                    return Color.Red;
 
                 MwcRng.SetSeed((uint)GetHashCode());
                 
-                double theta = Math.Atan2(res.Normal.Y, res.Normal.X);
-                double phi = Math.Acos(res.Normal.Z);
-
+                //double theta = Math.Atan2(res.Normal.Y, res.Normal.X);
+                //double phi = Math.Acos(res.Normal.Z);
+                
                 int notblocked = 0;
-                for (int i = 0; i < rays; i++)
+                int castedRays = 0;
+                while(castedRays < rays)
                 {
-                    double newtheta = theta + MwcRng.GetUniformRange(-Math.PI / 2.0, Math.PI / 2.0);
-                    double newphi = phi + MwcRng.GetUniformRange(0, Math.PI * 2.0);
+                    Vector rand = new Vector(MwcRng.GetUniformRange(-1, 1), MwcRng.GetUniformRange(-1, 1), MwcRng.GetUniformRange(-1, 1));
 
-                    Vector newnormal = new Vector(Math.Cos(newtheta), Math.Sin(newtheta), Math.Cos(newphi));
-                    Ray newray = new Ray(res.Point, newnormal);
-                    if (!IntersectScene(newray).Intersects)
+                    if (Vector.DotProduct(rand, res.Normal) < 0.0)
+                        continue;
+
+                    Ray newray = new Ray(res.Point, rand);
+                    Intersection res2 = IntersectSceneExcept(newray, res.Object);
+                    if (!res2.Intersects)
                         notblocked++;
+                    castedRays++;
+                    
+                    //    double newtheta = theta + MwcRng.GetUniformRange(-Math.PI / 2.0, Math.PI / 2.0);
+                    //    double newphi = phi + MwcRng.GetUniformRange(0, Math.PI * 2.0);
+
+                    //    Vector newnormal = new Vector(Math.Cos(newtheta), Math.Sin(newtheta), Math.Cos(newphi));
+                    //    Ray newray = new Ray(res.Point, newnormal);
+                    //    if (!IntersectSceneExcept(newray, res.Object).Intersects)
+                    //        notblocked++;
                 }
+                
+                //rays = 1;
+                //Ray newRay = new Ray(res.Point, res.Normal);
+                //if (!IntersectSceneExcept(newRay, res.Object).Intersects)
+                //if (!IntersectScene(newRay).Intersects)
+                //        notblocked++;
 
                 int col = (int)(notblocked * 255.0 / rays);
                 return Color.FromArgb(col, col, col);
@@ -275,7 +311,7 @@ namespace RayTracor.RayTracorLib
             return pixels;
         }
 
-        public byte[] RenderSuperSample(int x, int y, int width, int height)
+        public byte[] RenderDeterministicSuperSample(int x, int y, int width, int height)
         {
             byte[] pixels = new byte[width * 3 * height];
             int stride = width * 3;
@@ -339,23 +375,7 @@ namespace RayTracor.RayTracorLib
             }
             return resultColor.ToColor();
         }
-
-        private double GetDepth(Ray ray)
-        {
-            Intersection res = IntersectScene(ray);
-            if (res.Intersects)
-                return res.Distance;
-            return -1;
-        }
-
-        private Vector GetNormal(Ray ray)
-        {
-            Intersection res = IntersectScene(ray);
-            if (res.Intersects)
-                return res.Normal;
-            return Vector.Zero;
-        }
-
+        
         private Intersection IntersectScene(Ray ray)
         {
             Intersection closestIntersec = Intersection.False;
@@ -365,11 +385,24 @@ namespace RayTracor.RayTracorLib
             {
                 Intersection res = o.Intersects(ray);
 
-                if (res.Intersects)
-                {
-                    if (res.Distance < closestIntersec.Distance)
-                        closestIntersec = res;
-                }
+                if (res.Intersects && res.Distance < closestIntersec.Distance)
+                    closestIntersec = res;
+            }
+
+            return closestIntersec;
+        }
+
+        private Intersection IntersectSceneExcept(Ray ray, params Object[] objs)
+        {
+            Intersection closestIntersec = Intersection.False;
+            closestIntersec.Distance = double.MaxValue;
+            
+            foreach (Object o in objects.Except(objs))
+            {
+                Intersection res = o.Intersects(ray);
+
+                if (res.Intersects && res.Distance < closestIntersec.Distance)
+                    closestIntersec = res;
             }
 
             return closestIntersec;

@@ -8,7 +8,7 @@ namespace RayTracor.RayTracorLib
 {
     public class Intersection
     {
-        public static readonly Intersection False = new Intersection(false, 0.0, null, null, null, null);
+        public static readonly Intersection False = new Intersection();
 
         public bool Intersects { get; set; }
         public double Distance { get; set; }
@@ -16,12 +16,12 @@ namespace RayTracor.RayTracorLib
         public Object Object { get; set; }
         public Vector Normal { get; set; }
         public Vector2 BaryCoords { get; set; }
+        
+        private Intersection() { Intersects = false; }
 
-        public Intersection() { }
-
-        public Intersection(bool intersects, double distance, Vector point, Object obj, Vector normal, Vector2 baryCoords)
+        public Intersection(double distance, Vector point, Object obj, Vector normal, Vector2 baryCoords)
         {
-            Intersects = intersects;
+            Intersects = true;
             Distance = distance;
             Point = point;
             Object = obj;

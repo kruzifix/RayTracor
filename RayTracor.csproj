@@ -114,6 +114,7 @@
   <ItemGroup>
     <Content Include="AO_test.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="roadmap.txt" />
     <Content Include="scene.xml">

@@ -4,17 +4,19 @@
 -stochastic (random) super sampling
 -rework materials (phong shading)
 -material scripting ?
+-texturing, bumpmapping
+-gloss
 -depth of field
--quads
 -error checking when loading
 -area lights (soft shadows)
--gloss
--texturing, bumpmapping
 -meshes (.obj loader)
 -different backgrounds (patterns)
+
+-poisson disk distribution for rng
 
 things added:
 -triangles
 -render depth
 -deterministic supersampling
 -render normal map
+-quads
