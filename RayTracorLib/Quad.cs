@@ -55,7 +55,8 @@ namespace RayTracor.RayTracorLib
 
         public override Vector EvalMaterial(Intersection intersec, double lambertAmount)
         {
-            return new Vector(intersec.BaryCoords.X, intersec.BaryCoords.Y, 0) * 255.0;
+            Vector col = Material.Color.ToVector();
+            return Material.AddAmbientLambert(col, lambertAmount);
         }
 
         public override void Serialize(XmlDocument doc, XmlNode parent)
