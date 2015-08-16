@@ -172,17 +172,24 @@ namespace RayTracor
                 g.DrawEllipse(new Pen(s.Material.Color, 1.5f), rect);
             }
             if (obj is RayTracorLib.Triangle)
+                DrawTriangle(obj as Triangle);
+            if (obj is Quad)
             {
-                Triangle tri = obj as Triangle;
-
-                Vector2 v0 = new Vector2(tri.Vertex0.X, tri.Vertex0.Z);
-                Vector2 v1 = new Vector2(tri.Vertex1.X, tri.Vertex1.Z);
-                Vector2 v2 = new Vector2(tri.Vertex2.X, tri.Vertex2.Z);
-
-                DrawLine(Pens.Black, v0, v1);
-                DrawLine(Pens.Black, v1, v2);
-                DrawLine(Pens.Black, v2, v0);
+                Quad q = obj as Quad;
+                DrawTriangle(q.T1);
+                DrawTriangle(q.T2);
             }
+        }
+
+        private void DrawTriangle(Triangle tri)
+        {
+            Vector2 v0 = new Vector2(tri.Vertex0.X, tri.Vertex0.Z);
+            Vector2 v1 = new Vector2(tri.Vertex1.X, tri.Vertex1.Z);
+            Vector2 v2 = new Vector2(tri.Vertex2.X, tri.Vertex2.Z);
+
+            DrawLine(Pens.Black, v0, v1);
+            DrawLine(Pens.Black, v1, v2);
+            DrawLine(Pens.Black, v2, v0);
         }
 
         private void DrawRay(Color color, Ray ray)

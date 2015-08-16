@@ -39,6 +39,7 @@
             this.bLoad = new System.Windows.Forms.Button();
             this.bDepthMap = new System.Windows.Forms.Button();
             this.bNormalMap = new System.Windows.Forms.Button();
+            this.bAO = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // bRender
@@ -150,11 +151,22 @@
             this.bNormalMap.UseVisualStyleBackColor = true;
             this.bNormalMap.Click += new System.EventHandler(this.bNormalMap_Click);
             // 
+            // bAO
+            // 
+            this.bAO.Location = new System.Drawing.Point(369, 41);
+            this.bAO.Name = "bAO";
+            this.bAO.Size = new System.Drawing.Size(104, 23);
+            this.bAO.TabIndex = 10;
+            this.bAO.Text = "Ambient Occlusion";
+            this.bAO.UseVisualStyleBackColor = true;
+            this.bAO.Click += new System.EventHandler(this.bAO_Click);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(551, 419);
+            this.Controls.Add(this.bAO);
             this.Controls.Add(this.bNormalMap);
             this.Controls.Add(this.bDepthMap);
             this.Controls.Add(this.bLoad);
@@ -186,6 +198,7 @@
         private System.Windows.Forms.Button bLoad;
         private System.Windows.Forms.Button bDepthMap;
         private System.Windows.Forms.Button bNormalMap;
+        private System.Windows.Forms.Button bAO;
     }
 }
 

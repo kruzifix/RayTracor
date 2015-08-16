@@ -442,7 +442,9 @@ namespace RayTracor.RayTracorLib
                 s.objects.Add(Plane.Parse(n));
             foreach (XmlNode n in objects.SelectNodes("triangle"))
                 s.objects.Add(Triangle.Parse(n));
-            
+            foreach (XmlNode n in objects.SelectNodes("quad"))
+                s.objects.Add(Quad.Parse(n));
+
             return s;
         }
     }

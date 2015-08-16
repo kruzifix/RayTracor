@@ -2,8 +2,8 @@
 <scene>
   <backgroundcolor>FF808080</backgroundcolor>
   <camera>
-    <position x="6" y="6" z="6" />
-    <looksat x="0" y="2" z="0" />
+    <position x="8" y="7" z="8" />
+    <looksat x="0" y="1.5" z="0" />
     <globalup x="0" y="1" z="0" />
     <fov>45</fov>
   </camera>
@@ -15,18 +15,19 @@
     </pointlight>
   </lights>
   <objects>
-    <plane>
-      <position x="0" y="0" z="0" />
-      <normal x="0" y="1" z="0" />
-      <size>3</size>
-      <material>
-        <specular>0</specular>
-        <lambert>0.7</lambert>
-        <ambient>0.1</ambient>
-        <color>FFCEB0B0</color>
-        <textured>false</textured>
-      </material>
-    </plane>
+    <quad>
+			<vertex0 x="-3" y="0" z="-3"/>
+      <vertex1 x="3" y="0" z="-3"/>
+      <vertex2 x="3" y="0" z="3"/>
+      <vertex3 x="-3" y="0" z="3"/>
+			<material>
+				<specular>0</specular>
+				<lambert>0.7</lambert>
+				<ambient>0.1</ambient>
+				<color>FF22FF34</color>
+				<textured>false</textured>
+			</material>
+		</quad>
     <sphere>
       <position x="0" y="2" z="0" />
       <radius>2</radius>

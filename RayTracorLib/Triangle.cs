@@ -52,16 +52,16 @@ namespace RayTracor.RayTracorLib
             Vector col = Material.Color.ToVector();
             //if (bary.X > 0.25 && bary.Y < 0.75 && bary.Y > 0.25 && bary.Y < 0.75)
             //    col *= 0.5;
+            if (Material.Textured)
+            {
+                double scale = 255.0;
+                int u = (int)Math.Floor(intersec.BaryCoords.X * scale);
+                int v = (int)Math.Floor(intersec.BaryCoords.Y * scale);
 
-            double scale = 255.0;
-            int u = (int)Math.Floor(intersec.BaryCoords.X * scale);
-            int v = (int)Math.Floor(intersec.BaryCoords.Y * scale);
-
-            double fac = (u ^ v) * 0.75 / scale + 0.25;
-
-            return Material.AddAmbientLambert(col * fac, lambertAmount);
-
-            //return Material.AddAmbientLambert(Material.Color.ToVector(), lambertAmount);
+                double fac = (u ^ v) * 0.75 / scale + 0.25;
+                col *= fac;
+            }
+            return Material.AddAmbientLambert(col, lambertAmount);
         }
         
         public override void Serialize(XmlDocument doc, XmlNode parent)
