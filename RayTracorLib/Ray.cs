@@ -39,27 +39,4 @@ namespace RayTracor.RayTracorLib
             return new Ray(from, to - from);
         }
     }
-
-    public class IntersectionResult
-    {
-        public bool Intersects { get; set; }
-        public double Distance { get; set; }
-
-        public IntersectionResult(bool intersects, double distance)
-        {
-            Intersects = intersects;
-            Distance = distance;
-        }
-    }
-
-    public class IntersectionResultVector2 : IntersectionResult
-    {
-        public Vector2 Vector { get; set; }
-
-        public IntersectionResultVector2(bool intersects, double distance, Vector2 vec)
-            :base(intersects, distance)
-        {
-            Vector = vec;
-        }
-    }
 }

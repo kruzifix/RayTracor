@@ -60,6 +60,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RayTracorLib\Camera.cs" />
     <Compile Include="RayTracorLib\Extensions.cs" />
+    <Compile Include="RayTracorLib\IntersectionResult.cs" />
     <Compile Include="RayTracorLib\PointLight.cs" />
     <Compile Include="RayTracorLib\Material.cs" />
     <Compile Include="RayTracorLib\MwcRng.cs" />

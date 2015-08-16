@@ -3,11 +3,17 @@
   <backgroundcolor>FF808080</backgroundcolor>
   <camera>
     <position x="6" y="6" z="6" />
-    <looksat x="0" y="1" z="0" />
+    <looksat x="0" y="2" z="0" />
     <globalup x="0" y="1" z="0" />
     <fov>45</fov>
   </camera>
-  <lights></lights>
+  <lights>
+    <pointlight>
+      <position x="0" y="10" z="6" />
+      <color>FFFFFFFF</color>
+      <strength>1</strength>
+    </pointlight>
+  </lights>
   <objects>
     <plane>
       <position x="0" y="0" z="0" />

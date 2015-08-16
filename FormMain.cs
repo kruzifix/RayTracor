@@ -98,13 +98,15 @@ namespace RayTracor
 
         private int SaveBmp(Bitmap bmp, long ms, int tasks)
         {
-            if (!File.Exists("renders.txt"))
-                File.WriteAllText("renders.txt", "0");
-            string number = File.ReadAllText("renders.txt");
+            if (!Directory.Exists("renders"))
+                Directory.CreateDirectory("renders");
+            if (!File.Exists("renders/renders.txt"))
+                File.WriteAllText("renders/renders.txt", "0");
+            string number = File.ReadAllText("renders/renders.txt");
             int num = int.Parse(number);
-            string filename = string.Format("{0:000}_render_{1}ms_{2}task{3}.bmp", num, ms, tasks, tasks > 1 ? "s" : "");
+            string filename = string.Format("renders/{0:000}_render_{1}ms_{2}task{3}.bmp", num, ms, tasks, tasks > 1 ? "s" : "");
             bmp.Save(filename);
-            File.WriteAllText("renders.txt", (num + 1).ToString());
+            File.WriteAllText("renders/renders.txt", (num + 1).ToString());
             return num;
         }
 
@@ -147,14 +149,14 @@ namespace RayTracor
 
         private void bSave_Click(object sender, EventArgs e)
         {
-            scene.Serialize().Save("scene.xml");
+            //scene.Serialize().Save("scene.xml");
         }
 
         private void bLoad_Click(object sender, EventArgs e)
         {
             XmlDocument doc = new XmlDocument();
             doc.Load("AO_test.xml");
-            scene = Scene.Parse(doc["scene"]);
+            scene = Scene.Parse(doc);
 
             UpdateRenderControl();
         }

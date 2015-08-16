@@ -18,25 +18,25 @@ namespace RayTracor.RayTracorLib
             this.normal = normal.Normalized;
         }
 
-        public override IntersectionResult Intersects(Ray ray)
+        public override Intersection Intersects(Ray ray)
         {
             double denom = Vector.DotProduct(normal, ray.Direction);
             if (Math.Abs(denom) > 0.0001)
             {
                 double t = Vector.DotProduct(Position - ray.Start, normal) / denom;
                 if (t > 0.0005)
-                    return new IntersectionResult(true, t, this, normal, null);
+                    return new Intersection(true, t, ray.PointAt(t), this, normal, null);
             }
-            return new IntersectionResult(false, 0.0, null, null, null);
+            return Intersection.False;
         }
-        
-        public override Vector EvalMaterial(Vector point, Vector normal, double lambertAmount)
+
+        public override Vector EvalMaterial(Intersection intersec, double lambertAmount)
         {
             Vector col = Material.Color.ToVector();
             if (Material.Textured)
             {
-                double x = Math.Floor(point.X);
-                double y = Math.Floor(point.Z);
+                double x = Math.Floor(intersec.Point.X);
+                double y = Math.Floor(intersec.Point.Z);
 
                 if (x % 2 == 0 ^ y % 2 == 0)
                     col *= 0.5;

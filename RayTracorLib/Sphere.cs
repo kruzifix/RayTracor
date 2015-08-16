@@ -17,7 +17,7 @@ namespace RayTracor.RayTracorLib
             Radius = radius;
         }
 
-        public override IntersectionResult Intersects(Ray ray)
+        public override Intersection Intersects(Ray ray)
         {
             //Vector rayToCenter = Position - ray.Start;
             //double v = Vector.DotProduct(rayToCenter, ray.Direction);
@@ -47,8 +47,8 @@ namespace RayTracor.RayTracorLib
             double t0, t1;
 
             double discr = b * b - 4 * a * c;
-            if (discr < 0) 
-                return new IntersectionResult(false, 0.0);
+            if (discr < 0)
+                return Intersection.False;
             else if (discr == 0)
                 t0 = t1 = -0.5 * b / a;
             else
@@ -69,24 +69,20 @@ namespace RayTracor.RayTracorLib
             {
                 t0 = t1;
                 if (t0 < 0.0001)
-                    return new IntersectionResult(false, 0.0);
+                    return Intersection.False;
             }
 
-            return new IntersectionResult(true, t0);
+            Vector point = ray.PointAt(t0);
+            return new Intersection(true, t0, point, this, (point - Position).Normalized, null);
         }
-
-        public override Vector Normal(Vector point)
-        {
-            return (point - Position).Normalized;
-        }
-
-        public override Vector EvalMaterial(Vector point, Vector normal, double lambertAmount)
+        
+        public override Vector EvalMaterial(Intersection intersec, double lambertAmount)
         {
             Vector col = Material.Color.ToVector();
             if (Material.Textured)
             {
-                double xtex = (1 + Math.Atan2(normal.Z, normal.X) / Math.PI) * 0.5;
-                double ytex = Math.Acos(normal.Y) / Math.PI;
+                double xtex = (1 + Math.Atan2(intersec.Normal.Z, intersec.Normal.X) / Math.PI) * 0.5;
+                double ytex = Math.Acos(intersec.Normal.Y) / Math.PI;
                 double scale = 4;
 
                 bool pattern = ((xtex * scale) % 1.0 > 0.5) ^ ((ytex * scale) % 1.0 > 0.5);

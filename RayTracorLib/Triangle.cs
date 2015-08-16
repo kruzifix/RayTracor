@@ -15,7 +15,7 @@ namespace RayTracor.RayTracorLib
 
         public Vector E1 { get; private set; }
         public Vector E2 { get; private set; }
-        Vector normal;
+        public Vector Normal { get; private set; }
 
         public Triangle(Vector v0, Vector v1, Vector v2, Material material)
             :base(Vector.Zero, material)
@@ -26,30 +26,10 @@ namespace RayTracor.RayTracorLib
 
             E1 = Vertex1 - Vertex0;
             E2 = Vertex2 - Vertex0;
-            normal = Vector.CrossProduct(E2, E1).Normalized;
+            Normal = Vector.CrossProduct(E2, E1).Normalized;
         }
-
-        public override Vector EvalMaterial(Vector point, Vector normal, double lambertAmount)
-        {
-            return Material.AddAmbientLambert(Material.Color.ToVector(), lambertAmount);
-        }
-
-        public Vector EvalMaterial(Vector2 bary, double lambertAmount)
-        {
-            Vector col = Material.Color.ToVector();
-            //if (bary.X > 0.25 && bary.Y < 0.75 && bary.Y > 0.25 && bary.Y < 0.75)
-            //    col *= 0.5;
-
-            double scale = 255.0;
-            int u = (int)Math.Floor(bary.X * scale);
-            int v = (int)Math.Floor(bary.Y * scale);
-
-            double fac = (u ^ v) * 0.75 / scale + 0.25;
-            
-            return Material.AddAmbientLambert(col * fac, lambertAmount);
-        }
-
-        public override IntersectionResult Intersects(Ray ray)
+        
+        public override Intersection Intersects(Ray ray)
         {
             Vector T = ray.Start - Vertex0;
             Vector P = Vector.CrossProduct(ray.Direction, E2);
@@ -61,17 +41,29 @@ namespace RayTracor.RayTracorLib
                 double u = Vector.DotProduct(P, T) / denom;
                 double v = Vector.DotProduct(Q, ray.Direction) / denom;
                 double t = Vector.DotProduct(Q, E2) / denom;
-                if ((u >= 0.0 && u <= 1.0) && (v >= 0.0 && u+v <= 1.0))
-                    return new IntersectionResultVector2(true, t, new Vector2(u, v));
+                if ((u >= 0.0 && u <= 1.0) && (v >= 0.0 && u + v <= 1.0))
+                    return new Intersection(true, t, ray.PointAt(t), this, Normal, new Vector2(u, v));
             }
-            return new IntersectionResult(false, 0.0);
+            return Intersection.False;
         }
 
-        public override Vector Normal(Vector point)
+        public override Vector EvalMaterial(Intersection intersec, double lambertAmount)
         {
-            return normal;
-        }
+            Vector col = Material.Color.ToVector();
+            //if (bary.X > 0.25 && bary.Y < 0.75 && bary.Y > 0.25 && bary.Y < 0.75)
+            //    col *= 0.5;
 
+            double scale = 255.0;
+            int u = (int)Math.Floor(intersec.BaryCoords.X * scale);
+            int v = (int)Math.Floor(intersec.BaryCoords.Y * scale);
+
+            double fac = (u ^ v) * 0.75 / scale + 0.25;
+
+            return Material.AddAmbientLambert(col * fac, lambertAmount);
+
+            //return Material.AddAmbientLambert(Material.Color.ToVector(), lambertAmount);
+        }
+        
         public override void Serialize(XmlDocument doc, XmlNode parent)
         {
             XmlNode node = doc.CreateElement("triangle");

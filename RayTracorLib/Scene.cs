@@ -222,19 +222,15 @@ namespace RayTracor.RayTracorLib
         {
             return RenderFunc(width, height, (x, y) =>
             {
-                Object obj;
                 Ray ray = camera.CastRay(x, y);
-                IntersectionResult res = IntersectScene(ray, out obj);
+                Intersection res = IntersectScene(ray);
                 if (!res.Intersects)
                     return Color.White;
 
                 MwcRng.SetSeed((uint)GetHashCode());
-
-                Vector point = ray.PointAt(res.Distance);
-                Vector normal = obj.Normal(point);
-                //point += normal * 0.001;
-                double theta = Math.Atan2(normal.Y, normal.X);
-                double phi = Math.Acos(normal.Z);
+                
+                double theta = Math.Atan2(res.Normal.Y, res.Normal.X);
+                double phi = Math.Acos(res.Normal.Z);
 
                 int notblocked = 0;
                 for (int i = 0; i < rays; i++)
@@ -243,9 +239,8 @@ namespace RayTracor.RayTracorLib
                     double newphi = phi + MwcRng.GetUniformRange(0, Math.PI * 2.0);
 
                     Vector newnormal = new Vector(Math.Cos(newtheta), Math.Sin(newtheta), Math.Cos(newphi));
-                    Ray newray = new Ray(point, newnormal);
-                    Object dum;
-                    if (!IntersectScene(newray, out dum).Intersects)
+                    Ray newray = new Ray(res.Point, newnormal);
+                    if (!IntersectScene(newray).Intersects)
                         notblocked++;
                 }
 
@@ -310,50 +305,44 @@ namespace RayTracor.RayTracorLib
         {
             if (depth > 3)
                 return Color.Empty;
-
-            Object obj;
-            IntersectionResult res = IntersectScene(ray, out obj);
+            
+            Intersection res = IntersectScene(ray);
             if (!res.Intersects)
                 return backgroundColor;
-
-            Vector point = ray.PointAt(res.Distance);
-            Vector normal = obj.Normal(point);
-
+            
             // lights!
             double lambertAmount = 0;
             foreach (PointLight l in lights)
             {
-                double vis = LightVisibility(point, l);
+                double vis = LightVisibility(res.Point, l);
                 if (vis <= 0.0)
                     continue;
-                double contribution = Vector.DotProduct((l.Position - point).Normalized, normal);
+                double contribution = Vector.DotProduct((l.Position - res.Point).Normalized, res.Normal);
                 if (contribution > 0)
                     lambertAmount += contribution * vis;
             }
 
             lambertAmount = Math.Min(1, lambertAmount);
 
+            Object obj = res.Object;
             double specular = obj.Material.Specular;
-            Vector result = obj.EvalMaterial(point, normal, lambertAmount);
-            if (obj is Triangle)
-                result = (obj as Triangle).EvalMaterial((res as IntersectionResultVector2).Vector, lambertAmount);
+            Vector resultColor = obj.EvalMaterial(res, lambertAmount);
 
             if (specular != 0.0)
             {
-                Ray reflected = ray.Reflect(point, normal);
+                Ray reflected = ray.Reflect(res.Point, res.Normal);
                 reflected.Start += reflected.Direction * 0.001;
 
                 Color? reflectColor = Trace(reflected, depth + 1);
                 if (reflectColor.HasValue)
-                    result += new Vector(reflectColor.Value) * specular;
+                    resultColor += new Vector(reflectColor.Value) * specular;
             }
-            return result.ToColor();
+            return resultColor.ToColor();
         }
 
         private double GetDepth(Ray ray)
         {
-            Object obj;
-            IntersectionResult res = IntersectScene(ray, out obj);
+            Intersection res = IntersectScene(ray);
             if (res.Intersects)
                 return res.Distance;
             return -1;
@@ -361,30 +350,29 @@ namespace RayTracor.RayTracorLib
 
         private Vector GetNormal(Ray ray)
         {
-            Object obj;
-            IntersectionResult res = IntersectScene(ray, out obj);
+            Intersection res = IntersectScene(ray);
             if (res.Intersects)
-                return obj.Normal(ray.PointAt(res.Distance));
+                return res.Normal;
             return Vector.Zero;
         }
 
-        private IntersectionResult IntersectScene(Ray ray, out Object obj)
+        private Intersection IntersectScene(Ray ray)
         {
-            IntersectionResult closestDist = new IntersectionResult(false, double.MaxValue);
-            obj = null;
-
+            Intersection closestIntersec = Intersection.False;
+            closestIntersec.Distance = double.MaxValue;
+            
             foreach (Object o in objects)
             {
-                IntersectionResult res = o.Intersects(ray);
+                Intersection res = o.Intersects(ray);
 
-                if (res.Intersects && res.Distance < closestDist.Distance)
+                if (res.Intersects)
                 {
-                    closestDist = res;
-                    obj = o;
+                    if (res.Distance < closestIntersec.Distance)
+                        closestIntersec = res;
                 }
             }
 
-            return closestDist;
+            return closestIntersec;
         }
 
         private double LightVisibility(Vector point, PointLight light)
@@ -398,7 +386,7 @@ namespace RayTracor.RayTracorLib
 
             foreach (Object o in objects)
             {
-                IntersectionResult r = o.Intersects(ray);
+                Intersection r = o.Intersects(ray);
                 if (r.Intersects && r.Distance > -0.0005)
                     return 0.0;
             }
@@ -432,51 +420,29 @@ namespace RayTracor.RayTracorLib
             return doc;
         }
 
-        public static Scene Parse(XmlNode doc)
+        public static Scene Parse(XmlDocument doc)
         {
+            XmlNode root = doc["scene"];
             Scene s = new Scene();
-            Camera cam = Camera.Parse(doc["camera"]);
+            Camera cam = Camera.Parse(root["camera"]);
             s.camera = cam;
 
             // lights
-            XmlNode lights = doc.SelectSingleNode("//scene/lights");
-            foreach (XmlNode li in lights.SelectNodes("light"))
+            XmlNode lights = root.SelectSingleNode("//scene/lights");
+            foreach (XmlNode li in lights.SelectNodes("pointlight"))
                 s.lights.Add(PointLight.Parse(li));
             foreach (XmlNode sli in lights.SelectNodes("spotlight"))
                 s.lights.Add(SpotLight.Parse(sli));
 
             // objects
-            XmlNode objects = doc.SelectSingleNode("//scene/objects");
+            XmlNode objects = root.SelectSingleNode("//scene/objects");
             foreach (XmlNode n in objects.SelectNodes("sphere"))
                 s.objects.Add(Sphere.Parse(n));
             foreach (XmlNode n in objects.SelectNodes("plane"))
                 s.objects.Add(Plane.Parse(n));
             foreach (XmlNode n in objects.SelectNodes("triangle"))
                 s.objects.Add(Triangle.Parse(n));
-
-            //int numSpheres = 10;
-            //Random rand = new Random();
-            //for (int i = 0; i < numSpheres; i++)
-            //{
-            //    double x = rand.NextDouble(-3, 3);
-            //    double y = rand.NextDouble(-1, 1);
-            //    double z = rand.NextDouble(-5, 2);
-
-            //    double radius = rand.NextDouble(0.3, 1.3);
-
-            //    s.objects.Add(new Sphere(new Vector(x, y, z), radius,
-            //        new Material
-            //        {
-            //            Ambient = 0.1,
-            //            Specular = 0.0,
-            //            Color = Extensions.ColorFromHSV(rand.NextDouble() * 360.0, 0.7, 0.8),
-            //            Lambert = 0.7,
-            //            Textured = true
-            //        }));
-            //}
-
-            //s.objects.Add(new Plane(new Vector(0, 0, 0), new Vector(0, 1, 0), new Material { Ambient = 0.1, Specular = 0.4, Color = Color.White, Lambert = 0.7, Textured = false }));
-
+            
             return s;
         }
     }
