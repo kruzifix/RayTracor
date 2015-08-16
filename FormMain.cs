@@ -57,11 +57,6 @@ namespace RayTracor
             renderControl.Invalidate();
         }
 
-        private void bRender_Click(object sender, EventArgs e)
-        {
-            Render(() => scene.RenderAmbientOcclusion(settings.width, settings.height, 16), 1);
-        }
-
         private void RenderParallel()
         {
             int tasks = settings.tasks;
@@ -83,7 +78,7 @@ namespace RayTracor
                     taskArray[y] = Task.Factory.StartNew((x) =>
                     {
                         int i = (int)x;
-                        byte[] b = scene.RenderSuperSample(0, i * h, width, h);
+                        byte[] b = scene.Render(0, i * h, width, h);
                         Array.Copy(b, 0, pixels, 0 + i * h * data.Stride, b.Length);
                     }, y);
                 }
@@ -110,12 +105,6 @@ namespace RayTracor
             return num;
         }
 
-        private void bRenderParallel_Click(object sender, EventArgs e)
-        {
-            Thread t = new Thread(RenderParallel);
-            t.Start();
-        }
-
         private bool ParseResolution()
         {
             if (string.IsNullOrWhiteSpace(cBoxResolution.Text))
@@ -135,11 +124,45 @@ namespace RayTracor
             return true;
         }
 
+        private void SetRenderButtons(bool b)
+        {
+            this.UI(() =>
+            {
+                bRender.Enabled = b;
+                bRenderParallel.Enabled = b;
+                bDepthMap.Enabled = b;
+                bNormalMap.Enabled = b;
+            });
+        }
+
+        private void Render(Func<Bitmap> func, int tasks)
+        {
+            SetRenderButtons(false);
+
+            Stopwatch sw = Stopwatch.StartNew();
+            Bitmap bmp = func();
+            sw.Stop();
+
+            int number = SaveBmp(bmp, sw.ElapsedMilliseconds, tasks);
+            this.UI(() =>
+            {
+                FormShowRender fsr = new FormShowRender(bmp);
+                fsr.Text = string.Format("Render {0}; Time: {1}ms", number, sw.ElapsedMilliseconds);
+                fsr.Show();
+            });
+            SetRenderButtons(true);
+        }
+
         private void cBoxResolution_TextUpdate(object sender, EventArgs e)
         {
             bool b = ParseResolution();
             SetRenderButtons(b);
             cBoxResolution.BackColor = b ? SystemColors.Window : Color.FromArgb(0xFF, 0xCC, 0xCC);
+        }
+
+        private void cBoxTasks_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            settings.tasks = (int)cBoxTasks.SelectedItem;
         }
 
         private void renderControl_Click(object sender, EventArgs e)
@@ -161,48 +184,29 @@ namespace RayTracor
             UpdateRenderControl();
         }
 
+        private void bRender_Click(object sender, EventArgs e)
+        {
+            Render(() => scene.Render(settings.width, settings.height), 1);
+        }
+        
+        private void bRenderParallel_Click(object sender, EventArgs e)
+        {
+            new Thread(RenderParallel).Start();
+        }
+
         private void bDepthMap_Click(object sender, EventArgs e)
         {
             Render(() => scene.RenderDepthMap(settings.width, settings.height), 1);
         }
-
-        private void SetRenderButtons(bool b)
-        {
-            this.UI(() =>
-            {
-                bRender.Enabled = b;
-                bRenderParallel.Enabled = b;
-                bDepthMap.Enabled = b;
-                bNormalMap.Enabled = b;
-            });
-        }
-
+        
         private void bNormalMap_Click(object sender, EventArgs e)
         {
             Render(() => scene.RenderNormalMap(settings.width, settings.height), 1);
         }
-
-        private void Render(Func<Bitmap> func, int tasks)
+        
+        private void bAO_Click(object sender, EventArgs e)
         {
-            SetRenderButtons(false);
-
-            Stopwatch sw = Stopwatch.StartNew();
-            Bitmap bmp = func();
-            sw.Stop();
-
-            int number = SaveBmp(bmp, sw.ElapsedMilliseconds, tasks);
-            this.UI(() =>
-            {
-                FormShowRender fsr = new FormShowRender(bmp);
-                fsr.Text = string.Format("Render {0}; Time: {1}ms", number, sw.ElapsedMilliseconds);
-                fsr.Show();
-            });
-            SetRenderButtons(true);
-        }
-
-        private void cBoxTasks_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            settings.tasks = (int)cBoxTasks.SelectedItem;
+            Render(() => scene.RenderAmbientOcclusion(settings.width, settings.height, 8), 1);
         }
     }
 
