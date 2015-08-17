@@ -19,11 +19,15 @@ namespace RayTracor
 {
     public partial class FormMain : Form
     {
-        class RenderSettings { public int width; public int height; public int tasks; }
+        enum SuperSampleMode { None, Deterministic, Stochastic }
+        class RenderSettings { public int width; public int height; public int samples; public SuperSampleMode mode; }
 
         Scene scene;
         RenderSettings settings = new RenderSettings();
-        
+
+        int[] samples = new int[] { 2, 3, 4, 5 };
+        SuperSampleMode[] modes = new SuperSampleMode[] { SuperSampleMode.None, SuperSampleMode.Deterministic, SuperSampleMode.Stochastic };
+
         public FormMain()
         {
             InitializeComponent();
@@ -33,18 +37,22 @@ namespace RayTracor
         void FormMain_Load(object sender, EventArgs e)
         {
             scene = new Scene();
-            
-            UpdateRenderControl();
+            scene.ProgressReport = new Progress<int>((i) => progBar.Increment(1));
 
-            //for (int i = 0; i < 6; i++)
-            //    cBoxTasks.Items.Add((int)Math.Pow(2, i));
-            //cBoxTasks.Text = cBoxTasks.Items[2].ToString();
+            UpdateRenderControl();
 
             cBoxResolution.Items.AddRange(new object[] { "320x240", "640x360", "640x480", "960x540", "1024x768", "1280x720", "1920x1080", "2560x1440", "3840x2160" });
             cBoxResolution.Text = cBoxResolution.Items[0].ToString();
 
+            cBoxSuSas.Items.AddRange(samples.Select<int, object>((i) => "x"+i).ToArray());
+            cBoxSuSas.Text = cBoxSuSas.Items[0].ToString();
+            settings.samples = samples[0];
+
+            cBoxSuSaMode.Items.AddRange(modes.Select<SuperSampleMode, object>((s) => s.ToString()).ToArray());
+            cBoxSuSaMode.Text = cBoxSuSaMode.Items[0].ToString();
+            settings.mode = modes[0];
+
             ParseResolution();
-            //settings.tasks = (int)cBoxTasks.SelectedItem;
         }
 
         private void UpdateRenderControl()
@@ -57,41 +65,7 @@ namespace RayTracor
             renderControl.Invalidate();
         }
 
-        //private void RenderParallel()
-        //{
-        //    int tasks = settings.tasks;
-        //    int width = settings.width;
-        //    int height = settings.height;
-
-        //    Render(() => {
-        //        int h = height / tasks;
-
-        //        scene.SetResolution(width, height);
-
-        //        Bitmap bmp = new Bitmap(width, height);
-        //        BitmapData data = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
-        //        byte[] pixels = new byte[data.Stride * height];
-
-        //        Task[] taskArray = new Task[tasks];
-        //        for (int y = 0; y < tasks; y++)
-        //        {
-        //            taskArray[y] = Task.Factory.StartNew((x) =>
-        //            {
-        //                int i = (int)x;
-        //                byte[] b = scene.Render(0, i * h, width, h);
-        //                Array.Copy(b, 0, pixels, 0 + i * h * data.Stride, b.Length);
-        //            }, y);
-        //        }
-        //        Task.WaitAll(taskArray);
-
-        //        Marshal.Copy(pixels, 0, data.Scan0, pixels.Length);
-
-        //        bmp.UnlockBits(data);
-        //        return bmp;
-        //    }, tasks);
-        //}
-
-        private int SaveBmp(Bitmap bmp, long ms, int tasks)
+        private int SaveBmp(Bitmap bmp, long ms, string type)
         {
             if (!Directory.Exists("renders"))
                 Directory.CreateDirectory("renders");
@@ -99,7 +73,7 @@ namespace RayTracor
                 File.WriteAllText("renders/renders.txt", "0");
             string number = File.ReadAllText("renders/renders.txt");
             int num = int.Parse(number);
-            string filename = string.Format("renders/{0:000}_render_{1}ms_{2}task{3}.bmp", num, ms, tasks, tasks > 1 ? "s" : "");
+            string filename = string.Format("renders/{0:000}_render_{1}ms_{2}.bmp", num, ms, type);
             bmp.Save(filename);
             File.WriteAllText("renders/renders.txt", (num + 1).ToString());
             return num;
@@ -126,30 +100,33 @@ namespace RayTracor
 
         private void SetRenderButtons(bool b)
         {
-            this.UI(() =>
-            {
-                bRender.Enabled = b;
-                bDepthMap.Enabled = b;
-                bNormalMap.Enabled = b;
-                bAO.Enabled = b;
-            });
+            bRender.Enabled = b;
+            bDepthMap.Enabled = b;
+            bNormalMap.Enabled = b;
+            bAO.Enabled = b;
+
+            bSave.Enabled = b;
+            bLoad.Enabled = b;
         }
 
-        private void Render(Func<Bitmap> func, int tasks)
+        private async void Render(string type, Func<Bitmap> func)
         {
             SetRenderButtons(false);
+            progBar.Value = 0;
+            progBar.Maximum = settings.height;
 
-            Stopwatch sw = Stopwatch.StartNew();
-            Bitmap bmp = func();
-            sw.Stop();
-
-            int number = SaveBmp(bmp, sw.ElapsedMilliseconds, tasks);
-            this.UI(() =>
+            Stopwatch sw = null;
+            Bitmap bmp = null;
+            await Task.Factory.StartNew(() =>
             {
-                FormShowRender fsr = new FormShowRender(bmp);
-                fsr.Text = string.Format("Render {0}; Time: {1}ms", number, sw.ElapsedMilliseconds);
-                fsr.Show();
-            });
+                sw = Stopwatch.StartNew();
+                bmp = func();
+                sw.Stop();
+            }, TaskCreationOptions.LongRunning);
+            int number = SaveBmp(bmp, sw.ElapsedMilliseconds, type);
+            FormShowRender fsr = new FormShowRender(bmp);
+            fsr.Text = string.Format("Render {0}; Time: {1}ms", number, sw.ElapsedMilliseconds);
+            fsr.Show();
             SetRenderButtons(true);
         }
 
@@ -159,7 +136,7 @@ namespace RayTracor
             SetRenderButtons(b);
             cBoxResolution.BackColor = b ? SystemColors.Window : Color.FromArgb(0xFF, 0xCC, 0xCC);
         }
-        
+
         private void renderControl_Click(object sender, EventArgs e)
         {
             renderControl.Focus();
@@ -175,35 +152,57 @@ namespace RayTracor
             XmlDocument doc = new XmlDocument();
             doc.Load("AO_test.xml");
             scene = Scene.Parse(doc);
+            scene.ProgressReport = new Progress<int>((i) => progBar.Increment(1));
 
             UpdateRenderControl();
         }
 
         private void bRender_Click(object sender, EventArgs e)
         {
-            Render(() => scene.Render(settings.width, settings.height), 1);
+            switch(settings.mode)
+            {
+                case SuperSampleMode.None:
+                    Render("NoSS", () => scene.Render(settings.width, settings.height));
+                    break;
+                case SuperSampleMode.Deterministic:
+                    Render(string.Format("DetSSx{0}", settings.samples), () => scene.RenderDeterministicSuperSample(settings.width, settings.height, settings.samples));
+                    break;
+                case SuperSampleMode.Stochastic:
+                    //Render(string.Format("StoSSx{0}", settings.samples), () => scene.Render(settings.width, settings.height));
+                    break;
+            }
         }
-        
+
         private void bDepthMap_Click(object sender, EventArgs e)
         {
-            Render(() => scene.RenderGreyScaleDepthMap(settings.width, settings.height), 1);
+            Render("depthmap", () => scene.RenderGreyScaleDepthMap(settings.width, settings.height));
         }
-        
+
         private void bNormalMap_Click(object sender, EventArgs e)
         {
-            Render(() => scene.RenderNormalMap(settings.width, settings.height), 1);
+            Render("normalmap", () => scene.RenderNormalMap(settings.width, settings.height));
         }
-        
+
         private void bAO_Click(object sender, EventArgs e)
         {
-            Render(() => scene.RenderAmbientOcclusion(settings.width, settings.height, 16), 1);
+            Render("AO", () => scene.RenderAmbientOcclusion(settings.width, settings.height, 16));
+        }
+
+        private void cBoxSuSas_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            settings.samples = samples[cBoxSuSas.SelectedIndex];
+        }
+
+        private void cBoxSuSaMode_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            settings.mode = modes[cBoxSuSaMode.SelectedIndex];
         }
     }
 
     public static class FormExtensions
     {
         public static void UI(this Form f, Action a)
-        { 
+        {
             if (f.IsHandleCreated)
                 f.Invoke(a);
         }

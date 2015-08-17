@@ -1,6 +1,7 @@
 ﻿things to add:
 -new object types (cubes, torus?, geometry)
 -fog
+-super sampling radius
 -stochastic (random) super sampling
 -rework materials (phong shading)
 -material scripting ?
@@ -8,6 +9,7 @@
 -gloss
 -depth of field
 -error checking when loading
+-rework lights
 -area lights (soft shadows)
 -meshes (.obj loader)
 -different backgrounds (patterns)
