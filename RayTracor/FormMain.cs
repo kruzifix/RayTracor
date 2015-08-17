@@ -36,15 +36,15 @@ namespace RayTracor
             
             UpdateRenderControl();
 
-            for (int i = 0; i < 6; i++)
-                cBoxTasks.Items.Add((int)Math.Pow(2, i));
-            cBoxTasks.Text = cBoxTasks.Items[2].ToString();
+            //for (int i = 0; i < 6; i++)
+            //    cBoxTasks.Items.Add((int)Math.Pow(2, i));
+            //cBoxTasks.Text = cBoxTasks.Items[2].ToString();
 
             cBoxResolution.Items.AddRange(new object[] { "320x240", "640x360", "640x480", "960x540", "1024x768", "1280x720", "1920x1080", "2560x1440", "3840x2160" });
             cBoxResolution.Text = cBoxResolution.Items[0].ToString();
 
             ParseResolution();
-            settings.tasks = (int)cBoxTasks.SelectedItem;
+            //settings.tasks = (int)cBoxTasks.SelectedItem;
         }
 
         private void UpdateRenderControl()
@@ -57,39 +57,39 @@ namespace RayTracor
             renderControl.Invalidate();
         }
 
-        private void RenderParallel()
-        {
-            int tasks = settings.tasks;
-            int width = settings.width;
-            int height = settings.height;
+        //private void RenderParallel()
+        //{
+        //    int tasks = settings.tasks;
+        //    int width = settings.width;
+        //    int height = settings.height;
 
-            Render(() => {
-                int h = height / tasks;
+        //    Render(() => {
+        //        int h = height / tasks;
 
-                scene.SetResolution(width, height);
+        //        scene.SetResolution(width, height);
 
-                Bitmap bmp = new Bitmap(width, height);
-                BitmapData data = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
-                byte[] pixels = new byte[data.Stride * height];
+        //        Bitmap bmp = new Bitmap(width, height);
+        //        BitmapData data = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+        //        byte[] pixels = new byte[data.Stride * height];
 
-                Task[] taskArray = new Task[tasks];
-                for (int y = 0; y < tasks; y++)
-                {
-                    taskArray[y] = Task.Factory.StartNew((x) =>
-                    {
-                        int i = (int)x;
-                        byte[] b = scene.Render(0, i * h, width, h);
-                        Array.Copy(b, 0, pixels, 0 + i * h * data.Stride, b.Length);
-                    }, y);
-                }
-                Task.WaitAll(taskArray);
+        //        Task[] taskArray = new Task[tasks];
+        //        for (int y = 0; y < tasks; y++)
+        //        {
+        //            taskArray[y] = Task.Factory.StartNew((x) =>
+        //            {
+        //                int i = (int)x;
+        //                byte[] b = scene.Render(0, i * h, width, h);
+        //                Array.Copy(b, 0, pixels, 0 + i * h * data.Stride, b.Length);
+        //            }, y);
+        //        }
+        //        Task.WaitAll(taskArray);
 
-                Marshal.Copy(pixels, 0, data.Scan0, pixels.Length);
+        //        Marshal.Copy(pixels, 0, data.Scan0, pixels.Length);
 
-                bmp.UnlockBits(data);
-                return bmp;
-            }, tasks);
-        }
+        //        bmp.UnlockBits(data);
+        //        return bmp;
+        //    }, tasks);
+        //}
 
         private int SaveBmp(Bitmap bmp, long ms, int tasks)
         {
@@ -129,7 +129,6 @@ namespace RayTracor
             this.UI(() =>
             {
                 bRender.Enabled = b;
-                bRenderParallel.Enabled = b;
                 bDepthMap.Enabled = b;
                 bNormalMap.Enabled = b;
                 bAO.Enabled = b;
@@ -160,12 +159,7 @@ namespace RayTracor
             SetRenderButtons(b);
             cBoxResolution.BackColor = b ? SystemColors.Window : Color.FromArgb(0xFF, 0xCC, 0xCC);
         }
-
-        private void cBoxTasks_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            settings.tasks = (int)cBoxTasks.SelectedItem;
-        }
-
+        
         private void renderControl_Click(object sender, EventArgs e)
         {
             renderControl.Focus();
@@ -190,11 +184,6 @@ namespace RayTracor
             Render(() => scene.Render(settings.width, settings.height), 1);
         }
         
-        private void bRenderParallel_Click(object sender, EventArgs e)
-        {
-            new Thread(RenderParallel).Start();
-        }
-
         private void bDepthMap_Click(object sender, EventArgs e)
         {
             Render(() => scene.RenderGreyScaleDepthMap(settings.width, settings.height), 1);

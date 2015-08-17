@@ -156,8 +156,7 @@ namespace RayTracor.RayTracorLib
 
             camera.SetResolution(width, height);
 
-            for (int x = 0; x < width; x++)
-            {
+            Parallel.For(0, width, (x) => {
                 for (int y = 0; y < height; y++)
                 {
                     Color pixelColor = func(x, y);
@@ -165,7 +164,7 @@ namespace RayTracor.RayTracorLib
                     pixels[y * data.Stride + x * 3 + 1] = pixelColor.G;
                     pixels[y * data.Stride + x * 3 + 2] = pixelColor.R;
                 }
-            }
+            });
 
             CopyAndUnLock(bmp, data, pixels);
 
@@ -193,7 +192,7 @@ namespace RayTracor.RayTracorLib
 
             camera.SetResolution(width, height);
 
-            for (int x = 0; x < width; x++)
+            Parallel.For(0, width, (x) =>
             {
                 for (int y = 0; y < height; y++)
                 {
@@ -206,7 +205,7 @@ namespace RayTracor.RayTracorLib
                     int i = y * data.Stride + x * 4;
                     Array.Copy(bdepth, 0, pixels, i, 4);
                 }
-            }
+            });
 
             CopyAndUnLock(bmp, data, pixels);
             return bmp;
@@ -417,10 +416,12 @@ namespace RayTracor.RayTracorLib
             Ray ray = Ray.FromTo(point, light.Position);
             ray.Start += ray.Direction * 0.001;
 
+            double lightDist = (light.Position - point).Length;
+
             foreach (Object o in objects)
             {
                 Intersection r = o.Intersects(ray);
-                if (r.Intersects && r.Distance > -0.0005)
+                if (r.Intersects && r.Distance > -0.0005 && r.Distance < lightDist)
                     return 0.0;
             }
             return vis;

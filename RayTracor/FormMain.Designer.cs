@@ -29,9 +29,6 @@
         private void InitializeComponent()
         {
             this.bRender = new System.Windows.Forms.Button();
-            this.bRenderParallel = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.cBoxTasks = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.cBoxResolution = new System.Windows.Forms.ComboBox();
             this.renderControl = new RayTracor.RenderControl();
@@ -51,35 +48,6 @@
             this.bRender.Text = "Render";
             this.bRender.UseVisualStyleBackColor = true;
             this.bRender.Click += new System.EventHandler(this.bRender_Click);
-            // 
-            // bRenderParallel
-            // 
-            this.bRenderParallel.Location = new System.Drawing.Point(408, 12);
-            this.bRenderParallel.Name = "bRenderParallel";
-            this.bRenderParallel.Size = new System.Drawing.Size(87, 23);
-            this.bRenderParallel.TabIndex = 2;
-            this.bRenderParallel.Text = "Render Parallel";
-            this.bRenderParallel.UseVisualStyleBackColor = true;
-            this.bRenderParallel.Click += new System.EventHandler(this.bRenderParallel_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(288, 17);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(39, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Tasks:";
-            // 
-            // cBoxTasks
-            // 
-            this.cBoxTasks.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cBoxTasks.FormattingEnabled = true;
-            this.cBoxTasks.Location = new System.Drawing.Point(333, 14);
-            this.cBoxTasks.Name = "cBoxTasks";
-            this.cBoxTasks.Size = new System.Drawing.Size(69, 21);
-            this.cBoxTasks.TabIndex = 4;
-            this.cBoxTasks.SelectedIndexChanged += new System.EventHandler(this.cBoxTasks_SelectedIndexChanged);
             // 
             // label2
             // 
@@ -173,9 +141,6 @@
             this.Controls.Add(this.bSave);
             this.Controls.Add(this.cBoxResolution);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.cBoxTasks);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.bRenderParallel);
             this.Controls.Add(this.bRender);
             this.Controls.Add(this.renderControl);
             this.Name = "FormMain";
@@ -189,9 +154,6 @@
 
         private RayTracor.RenderControl renderControl;
         private System.Windows.Forms.Button bRender;
-        private System.Windows.Forms.Button bRenderParallel;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ComboBox cBoxTasks;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox cBoxResolution;
         private System.Windows.Forms.Button bSave;

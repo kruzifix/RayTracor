@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <scene>
-  <backgroundcolor>FF808080</backgroundcolor>
+  <backgroundcolor>FF000000</backgroundcolor>
   <camera>
     <position x="3" y="5" z="9" />
     <looksat x="0" y="2" z="2" />
