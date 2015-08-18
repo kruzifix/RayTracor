@@ -5,10 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using RayTracor.RayTracorLib.Tracing;
 
-namespace RayTracor.RayTracorLib
+namespace RayTracor.RayTracorLib.Utility
 {
-    public static class Extensions
+    public static class Utility
     {
         public static int Clamp(this int value, int min, int max)
         {
@@ -49,9 +50,9 @@ namespace RayTracor.RayTracorLib
             g.DrawLine(pen, (int)x1, (int)y1, (int)x2, (int)y2);
         }
 
-        public static Vector ToVector(this Color color)
+        public static Vector3 ToVector(this Color color)
         {
-            return new Vector(color);
+            return new Vector3(color);
         }
 
         public static double NextDouble(this Random random, double min, double max)

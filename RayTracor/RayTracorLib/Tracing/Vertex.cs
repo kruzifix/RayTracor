@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace RayTracor.RayTracorLib
+namespace RayTracor.RayTracorLib.Tracing
 {
     public class Vertex
     {
-        public Vector Position { get; set; }
+        public Vector3 Position { get; set; }
         public Vector2 TexCoord { get; set; }
-        public Vector Color { get; set; }
+        //public Vector3 Color { get; set; }
     }
 }

@@ -4,17 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using RayTracor.RayTracorLib.Materials;
+using RayTracor.RayTracorLib.Tracing;
+using RayTracor.RayTracorLib.Utility;
 
-namespace RayTracor.RayTracorLib
+namespace RayTracor.RayTracorLib.Objects
 {
-    public class Sphere : Object
+    public class Sphere : IObject
     {
+        public Vector3 Position { get; set; }
         public double Radius { get; set; }
+        double radius2;
         
-        public Sphere(Vector position, double radius, Material material)
-            : base(position, material)
+        public Sphere(Vector3 position, double radius, Material material)
+            : base(material)
         {
+            Position = position;
             Radius = radius;
+            radius2 = radius * radius;
         }
 
         public override Intersection Intersects(Ray ray)
@@ -28,17 +35,17 @@ namespace RayTracor.RayTracorLib
             //    return new IntersectionResult(false, 0);
             //return new IntersectionResult(true, v - Math.Sqrt(discriminant));
 
-            double a = Vector.DotProduct(ray.Direction, ray.Direction);
-            double b = 2 * Vector.DotProduct(ray.Direction, ray.Start - Position);
-            Vector rayToCenter = ray.Start - Position;
-            double c = Vector.DotProduct(rayToCenter, rayToCenter) - Radius * Radius;
+            double a = Vector3.DotProduct(ray.Direction, ray.Direction);
+            double b = 2 * Vector3.DotProduct(ray.Direction, ray.Start - Position);
+            Vector3 rayToCenter = ray.Start - Position;
+            double c = Vector3.DotProduct(rayToCenter, rayToCenter) - radius2;
 
             double dis = b * b - 4 * a * c;
 
             if (dis >= 0.0)
             {
                 double t = (-Math.Sqrt(dis) - b) / (2.0 * a);
-                Vector point = ray.PointAt(t);
+                Vector3 point = ray.PointAt(t);
                 return new Intersection(t, point, this, (point - Position).Normalized, null);
             }
             return Intersection.False;
@@ -80,9 +87,8 @@ namespace RayTracor.RayTracorLib
             //return new Intersection(t0, point, this, (point - Position).Normalized, null);
         }
         
-        public override Vector EvalMaterial(Intersection intersec, double lambertAmount)
+        public override Vector3 EvalMaterial(Intersection intersec)
         {
-            Vector col = Material.Color.ToVector();
             if (Material.Textured)
             {
                 double xtex = (1 + Math.Atan2(intersec.Normal.Z, intersec.Normal.X) / Math.PI) * 0.5;
@@ -90,7 +96,8 @@ namespace RayTracor.RayTracorLib
                 double scale = 4;
 
                 bool pattern = ((xtex * scale) % 1.0 > 0.5) ^ ((ytex * scale) % 1.0 > 0.5);
-                col *= pattern ? 0.5 : 1;
+                if (pattern)
+                    return Vector3.Zero;
 
                 //int x = (int)(Math.Abs(point.X) * 255.0);
                 //int y = (int)(Math.Abs(point.Y) * 255.0);
@@ -99,22 +106,23 @@ namespace RayTracor.RayTracorLib
 
                 //col = Extensions.ColorFromHSV(c / 255.0 * 360.0, 0.8, 0.7).ToVector();
             }
-            return Material.AddAmbientLambert(col, lambertAmount);
+            return Material.Color.ToVector();
         }
 
         public override void Serialize(XmlDocument doc, XmlNode parent)
         {
             XmlNode node = doc.CreateElement("sphere");
 
-            SerializeBase(doc, node);
+            node.AppendChild(Position.Serialize(doc, "position"));
             node.AppendChild(Radius.Serialize(doc, "radius"));
+            base.Serialize(doc, node);
             
             parent.AppendChild(node);
         }
 
         public static Sphere Parse(XmlNode node)
         {
-            Vector pos = Vector.Parse(node["position"]);
+            Vector3 pos = Vector3.Parse(node["position"]);
             Material mat = Material.Parse(node["material"]);
             double radius = node["radius"].ParseDouble();
 

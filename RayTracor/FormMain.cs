@@ -44,7 +44,7 @@ namespace RayTracor
             cBoxResolution.Items.AddRange(new object[] { "320x240", "640x360", "640x480", "960x540", "1024x768", "1280x720", "1920x1080", "2560x1440", "3840x2160" });
             cBoxResolution.Text = cBoxResolution.Items[0].ToString();
 
-            cBoxSuSas.Items.AddRange(samples.Select<int, object>((i) => "x"+i).ToArray());
+            cBoxSuSas.Items.AddRange(samples.Select<int, object>((i) => "x" + i).ToArray());
             cBoxSuSas.Text = cBoxSuSas.Items[0].ToString();
             settings.samples = samples[0];
 
@@ -150,7 +150,7 @@ namespace RayTracor
         private void bLoad_Click(object sender, EventArgs e)
         {
             XmlDocument doc = new XmlDocument();
-            doc.Load("AO_test.xml");
+            doc.Load("scenes/AO_test.xml");
             scene = Scene.Parse(doc);
             scene.ProgressReport = new Progress<int>((i) => progBar.Increment(1));
 
@@ -185,7 +185,7 @@ namespace RayTracor
 
         private void bAO_Click(object sender, EventArgs e)
         {
-            Render("AO", () => scene.RenderAmbientOcclusion(settings.width, settings.height, 16));
+            Render("AO", () => scene.RenderAmbientOcclusion(settings.width, settings.height, 512));
         }
 
         private void cBoxSuSas_SelectedIndexChanged(object sender, EventArgs e)

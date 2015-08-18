@@ -5,30 +5,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using RayTracor.RayTracorLib.Tracing;
+using RayTracor.RayTracorLib.Utility;
 
-namespace RayTracor.RayTracorLib
+namespace RayTracor.RayTracorLib.Lights
 {
-    public class PointLight
+    public class PointLight : ILight
     {
-        public Vector Position { get; set; }
+        public Vector3 Position { get; set; }
         public Color Color { get; set; }
         public double Strength { get; set; }
 
-        public PointLight() { Position = Vector.Zero; Color = Color.White; Strength = 1; }
+        public PointLight() { Position = Vector3.Zero; Color = Color.White; Strength = 1; }
 
-        public PointLight(Vector position, Color color, double strength)
+        public PointLight(Vector3 position, Color color, double strength)
         {
             Position = position;
             Color = color;
             Strength = strength;
         }
-
-        public virtual double LightVisibility(Vector position)
-        {
-            return 1.0;
-        }
-
-        public virtual void Serialize(XmlDocument doc, XmlNode parent)
+        
+        public override void Serialize(XmlDocument doc, XmlNode parent)
         {
             XmlNode lNode = doc.CreateElement("pointlight");
 
@@ -41,7 +38,7 @@ namespace RayTracor.RayTracorLib
 
         public static PointLight Parse(XmlNode li)
         {
-            Vector pos = Vector.Parse(li["position"]);
+            Vector3 pos = Vector3.Parse(li["position"]);
             Color color = li["color"].ParseColor();
             double strength = li["strength"].ParseDouble();
 

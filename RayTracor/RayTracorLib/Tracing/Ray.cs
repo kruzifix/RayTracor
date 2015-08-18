@@ -4,19 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RayTracor.RayTracorLib
+namespace RayTracor.RayTracorLib.Tracing
 {
     public class Ray
     {
-        public Vector Start { get; set; }
-        public Vector Direction { get { return dir; } set { dir = value; CalcDirFrac(); } }
-        public Vector DirFrac { get { return dirFrac; } }
+        public Vector3 Start { get; set; }
+        public Vector3 Direction { get { return dir; } set { dir = value; CalcDirFrac(); } }
+        public Vector3 DirFrac { get { return dirFrac; } }
 
-        Vector dir, dirFrac = Vector.Zero;
+        Vector3 dir, dirFrac = Vector3.Zero;
 
-        public Ray() { Start = Vector.Zero; Direction = Vector.UnitX; }
+        public Ray() { Start = Vector3.Zero; Direction = Vector3.UnitX; }
 
-        public Ray(Vector start, Vector direction)
+        public Ray(Vector3 start, Vector3 direction)
         {
             Start = start;
             Direction = direction.Normalized;
@@ -29,14 +29,14 @@ namespace RayTracor.RayTracorLib
             dirFrac.Z = dir.Z == 0 ? double.MaxValue : 1.0 / dir.Z;
         }
 
-        public Vector PointAt(double k)
+        public Vector3 PointAt(double k)
         {
             return Start + Direction * k;
         }
 
-        public Ray Reflect(Vector point, Vector normal)
+        public Ray Reflect(Vector3 point, Vector3 normal)
         {
-            return new Ray(point, Direction - normal * 2.0 * Vector.DotProduct(Direction, normal));
+            return new Ray(point, Direction - normal * 2.0 * Vector3.DotProduct(Direction, normal));
         }
 
         public override string ToString()
@@ -44,7 +44,7 @@ namespace RayTracor.RayTracorLib
             return string.Format("<{0}, {1}>", Start, Direction);
         }
 
-        public static Ray FromTo(Vector from, Vector to)
+        public static Ray FromTo(Vector3 from, Vector3 to)
         {
             return new Ray(from, to - from);
         }

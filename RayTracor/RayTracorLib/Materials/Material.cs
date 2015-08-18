@@ -5,8 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using RayTracor.RayTracorLib.Tracing;
+using RayTracor.RayTracorLib.Utility;
 
-namespace RayTracor.RayTracorLib
+namespace RayTracor.RayTracorLib.Materials
 {
     public class Material
     {
@@ -19,12 +21,12 @@ namespace RayTracor.RayTracorLib
 
         public Material() { }
 
-        public Vector AddAmbientLambert(Vector col, double lambert)
-        {
-            return col * lambert * Lambert + col * Ambient;
-        }
+        //public Vector3 AddAmbientLambert(Vector3 col, double lambert)
+        //{
+        //    return col * lambert * Lambert + col * Ambient;
+        //}
 
-        public Vector GetTexCol(Vector2 coords)
+        public Vector3 GetTextureColor(Vector2 coords)
         {
             return Texture.GetColor(coords);
         }

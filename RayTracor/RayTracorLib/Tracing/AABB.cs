@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace RayTracor.RayTracorLib
+namespace RayTracor.RayTracorLib.Tracing
 {
     public class AABB
     {
-        public Vector Min { get; private set; }
-        public Vector Max { get; private set; }
+        public Vector3 Min { get; private set; }
+        public Vector3 Max { get; private set; }
 
-        public AABB(Vector min, Vector max)
+        public AABB(Vector3 min, Vector3 max)
         {
             Min = min;
             Max = max;
         }
 
-        public bool Contains(Vector v)
+        public bool Contains(Vector3 v)
         {
             return  v.X >= Min.X && v.X <= Max.X &&
                     v.Y >= Min.Y && v.Y <= Max.Y &&

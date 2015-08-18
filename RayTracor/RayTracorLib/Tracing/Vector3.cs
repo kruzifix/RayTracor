@@ -5,32 +5,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using RayTracor.RayTracorLib.Utility;
 
-namespace RayTracor.RayTracorLib
+namespace RayTracor.RayTracorLib.Tracing
 {
-    public class Vector
+    public class Vector3
     {
-        public static readonly Vector Zero = new Vector(0, 0, 0);
-        public static readonly Vector One = new Vector(1, 1, 1);
-        public static readonly Vector UnitX = new Vector(1, 0, 0);
-        public static readonly Vector UnitY = new Vector(0, 1, 0);
-        public static readonly Vector UnitZ = new Vector(0, 0, 1);
+        public static readonly Vector3 Zero = new Vector3(0, 0, 0);
+        public static readonly Vector3 One = new Vector3(1, 1, 1);
+        public static readonly Vector3 UnitX = new Vector3(1, 0, 0);
+        public static readonly Vector3 UnitY = new Vector3(0, 1, 0);
+        public static readonly Vector3 UnitZ = new Vector3(0, 0, 1);
         
         public double X { get; set; }
         public double Y { get; set; }
         public double Z { get; set; }
 
         public double Length { get { return Math.Sqrt(X * X + Y * Y + Z * Z); } }
-        public Vector Normalized { get { double len = Length; return new Vector(X / len, Y / len, Z / len); } }
-        public Vector Negated { get { return new Vector(-X, -Y, -Z); } }
+        public Vector3 Normalized { get { double len = Length; return new Vector3(X / len, Y / len, Z / len); } }
+        public Vector3 Negated { get { return new Vector3(-X, -Y, -Z); } }
 
-        public Vector() { X = 0; Y = 0; Z = 0; }
+        public Vector3() { X = 0; Y = 0; Z = 0; }
 
-        public Vector(double v) { X = Y = Z = v; }
+        public Vector3(double v) { X = Y = Z = v; }
 
-        public Vector(double x, double y, double z) { X = x; Y = y; Z = z; }
+        public Vector3(double x, double y, double z) { X = x; Y = y; Z = z; }
 
-        public Vector(Color color) { X = color.R; Y = color.G; Z = color.B; }
+        public Vector3(Color color) { X = color.R; Y = color.G; Z = color.B; }
 
         public override string ToString()
         {
@@ -67,47 +68,47 @@ namespace RayTracor.RayTracorLib
             return node;
         }
         
-        public static double DotProduct(Vector u, Vector v)
+        public static double DotProduct(Vector3 u, Vector3 v)
         {
             return u.X * v.X + u.Y * v.Y + u.Z * v.Z;
         }
 
-        public static Vector CrossProduct(Vector u, Vector v)
+        public static Vector3 CrossProduct(Vector3 u, Vector3 v)
         {
-            return new Vector(
+            return new Vector3(
                 u.Y * v.Z - u.Z * v.Y,
                 u.Z * v.X - u.X * v.Z,
                 u.X * v.Y - u.Y * v.X
                 );
         }
 
-        public static Vector Parse(XmlElement node)
+        public static Vector3 Parse(XmlElement node)
         {
             double x = double.Parse(node.Attributes["x"].Value);
             double y = double.Parse(node.Attributes["y"].Value);
             double z = double.Parse(node.Attributes["z"].Value);
 
-            return new Vector(x, y, z);
+            return new Vector3(x, y, z);
         }
 
-        public static Vector operator +(Vector v1, Vector v2)
+        public static Vector3 operator +(Vector3 v1, Vector3 v2)
         {
-            return new Vector(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z);
+            return new Vector3(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z);
         }
 
-        public static Vector operator -(Vector v1, Vector v2)
+        public static Vector3 operator -(Vector3 v1, Vector3 v2)
         {
-            return new Vector(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z);
+            return new Vector3(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z);
         }
 
-        public static Vector operator *(Vector v1, double k)
+        public static Vector3 operator *(Vector3 v1, double k)
         {
-            return new Vector(v1.X * k, v1.Y * k, v1.Z * k);
+            return new Vector3(v1.X * k, v1.Y * k, v1.Z * k);
         }
         
-        public static Vector operator /(Vector v1, double k)
+        public static Vector3 operator /(Vector3 v1, double k)
         {
-            return new Vector(v1.X / k, v1.Y / k, v1.Z / k);
+            return new Vector3(v1.X / k, v1.Y / k, v1.Z / k);
         }
     }
 }

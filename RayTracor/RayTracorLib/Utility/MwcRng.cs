@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RayTracor.RayTracorLib
+namespace RayTracor.RayTracorLib.Utility
 {
     /// <summary>
     /// MwcRng is a simple random number generator based on 
@@ -32,6 +32,12 @@ namespace RayTracor.RayTracorLib
         public static void SetSeed(uint u)
         {
             w = u;
+        }
+
+        public static void SeedFromTime()
+        {
+            long x = DateTime.Now.ToFileTime();
+            SetSeed((uint)(x >> 16), (uint)(x % 4294967296));
         }
 
         public static uint GetUint()

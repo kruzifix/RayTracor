@@ -4,42 +4,44 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using RayTracor.RayTracorLib.Tracing;
+using RayTracor.RayTracorLib.Utility;
 
 namespace RayTracor.RayTracorLib
 {
     public class Camera
     {
-        Vector gup, up, right;
-        Vector pos, dir;
+        Vector3 gup, up, right;
+        Vector3 pos, dir;
         double fov, tan;
 
         int width, height;
         double ratio, tanratio;
         double xs, ys;
 
-        public Vector Position { get { return pos; } set { pos = value; UpdateRightUp(); } }
-        public Vector Direction { get { return dir; } set { dir = value; UpdateRightUp(); } }
-        public Vector GlobalUp { get { return gup; } set { gup = value; UpdateRightUp(); } }
+        public Vector3 Position { get { return pos; } set { pos = value; UpdateRightUp(); } }
+        public Vector3 Direction { get { return dir; } set { dir = value; UpdateRightUp(); } }
+        public Vector3 GlobalUp { get { return gup; } set { gup = value; UpdateRightUp(); } }
         public double FOV { get { return fov; } set { fov = value; tan = Math.Tan(FOV.ToRadians() / 2.0); } }
         public double Tan { get { return tan; } }
 
-        public Vector Right { get { return right; } }
-        public Vector Up { get { return up; } }
+        public Vector3 Right { get { return right; } }
+        public Vector3 Up { get { return up; } }
 
         public int Width { get { return width; } }
         public int Height { get { return height; } }
 
         public Camera() 
         { 
-            pos = Vector.Zero; 
-            dir = Vector.UnitX;
-            gup = Vector.UnitY;
+            pos = Vector3.Zero; 
+            dir = Vector3.UnitX;
+            gup = Vector3.UnitY;
             FOV = Math.PI / 2.0;
 
             UpdateRightUp();
         }
 
-        public Camera(Vector position, Vector direction, Vector globalup, double fov)
+        public Camera(Vector3 position, Vector3 direction, Vector3 globalup, double fov)
         {
             pos = position;
             dir = direction;
@@ -51,9 +53,9 @@ namespace RayTracor.RayTracorLib
 
         private void UpdateRightUp()
         {
-            right = Vector.CrossProduct(dir, gup);
+            right = Vector3.CrossProduct(dir, gup);
             right.Normalize();
-            up = Vector.CrossProduct(right, dir);
+            up = Vector3.CrossProduct(right, dir);
             up.Normalize();
         }
 
@@ -107,19 +109,19 @@ namespace RayTracor.RayTracorLib
 
         public static Camera Parse(XmlNode camNode)
         {
-            Vector pos = Vector.Parse(camNode["position"]);
-            Vector dir = Vector.UnitX;
+            Vector3 pos = Vector3.Parse(camNode["position"]);
+            Vector3 dir = Vector3.UnitX;
             if (camNode["direction"] != null)
-                dir = Vector.Parse(camNode["direction"]).Normalized;
+                dir = Vector3.Parse(camNode["direction"]).Normalized;
             if (camNode["looksat"] != null)
-                dir = (Vector.Parse(camNode["looksat"]) - pos).Normalized;
-            Vector gup = Vector.Parse(camNode["globalup"]).Normalized;
+                dir = (Vector3.Parse(camNode["looksat"]) - pos).Normalized;
+            Vector3 gup = Vector3.Parse(camNode["globalup"]).Normalized;
             double fov = camNode["fov"].ParseDouble();
 
             return new Camera(pos, dir, gup, fov);
         }
 
-        public static Camera CreateLookAt(Vector position, Vector target, Vector up, double fov)
+        public static Camera CreateLookAt(Vector3 position, Vector3 target, Vector3 up, double fov)
         {
             return new Camera(position, (target - position).Normalized, up, fov);
         }

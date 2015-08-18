@@ -3,36 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using RayTracor.RayTracorLib.Tracing;
+using RayTracor.RayTracorLib.Utility;
 
-namespace RayTracor.RayTracorLib
+namespace RayTracor.RayTracorLib.Materials
 {
     public class Texture
     {
         Bitmap bmp;
 
         int width, height;
-        Vector[] colors;
-
-        public Vector2 Scale { get; set; }
-
+        Vector3[] colors;
+        
         public Texture(Bitmap bmp)
         {
-            Scale = Vector2.One;
             this.bmp = bmp;
-            this.width = bmp.Width;
-            this.height = bmp.Height;
+            width = bmp.Width;
+            height = bmp.Height;
 
-            colors = new Vector[width*height];
+            colors = new Vector3[width*height];
 
             for (int x = 0; x < width; x++)
                 for (int y = 0; y < height; y++)
                     colors[x + y * width] = bmp.GetPixel(x, y).ToVector();
         }
 
-        public Vector GetColor(double u, double v)
+        public Vector3 GetColor(double u, double v)
         {
-            u = Math.Abs((u * Scale.X) % 1.0);
-            v = Math.Abs((v * Scale.Y) % 1.0);
+            u = Math.Abs(u % 1.0);
+            v = Math.Abs(v % 1.0);
 
             int x = (int)(u * width);
             int y = (int)(v * height);
@@ -40,7 +39,7 @@ namespace RayTracor.RayTracorLib
             return colors[x + y * width];
         }
 
-        public Vector GetColor(Vector2 uv)
+        public Vector3 GetColor(Vector2 uv)
         {
             return GetColor(uv.X, uv.Y);
         }

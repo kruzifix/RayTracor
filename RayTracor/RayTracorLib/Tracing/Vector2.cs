@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RayTracor.RayTracorLib
+namespace RayTracor.RayTracorLib.Tracing
 {
     public class Vector2
     {
@@ -35,7 +35,7 @@ namespace RayTracor.RayTracorLib
             return string.Format("[{0}, {1}]", X, Y);
         }
 
-        public static double DotProduct(Vector u, Vector v)
+        public static double DotProduct(Vector3 u, Vector3 v)
         {
             return u.X * v.X + u.Y * v.Y;
         }

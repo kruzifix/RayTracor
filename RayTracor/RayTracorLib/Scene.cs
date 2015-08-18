@@ -7,31 +7,32 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Xml;
+using RayTracor.RayTracorLib.Lights;
+using RayTracor.RayTracorLib.Objects;
+using RayTracor.RayTracorLib.Tracing;
+using RayTracor.RayTracorLib.Utility;
+using RayTracor.RayTracorLib.Materials;
 
 namespace RayTracor.RayTracorLib
 {
     public class Scene
     {
-        // Camera
-        // Lights
-        // Objects
-
         public Camera camera;
-        public List<PointLight> lights;
-        public List<Object> objects;
+        public List<ILight> lights;
+        public List<IObject> objects;
 
         //public event EventHandler<int> ProgressChanged;
         public IProgress<int> ProgressReport;
 
-        Color backgroundColor;
+        Vector3 backgroundColor;
 
         public Scene()
         {
             //camera = Camera.CreateLookAt(new Vector(0, 1.8, 10), new Vector(0, 3, 0), new Vector(0,1,0), 45.0);
             //camera = Camera.CreateLookAt(new Vector(0, 3, 12), new Vector(0, 0, 0), new Vector(0, 1, 0), 45.0);
             camera = new Camera();
-            lights = new List<PointLight>();
-            objects = new List<Object>();
+            lights = new List<ILight>();
+            objects = new List<IObject>();
 
             //lights.Add(new Light(new Vector(-30, -10, 20), Color.White, 1));
             //lights.Add(new Light(new Vector(7, 10, 7), Color.White, 1));
@@ -114,7 +115,7 @@ namespace RayTracor.RayTracorLib
             //objects.Add(new Plane(new Vector(0,0,0), new Vector(0,-1,0), new Material { Ambient = 0.1, Specular = 0.0, Color = Color.FromArgb(50, 155, 30), Lambert = 0.7 }));
             //objects.Add(new Plane(new Vector(0, 0, 0), new Vector(0, 1, 0), new Material { Ambient = 0.1, Specular = 0.4, Color = Color.White, Lambert = 0.7, Textured = false }));
 
-            backgroundColor = Color.White;
+            backgroundColor = new Vector3(255.0);
         }
 
         //private void OnProgressChanged(int p)
@@ -132,13 +133,14 @@ namespace RayTracor.RayTracorLib
         {
             return RenderFunc(width, height, (x, y) =>
             {
-                Vector col = Vector.Zero;
+                Vector3 col = Vector3.Zero;
                 double delta = 1.0 / samples;
+                double offset = samples * 0.5 * delta;
                 for (int i = 0; i < samples; i++)
                     for (int j = 0; j < samples; j++)
-                        col += Trace(camera.CastRay(x + (i - samples * 0.5) * delta, y + (j - samples * 0.5) * delta), 0).ToVector();
+                        col += Trace(camera.CastRay(x + i * delta - offset, y + j * delta - offset), 0);
                 col /= samples * samples;
-                return col.ToColor();
+                return col;
             });
         }
 
@@ -157,7 +159,7 @@ namespace RayTracor.RayTracorLib
         //    });
         //}
 
-        private Bitmap RenderFunc(int width, int height, Func<int, int, Color> func)
+        private Bitmap RenderFunc(int width, int height, Func<int, int, Vector3> func)
         {
             Bitmap bmp;
             BitmapData data;
@@ -165,11 +167,11 @@ namespace RayTracor.RayTracorLib
 
             camera.SetResolution(width, height);
             
-            Parallel.For(0, height, (y) => {
-                
+            Parallel.For(0, height, (y) => 
+            {
                 for (int x = 0; x < width; x++)
                 {
-                    Color pixelColor = func(x, y);
+                    Color pixelColor = func(x, y).ToColor();
                     pixels[y * data.Stride + x * 3 + 0] = pixelColor.B;
                     pixels[y * data.Stride + x * 3 + 1] = pixelColor.G;
                     pixels[y * data.Stride + x * 3 + 2] = pixelColor.R;
@@ -230,9 +232,9 @@ namespace RayTracor.RayTracorLib
             return RenderFunc(width, height,  (x,y)=> {
                 Intersection res = IntersectScene(camera.CastRay(x, y));
                 if (!res.Intersects || res.Distance > maxDist)
-                    return Color.Black;
+                    return Vector3.Zero;
                 int col = 255 - (int)(res.Distance / maxDist * 255.0);
-                return Color.FromArgb(col, col, col);
+                return new Vector3(col);
             });
         }
 
@@ -242,8 +244,8 @@ namespace RayTracor.RayTracorLib
             {
                 Intersection res = IntersectScene(camera.CastRay(x, y));
                 if (res.Intersects)
-                    return (res.Normal * 127.0 + new Vector(128.0)).ToColor();
-                return Color.Black;
+                    return (res.Normal * 127.0 + new Vector3(128.0));
+                return Vector3.Zero;
             });
         }
 
@@ -254,21 +256,26 @@ namespace RayTracor.RayTracorLib
                 Ray ray = camera.CastRay(x, y);
                 Intersection res = IntersectScene(ray);
                 if (!res.Intersects)
-                    return Color.White;
+                    return new Vector3(255.0);
 
-                MwcRng.SetSeed((uint)GetHashCode());
+                //MwcRng.SetSeed((uint)GetHashCode());
                 
                 //double theta = Math.Atan2(res.Normal.Y, res.Normal.X);
                 //double phi = Math.Acos(res.Normal.Z);
                 
                 int notblocked = 0;
                 int castedRays = 0;
+                int tries = 0;
                 while(castedRays < rays)
                 {
-                    Vector rand = new Vector(MwcRng.GetUniformRange(-1, 1), MwcRng.GetUniformRange(-1, 1), MwcRng.GetUniformRange(-1, 1));
+                    Vector3 rand = new Vector3(MwcRng.GetUniformRange(-1, 1), MwcRng.GetUniformRange(-1, 1), MwcRng.GetUniformRange(-1, 1));
 
-                    if (Vector.DotProduct(rand, res.Normal) < 0.0)
+                    if (Vector3.DotProduct(rand, res.Normal) < 0.0)
+                    {
+                        if (tries++ > rays * 2)
+                            break;
                         continue;
+                    }
 
                     Ray newray = new Ray(res.Point, rand);
                     Intersection res2 = IntersectSceneExcept(newray, res.Object);
@@ -291,8 +298,8 @@ namespace RayTracor.RayTracorLib
                 //if (!IntersectScene(newRay).Intersects)
                 //        notblocked++;
 
-                int col = (int)(notblocked * 255.0 / rays);
-                return Color.FromArgb(col, col, col);
+                int col = (int)(notblocked * 255.0 / castedRays);
+                return new Vector3(col);
             });
         }
 
@@ -301,10 +308,10 @@ namespace RayTracor.RayTracorLib
             camera.SetResolution(width, height);
         }
         
-        private Color Trace(Ray ray, int depth)
+        private Vector3 Trace(Ray ray, int depth)
         {
             if (depth > 3)
-                return Color.Empty;
+                return Vector3.Zero;
             
             Intersection res = IntersectScene(ray);
             if (!res.Intersects)
@@ -312,22 +319,26 @@ namespace RayTracor.RayTracorLib
             
             // lights!
             double lambertAmount = 0;
-            foreach (PointLight l in lights)
+            foreach (ILight light in lights)
             {
-                double vis = LightVisibility(res.Point, l);
-                if (vis <= 0.0)
+                if (!IsLightVisible(res.Point, light))
                     continue;
-                double contribution = Vector.DotProduct((l.Position - res.Point).Normalized, res.Normal);
-                if (contribution > 0)
-                    lambertAmount += contribution * vis;
+
+                double contribution = 0;
+                if (light is PointLight)
+                    contribution = Vector3.DotProduct(((light as PointLight).Position - res.Point).Normalized, res.Normal);
+                
+                lambertAmount += contribution;
             }
 
             lambertAmount = Math.Min(1, lambertAmount);
 
-            Object obj = res.Object;
-            double specular = obj.Material.Specular;
-            Vector resultColor = obj.EvalMaterial(res, lambertAmount);
+            IObject obj = res.Object;
+            Material mat = obj.Material;
+            Vector3 objColor = obj.EvalMaterial(res);
 
+            Vector3 resultColor = objColor * mat.Ambient + objColor * lambertAmount * mat.Lambert;
+            
             //if (specular != 0.0)
             //{
             //    Ray reflected = ray.Reflect(res.Point, res.Normal);
@@ -337,7 +348,7 @@ namespace RayTracor.RayTracorLib
             //    if (reflectColor.HasValue)
             //        resultColor += new Vector(reflectColor.Value) * specular;
             //}
-            return resultColor.ToColor();
+            return resultColor;
         }
         
         private Intersection IntersectScene(Ray ray)
@@ -345,7 +356,7 @@ namespace RayTracor.RayTracorLib
             Intersection closestIntersec = Intersection.False;
             closestIntersec.Distance = double.MaxValue;
             
-            foreach (Object o in objects)
+            foreach (var o in objects)
             {
                 Intersection res = o.Intersects(ray);
 
@@ -356,12 +367,12 @@ namespace RayTracor.RayTracorLib
             return closestIntersec;
         }
 
-        private Intersection IntersectSceneExcept(Ray ray, params Object[] objs)
+        private Intersection IntersectSceneExcept(Ray ray, params IObject[] objs)
         {
             Intersection closestIntersec = Intersection.False;
             closestIntersec.Distance = double.MaxValue;
             
-            foreach (Object o in objects.Except(objs))
+            foreach (var o in objects.Except(objs))
             {
                 Intersection res = o.Intersects(ray);
 
@@ -372,24 +383,39 @@ namespace RayTracor.RayTracorLib
             return closestIntersec;
         }
 
-        private double LightVisibility(Vector point, PointLight light)
+        private bool IsLightVisible(Vector3 point, ILight light)
         {
-            double vis = light.LightVisibility(point);
-            if (vis <= 0.0)
-                return 0.0;
-
-            Ray ray = Ray.FromTo(point, light.Position);
-            ray.Start += ray.Direction * 0.001;
-
-            double lightDist = (light.Position - point).Length;
-
-            foreach (Object o in objects)
+            if (light is PointLight)
             {
-                Intersection r = o.Intersects(ray);
-                if (r.Intersects && r.Distance > -0.0005 && r.Distance < lightDist)
-                    return 0.0;
+                PointLight plight = light as PointLight;
+                return PointObstructed(point, plight.Position);
             }
-            return vis;
+
+            if (light is SpotLight)
+            {
+                SpotLight slight = light as SpotLight;
+                if (!slight.PointLighted(point))
+                    return false;
+
+                return PointObstructed(point, slight.Position);
+            }
+
+            return false;
+        }
+
+        private bool PointObstructed(Vector3 from, Vector3 to)
+        {
+            Ray ray = Ray.FromTo(from, to);
+            ray.Start += ray.Direction * 0.001;
+            double dist = (to - from).Length;
+
+            foreach (var o in objects)
+            {
+                Intersection res = o.Intersects(ray);
+                if (res.Intersects && res.Distance > -0.0005 && res.Distance < dist)
+                    return false;
+            }
+            return true;
         }
 
         public XmlDocument Serialize()
@@ -413,7 +439,7 @@ namespace RayTracor.RayTracorLib
             // objects
             XmlNode objectsNode = doc.CreateElement("objects");
             root.AppendChild(objectsNode);
-            foreach (Object o in objects)
+            foreach (IObject o in objects)
                 o.Serialize(doc, objectsNode);
 
             return doc;
@@ -425,7 +451,7 @@ namespace RayTracor.RayTracorLib
             Scene s = new Scene();
             Camera cam = Camera.Parse(root["camera"]);
             s.camera = cam;
-            s.backgroundColor = root["backgroundcolor"].ParseColor();
+            s.backgroundColor = root["backgroundcolor"].ParseColor().ToVector();
 
             // lights
             XmlNode lights = root.SelectSingleNode("//scene/lights");

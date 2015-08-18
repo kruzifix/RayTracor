@@ -9,6 +9,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using RayTracor.RayTracorLib;
+using RayTracor.RayTracorLib.Tracing;
+using RayTracor.RayTracorLib.Lights;
+using RayTracor.RayTracorLib.Objects;
+using RayTracor.RayTracorLib.Utility;
 
 namespace RayTracor
 {
@@ -16,8 +20,8 @@ namespace RayTracor
     {
         public Camera camera;
         public List<Ray> rays = new List<Ray>();
-        public List<RayTracorLib.Object> objects = new List<RayTracorLib.Object>();
-        public List<PointLight> lights = new List<PointLight>();
+        public List<IObject> objects = new List<IObject>();
+        public List<ILight> lights = new List<ILight>();
 
         double areaSize = 15.0;
         Vector2 offset = new Vector2();
@@ -50,7 +54,7 @@ namespace RayTracor
             DrawGrid();
             foreach (Ray r in rays)
                 DrawRay(Color.Red, r);
-            foreach (RayTracorLib.Object o in objects)
+            foreach (var o in objects)
                 DrawObject(o);
             foreach (PointLight l in lights)
                 DrawLight(l);
@@ -101,13 +105,13 @@ namespace RayTracor
             double aspect = this.Width / (double)this.Height;
             if (Width > Height)
             {
-                scale.X = (double)this.Width / areaSize / aspect;
-                scale.Y = (double)this.Height / areaSize;
+                scale.X = Width / areaSize / aspect;
+                scale.Y = Height / areaSize;
             }
             else
             {
-                scale.X = (double)this.Width / areaSize;
-                scale.Y = (double)this.Height / areaSize * aspect;
+                scale.X = Width / areaSize;
+                scale.Y = Height / areaSize * aspect;
             }
         }
 
@@ -158,9 +162,9 @@ namespace RayTracor
             }
         }
 
-        private void DrawObject(RayTracorLib.Object obj)
+        private void DrawObject(IObject obj)
         {
-            if (obj is RayTracorLib.Sphere)
+            if (obj is Sphere)
             {
                 Sphere s = obj as Sphere;
                 Vector2 center = new Vector2(s.Position.X, s.Position.Z);
@@ -171,7 +175,7 @@ namespace RayTracor
                 g.FillEllipse(new SolidBrush(Color.FromArgb(64, s.Material.Color)), rect);
                 g.DrawEllipse(new Pen(s.Material.Color, 1.5f), rect);
             }
-            if (obj is RayTracorLib.Triangle)
+            if (obj is Triangle)
                 DrawTriangle(obj as Triangle);
             if (obj is Quad)
             {

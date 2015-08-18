@@ -3,6 +3,7 @@
 -fog
 -super sampling radius
 -stochastic (random) super sampling
+-adaptive super sampling
 -rework materials (phong shading)
 -material scripting ?
 -texturing, bumpmapping
@@ -15,6 +16,8 @@
 -different backgrounds (patterns)
 
 -poisson disk distribution for rng
+-bsp with aabb
+-vertex serialization
 
 things added:
 -triangles
