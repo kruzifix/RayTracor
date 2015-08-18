@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,15 +9,15 @@ namespace RayTracor.RayTracorLib
 {
     public class Quad : Object
     {
-        public Vector Vertex0 { get; set; }
-        public Vector Vertex1 { get; set; }
-        public Vector Vertex2 { get; set; }
-        public Vector Vertex3 { get; set; }
+        public Vertex Vertex0 { get; set; }
+        public Vertex Vertex1 { get; set; }
+        public Vertex Vertex2 { get; set; }
+        public Vertex Vertex3 { get; set; }
 
         public Triangle T1 { get; private set; }
         public Triangle T2 { get; private set; }
 
-        public Quad(Vector v0, Vector v1, Vector v2, Vector v3, Material material)
+        public Quad(Vertex v0, Vertex v1, Vertex v2, Vertex v3, Material material)
             : base(Vector.Zero, material)
         {
             Vertex0 = v0;
@@ -55,18 +55,30 @@ namespace RayTracor.RayTracorLib
 
         public override Vector EvalMaterial(Intersection intersec, double lambertAmount)
         {
-            Vector col = Material.Color.ToVector();
-            return Material.AddAmbientLambert(col, lambertAmount);
+            Vector2 bary = intersec.BaryCoords;
+            
+            if (bary.X + bary.Y > 1.0)
+            {
+                intersec.BaryCoords.X = 1.0 - intersec.BaryCoords.X;
+                intersec.BaryCoords.Y = 1.0 - intersec.BaryCoords.Y;
+                return T2.EvalMaterial(intersec, lambertAmount);
+            }
+            return T1.EvalMaterial(intersec, lambertAmount);
+        }
+
+        private double Lerp(double y1, double y2, double x)
+        {
+            return y1 + (y2 - y1) * x;
         }
 
         public override void Serialize(XmlDocument doc, XmlNode parent)
         {
             XmlNode node = doc.CreateElement("quad");
             Material.Serialize(doc, node);
-            node.AppendChild(Vertex0.Serialize(doc, "vertex0"));
-            node.AppendChild(Vertex1.Serialize(doc, "vertex1"));
-            node.AppendChild(Vertex2.Serialize(doc, "vertex2"));
-            node.AppendChild(Vertex2.Serialize(doc, "vertex3"));
+            //node.AppendChild(Vertex0.Serialize(doc, "vertex0"));
+            //node.AppendChild(Vertex1.Serialize(doc, "vertex1"));
+            //node.AppendChild(Vertex2.Serialize(doc, "vertex2"));
+            //node.AppendChild(Vertex2.Serialize(doc, "vertex3"));
             parent.AppendChild(node);
         }
 
@@ -77,8 +89,12 @@ namespace RayTracor.RayTracorLib
             Vector v2 = Vector.Parse(node["vertex2"]);
             Vector v3 = Vector.Parse(node["vertex3"]);
             Material mat = Material.Parse(node["material"]);
+            Quad q = new Quad(new Vertex { Position = v0, TexCoord = Vector2.UnitX },
+                              new Vertex { Position = v1, TexCoord = Vector2.Zero },
+                              new Vertex { Position = v2, TexCoord = Vector2.UnitY },
+                              new Vertex { Position = v3, TexCoord = Vector2.One }, mat);
 
-            return new Quad(v0, v1, v2, v3, mat);
+            return q;
         }
     }
 }
