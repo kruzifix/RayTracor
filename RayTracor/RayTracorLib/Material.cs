@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -15,12 +15,18 @@ namespace RayTracor.RayTracorLib
         public double Ambient { get; set; }
         public Color Color { get; set; }
         public bool Textured { get; set; }
+        public Texture Texture { get; set; }
 
         public Material() { }
 
         public Vector AddAmbientLambert(Vector col, double lambert)
         {
             return col * lambert * Lambert + col * Ambient;
+        }
+
+        public Vector GetTexCol(Vector2 coords)
+        {
+            return Texture.GetColor(coords);
         }
 
         public void Serialize(XmlDocument doc, XmlNode parent)
@@ -45,6 +51,9 @@ namespace RayTracor.RayTracorLib
             mat.Ambient = node["ambient"].ParseDouble();
             mat.Color = node["color"].ParseColor();
             mat.Textured = node["textured"].ParseBool();
+
+            if (mat.Textured)
+                mat.Texture = Texture.FromPath(node["texture"].InnerText);
 
             return mat;
         }
