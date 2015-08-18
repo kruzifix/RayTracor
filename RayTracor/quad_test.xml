@@ -23,8 +23,8 @@
       <vertex3 x="2" y="-2" z="0"/>
 			<material>
 				<specular>0</specular>
-				<lambert>0,7</lambert>
-				<ambient>0,1</ambient>
+				<lambert>0.7</lambert>
+				<ambient>0.1</ambient>
 				<color>FF2BC22D</color>
 				<textured>true</textured>
         <texture>bricks.jpg</texture>

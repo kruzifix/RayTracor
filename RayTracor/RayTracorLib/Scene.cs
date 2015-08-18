@@ -328,15 +328,15 @@ namespace RayTracor.RayTracorLib
             double specular = obj.Material.Specular;
             Vector resultColor = obj.EvalMaterial(res, lambertAmount);
 
-            if (specular != 0.0)
-            {
-                Ray reflected = ray.Reflect(res.Point, res.Normal);
-                reflected.Start += reflected.Direction * 0.001;
+            //if (specular != 0.0)
+            //{
+            //    Ray reflected = ray.Reflect(res.Point, res.Normal);
+            //    reflected.Start += reflected.Direction * 0.001;
 
-                Color? reflectColor = Trace(reflected, depth + 1);
-                if (reflectColor.HasValue)
-                    resultColor += new Vector(reflectColor.Value) * specular;
-            }
+            //    Color? reflectColor = Trace(reflected, depth + 1);
+            //    if (reflectColor.HasValue)
+            //        resultColor += new Vector(reflectColor.Value) * specular;
+            //}
             return resultColor.ToColor();
         }
         
@@ -425,6 +425,7 @@ namespace RayTracor.RayTracorLib
             Scene s = new Scene();
             Camera cam = Camera.Parse(root["camera"]);
             s.camera = cam;
+            s.backgroundColor = root["backgroundcolor"].ParseColor();
 
             // lights
             XmlNode lights = root.SelectSingleNode("//scene/lights");

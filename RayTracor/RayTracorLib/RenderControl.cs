@@ -183,9 +183,9 @@ namespace RayTracor
 
         private void DrawTriangle(Triangle tri)
         {
-            Vector2 v0 = new Vector2(tri.Vertex0.X, tri.Vertex0.Z);
-            Vector2 v1 = new Vector2(tri.Vertex1.X, tri.Vertex1.Z);
-            Vector2 v2 = new Vector2(tri.Vertex2.X, tri.Vertex2.Z);
+            Vector2 v0 = new Vector2(tri.Vertex0.Position.X, tri.Vertex0.Position.Z);
+            Vector2 v1 = new Vector2(tri.Vertex1.Position.X, tri.Vertex1.Position.Z);
+            Vector2 v2 = new Vector2(tri.Vertex2.Position.X, tri.Vertex2.Position.Z);
 
             DrawLine(Pens.Black, v0, v1);
             DrawLine(Pens.Black, v1, v2);

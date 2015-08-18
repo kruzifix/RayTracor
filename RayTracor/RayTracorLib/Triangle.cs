@@ -43,7 +43,7 @@ namespace RayTracor.RayTracorLib
                 double t = Vector.DotProduct(Q, E2) / denom;
                 bool kl = denom < 0.0;
                 if ((u >= 0.0 && u <= 1.0) && (v >= 0.0 && u + v <= 1.0))
-                    return new Intersection(t, ray.PointAt(t), this, kl ? Normal : Normal.Negated, new Vector2(u, kl?v:1-v)); // automatic texture flipping
+                    return new Intersection(t, ray.PointAt(t), this, kl ? Normal : Normal.Negated, new Vector2(u, v)); // automatic texture flipping
             }
             return Intersection.False;
         }

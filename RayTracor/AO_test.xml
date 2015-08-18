@@ -2,7 +2,7 @@
 <scene>
   <backgroundcolor>FF000000</backgroundcolor>
   <camera>
-    <position x="3" y="5" z="9" />
+    <position x="4" y="6" z="12" />
     <looksat x="0" y="2" z="2" />
     <globalup x="0" y="1" z="0" />
     <fov>45</fov>
@@ -23,8 +23,8 @@
       <vertex3 x="-2" y="0" z="2"/>
 			<material>
 				<specular>0</specular>
-				<lambert>0,7</lambert>
-				<ambient>0,1</ambient>
+				<lambert>0.7</lambert>
+				<ambient>0.1</ambient>
 				<color>FF2BC22D</color>
 				<textured>true</textured>
         <texture>brickwork.jpg</texture>
@@ -37,8 +37,8 @@
       <vertex3 x="2" y="0" z="-2"/>
 			<material>
 				<specular>0</specular>
-				<lambert>0,7</lambert>
-				<ambient>0,1</ambient>
+				<lambert>0.7</lambert>
+				<ambient>0.1</ambient>
         <color>FF2BC22D</color>
         <textured>true</textured>
         <texture>brickwork.jpg</texture>
@@ -51,8 +51,8 @@
       <vertex3 x="2" y="0" z="-2"/>
 			<material>
 				<specular>0</specular>
-				<lambert>0,7</lambert>
-				<ambient>0,1</ambient>
+				<lambert>0.7</lambert>
+				<ambient>0.1</ambient>
 				<color>FF2BC22D</color>
         <textured>true</textured>
         <texture>brickwork.jpg</texture>
@@ -65,8 +65,8 @@
       <vertex3 x="-2" y="4" z="2"/>
 			<material>
 				<specular>0</specular>
-				<lambert>0,7</lambert>
-				<ambient>0,1</ambient>
+				<lambert>0.7</lambert>
+				<ambient>0.1</ambient>
 				<color>FF2BC22D</color>
         <textured>true</textured>
         <texture>brickwork.jpg</texture>
@@ -74,12 +74,12 @@
 		</quad>
     <!-- /box -->
     <sphere>
-      <position x="0" y="1" z="1,75" />
+      <position x="0" y="1" z="1.75" />
       <radius>1</radius>
       <material>
         <specular>0</specular>
-        <lambert>0,7</lambert>
-        <ambient>0,1</ambient>
+        <lambert>0.7</lambert>
+        <ambient>0.1</ambient>
         <color>FFFF2234</color>
         <textured>false</textured>
       </material>
@@ -89,8 +89,8 @@
       <normal x="0" y="1" z="0" />
       <material>
         <specular>0</specular>
-        <lambert>0,7</lambert>
-        <ambient>0,1</ambient>
+        <lambert>0.7</lambert>
+        <ambient>0.1</ambient>
         <color>FFFFFFFF</color>
         <textured>false</textured>
       </material>

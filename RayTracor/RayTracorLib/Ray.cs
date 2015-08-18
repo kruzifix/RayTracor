@@ -9,7 +9,10 @@ namespace RayTracor.RayTracorLib
     public class Ray
     {
         public Vector Start { get; set; }
-        public Vector Direction { get; set; }
+        public Vector Direction { get { return dir; } set { dir = value; CalcDirFrac(); } }
+        public Vector DirFrac { get { return dirFrac; } }
+
+        Vector dir, dirFrac = Vector.Zero;
 
         public Ray() { Start = Vector.Zero; Direction = Vector.UnitX; }
 
@@ -17,6 +20,13 @@ namespace RayTracor.RayTracorLib
         {
             Start = start;
             Direction = direction.Normalized;
+        }
+
+        private void CalcDirFrac()
+        {
+            dirFrac.X = dir.X == 0 ? double.MaxValue : 1.0 / dir.X;
+            dirFrac.Y = dir.Y == 0 ? double.MaxValue : 1.0 / dir.Y;
+            dirFrac.Z = dir.Z == 0 ? double.MaxValue : 1.0 / dir.Z;
         }
 
         public Vector PointAt(double k)
