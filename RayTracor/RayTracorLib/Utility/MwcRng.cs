@@ -47,6 +47,13 @@ namespace RayTracor.RayTracorLib.Utility
             return (z << 16) + w;
         }
 
+        public static int GetInt(int exclusiveMax)
+        {
+            if (exclusiveMax < 1)
+                throw new ArgumentException("exclusiveMax has to be atleast 1.");
+            return (int)(GetUint() % exclusiveMax);
+        }
+
         /// <summary>
         /// Generates a uniform distributed double floating point number from the open interval (0,1).
         /// Does not contain 0 or 1.

@@ -61,6 +61,7 @@
     <Compile Include="RayTracorLib\Tracing\AABB.cs" />
     <Compile Include="RayTracorLib\Camera.cs" />
     <Compile Include="RayTracorLib\Lights\ILight.cs" />
+    <Compile Include="RayTracorLib\Utility\PoissonDisk2.cs" />
     <Compile Include="RayTracorLib\Utility\Utility.cs" />
     <Compile Include="RayTracorLib\Tracing\Intersection.cs" />
     <Compile Include="RayTracorLib\Lights\PointLight.cs" />
