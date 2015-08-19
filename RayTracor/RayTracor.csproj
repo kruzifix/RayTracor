@@ -58,6 +58,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RayTracorLib\Lights\AreaLight.cs" />
     <Compile Include="RayTracorLib\Tracing\AABB.cs" />
     <Compile Include="RayTracorLib\Camera.cs" />
     <Compile Include="RayTracorLib\Lights\ILight.cs" />

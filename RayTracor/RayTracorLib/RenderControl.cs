@@ -56,7 +56,7 @@ namespace RayTracor
                 DrawRay(Color.Red, r);
             foreach (var o in objects)
                 DrawObject(o);
-            foreach (PointLight l in lights)
+            foreach (ILight l in lights)
                 DrawLight(l);
             if (camera != null)
                 DrawCamera();
@@ -133,26 +133,39 @@ namespace RayTracor
             DrawLine(cpen, start + left * 2.0, start + right * 2.0);
         }
 
-        private void DrawLight(PointLight l)
+        private void DrawLight(ILight l)
         {
-            Vector2 center = new Vector2(l.Position.X, l.Position.Z);
-            double crossSize = 500.0 / areaSize;
-            Vector2 pc = VectorToPixel(center);
+            if (l is PointLight)
+            {
+                PointLight pl = l as PointLight;
+                Vector2 center = new Vector2(pl.Position.X, pl.Position.Z);
+                double crossSize = 500.0 / areaSize;
+                Vector2 pc = VectorToPixel(center);
 
-            g.DrawLine(Pens.Black, pc.X - crossSize, pc.Y - crossSize, pc.X + crossSize, pc.Y + crossSize);
-            g.DrawLine(Pens.Black, pc.X - crossSize, pc.Y + crossSize, pc.X + crossSize, pc.Y - crossSize);
-            Rectangle rect = new Rectangle((int)(pc.X - crossSize * 0.6), (int)(pc.Y - crossSize * 0.6), (int)(crossSize * 1.2), (int)(crossSize * 1.2));
-            g.FillEllipse(new SolidBrush(l.Color), rect);
-            g.DrawEllipse(Pens.Black, rect);
+                g.DrawLine(Pens.Black, pc.X - crossSize, pc.Y - crossSize, pc.X + crossSize, pc.Y + crossSize);
+                g.DrawLine(Pens.Black, pc.X - crossSize, pc.Y + crossSize, pc.X + crossSize, pc.Y - crossSize);
+                Rectangle rect = new Rectangle((int)(pc.X - crossSize * 0.6), (int)(pc.Y - crossSize * 0.6), (int)(crossSize * 1.2), (int)(crossSize * 1.2));
+                g.FillEllipse(new SolidBrush(pl.Color.ToColor()), rect);
+                g.DrawEllipse(Pens.Black, rect);
+            }
 
             if (l is SpotLight)
             { 
-                SpotLight s = l as SpotLight;
-                Vector2 dir = new Vector2(s.Direction.X, s.Direction.Z);
+                SpotLight sl = l as SpotLight;
+                Vector2 center = new Vector2(sl.Position.X, sl.Position.Z);
+                double crossSize = 500.0 / areaSize;
+                Vector2 pc = VectorToPixel(center);
+
+                g.DrawLine(Pens.Black, pc.X - crossSize, pc.Y - crossSize, pc.X + crossSize, pc.Y + crossSize);
+                g.DrawLine(Pens.Black, pc.X - crossSize, pc.Y + crossSize, pc.X + crossSize, pc.Y - crossSize);
+                Rectangle rect = new Rectangle((int)(pc.X - crossSize * 0.6), (int)(pc.Y - crossSize * 0.6), (int)(crossSize * 1.2), (int)(crossSize * 1.2));
+                g.FillEllipse(new SolidBrush(sl.Color.ToColor()), rect);
+                g.DrawEllipse(Pens.Black, rect);
+                Vector2 dir = new Vector2(sl.Direction.X, sl.Direction.Z);
                 if (dir.Length == 0.0)
                     return;
                 dir.Normalize();
-                Vector2 orth = new Vector2(-dir.Y, dir.X) * Math.Tan(s.Angle.ToRadians());
+                Vector2 orth = new Vector2(-dir.Y, dir.X) * Math.Tan(sl.Angle.ToRadians());
 
                 Vector2 left = dir - orth;
                 Vector2 right = dir + orth;

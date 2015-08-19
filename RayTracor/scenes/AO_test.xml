@@ -8,15 +8,22 @@
     <fov>45</fov>
   </camera>
   <lights>
-    <pointlight>
+    <!--<pointlight>
       <position x="10" y="10" z="14" />
       <color>FFFFFFFF</color>
       <strength>1</strength>
-    </pointlight>
+    </pointlight>-->
+    <arealight>
+      <position x="14" y="15" z="14" />
+      <color>FFFFFFFF</color>
+      <strength>1</strength>
+      <size>1</size>
+      <looksat x="0" y="0" z="0"/>
+    </arealight>
   </lights>
   <objects>
     <!-- box -->
-    <!-- <quad> left 
+    <quad> <!-- left --> 
 			<vertex0 x="-2" y="0" z="-2"/>
       <vertex1 x="-2" y="4" z="-2"/>
       <vertex2 x="-2" y="4" z="2"/>
@@ -30,7 +37,7 @@
         <texture>textures/brickwork.jpg</texture>
 			</material>
 		</quad>
-    <quad> right 
+    <quad> <!--right -->
 			<vertex0 x="2" y="0" z="2"/>
       <vertex1 x="2" y="4" z="2"/>
       <vertex2 x="2" y="4" z="-2"/>
@@ -44,7 +51,7 @@
         <texture>textures/brickwork.jpg</texture>
 			</material>
 		</quad>
-    <quad> back 
+    <quad> <!-- back -->
 			<vertex0 x="-2" y="0" z="-2"/>
       <vertex1 x="-2" y="4" z="-2"/>
       <vertex2 x="2" y="4" z="-2"/>
@@ -58,7 +65,7 @@
         <texture>textures/brickwork.jpg</texture>
 			</material>
 		</quad>
-    <quad> top 
+    <quad> <!-- top -->
 			<vertex0 x="-2" y="4" z="-2"/>
       <vertex1 x="2" y="4" z="-2"/>
       <vertex2 x="2" y="4" z="2"/>

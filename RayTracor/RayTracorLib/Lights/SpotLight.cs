@@ -10,8 +10,9 @@ using RayTracor.RayTracorLib.Tracing;
 
 namespace RayTracor.RayTracorLib.Lights
 {
-    public class SpotLight : PointLight
+    public class SpotLight : ILight
     {
+        public Vector3 Position { get; set; }
         public Vector3 Direction { get; set; }
         // saved in radians; given in degrees
         public double Angle { get; set; }
@@ -21,19 +22,13 @@ namespace RayTracor.RayTracorLib.Lights
         { Direction = Vector3.UnitX; Angle = (30.0).ToRadians(); }
 
         public SpotLight(Vector3 position, Color color, double strength, Vector3 direction, double angle)
-            : base(position, color, strength)
+            : base(color, strength)
         {
+            Position = position;
             Direction = direction;
             Angle = angle.ToRadians();
         }
-
-        public SpotLight(PointLight lbase, Vector3 direction, double angle)
-            : base(lbase.Position, lbase.Color, lbase.Strength)
-        {
-            Direction = direction;
-            Angle = angle.ToRadians();
-        }
-
+        
         public bool PointLighted(Vector3 point)
         {
             double a = Vector3.DotProduct(Direction, (point - Position).Normalized);
@@ -49,21 +44,20 @@ namespace RayTracor.RayTracorLib.Lights
             lNode.AppendChild(Position.Serialize(doc, "position"));
             lNode.AppendChild(Direction.Serialize(doc, "direction"));
             lNode.AppendChild(Angle.ToDegrees().Serialize(doc, "angle"));
-            lNode.AppendChild(Color.Serialize(doc, "color"));
-            lNode.AppendChild(Strength.Serialize(doc, "strength"));
+            base.Serialize(doc, lNode);
 
             parent.AppendChild(lNode);
         }
 
-        public static new SpotLight Parse(XmlNode li)
+        public static SpotLight Parse(XmlNode li)
         {
             Vector3 dir = Vector3.Parse(li["direction"]).Normalized;
             double angle = li["angle"].ParseDouble();
 
-            PointLight lbase = PointLight.Parse(li);
-            SpotLight spl = new SpotLight(lbase, dir, angle);
+            //PointLight lbase = PointLight.Parse(li);
+            //SpotLight spl = new SpotLight(lbase, dir, angle);
 
-            return spl;
+            throw new NotImplementedException();
         }
 
         public static SpotLight FromTo(Vector3 position, Vector3 point, Color color, double strength, double angle)

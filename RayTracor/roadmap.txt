@@ -14,8 +14,6 @@
 -area lights (soft shadows)
 -meshes (.obj loader)
 -different backgrounds (patterns)
-
--poisson disk distribution for rng
 -bsp with aabb
 -vertex serialization
 
@@ -25,3 +23,4 @@ things added:
 -deterministic supersampling
 -render normal map
 -quads
+-poisson disk distribution for rng

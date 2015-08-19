@@ -4,8 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RayTracor.RayTracorLib.Tracing;
 
-namespace PoissonDisk
+namespace RayTracor.RayTracorLib.Utility
 {
     public class PoissonDisk2
     {
@@ -33,7 +34,7 @@ namespace PoissonDisk
             while (lastRandomSamples.Contains(rsi))
                 rsi = MwcRng.GetInt(samples.Count);
             lastRandomSamples.Add(rsi);
-            if (lastRandomSamples.Count > samples.Count / 2)
+            while (lastRandomSamples.Count > samples.Count / 2)
                 lastRandomSamples.RemoveAt(0);
             return samples[rsi];
         }

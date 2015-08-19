@@ -13,25 +13,21 @@ namespace RayTracor.RayTracorLib.Lights
     public class PointLight : ILight
     {
         public Vector3 Position { get; set; }
-        public Color Color { get; set; }
-        public double Strength { get; set; }
 
-        public PointLight() { Position = Vector3.Zero; Color = Color.White; Strength = 1; }
+        public PointLight() : base() { Position = Vector3.Zero; }
 
         public PointLight(Vector3 position, Color color, double strength)
+            :base(color, strength)
         {
             Position = position;
-            Color = color;
-            Strength = strength;
         }
-        
+
         public override void Serialize(XmlDocument doc, XmlNode parent)
         {
             XmlNode lNode = doc.CreateElement("pointlight");
 
             lNode.AppendChild(Position.Serialize(doc, "position"));
-            lNode.AppendChild(Color.Serialize(doc, "color"));
-            lNode.AppendChild(Strength.Serialize(doc, "strength"));
+            base.Serialize(doc, lNode);
 
             parent.AppendChild(lNode);
         }

@@ -20,6 +20,7 @@ namespace RayTracor.RayTracorLib
         public Camera camera;
         public List<ILight> lights;
         public List<IObject> objects;
+        PoissonDisk2 pdisk;
 
         //public event EventHandler<int> ProgressChanged;
         public IProgress<int> ProgressReport;
@@ -33,6 +34,8 @@ namespace RayTracor.RayTracorLib
             camera = new Camera();
             lights = new List<ILight>();
             objects = new List<IObject>();
+            pdisk = new PoissonDisk2(0.1);
+            pdisk.Generate();
 
             //lights.Add(new Light(new Vector(-30, -10, 20), Color.White, 1));
             //lights.Add(new Light(new Vector(7, 10, 7), Color.White, 1));
@@ -321,14 +324,40 @@ namespace RayTracor.RayTracorLib
             double lambertAmount = 0;
             foreach (ILight light in lights)
             {
-                if (!IsLightVisible(res.Point, light))
-                    continue;
-
                 double contribution = 0;
                 if (light is PointLight)
+                {
+                    if (!IsLightVisible(res.Point, light))
+                        continue;
                     contribution = Vector3.DotProduct(((light as PointLight).Position - res.Point).Normalized, res.Normal);
-                
-                lambertAmount += contribution;
+                }
+                if (light is AreaLight)
+                {
+                    AreaLight alight = light as AreaLight;
+                    double lambert = Vector3.DotProduct((alight.Position - res.Point).Normalized, res.Normal);
+
+                    int tests = 16;
+                    int obstructed = 0;
+                    for(int i = 0; i < tests; i++)
+                    {
+                        Vector2 uv = pdisk.GetRandomSample();
+                        Vector3 apoint = alight.GetPoint(uv.X * 2.0 - 1.0, uv.Y * 2.0 - 1.0);
+                        Ray testRay = Ray.FromTo(res.Point + res.Normal * 0.001, apoint);
+                        Intersection sec = IntersectSceneExcept(testRay, res.Object);
+                        double dist = (apoint - res.Point).Length;
+                        if (!sec.Intersects)
+                            continue;
+                        if (sec.Distance > dist)
+                            continue;
+                        obstructed++;
+                    }
+
+                    double visibility = (tests - obstructed) / (double)tests;
+
+                    contribution = visibility * lambert;
+                }
+
+                lambertAmount += contribution * light.Strength;
             }
 
             lambertAmount = Math.Min(1, lambertAmount);
@@ -433,7 +462,7 @@ namespace RayTracor.RayTracorLib
             // lights
             XmlNode lightsNode = doc.CreateElement("lights");
             root.AppendChild(lightsNode);
-            foreach (PointLight l in lights)
+            foreach (ILight l in lights)
                 l.Serialize(doc, lightsNode);
 
             // objects
@@ -459,6 +488,8 @@ namespace RayTracor.RayTracorLib
                 s.lights.Add(PointLight.Parse(li));
             foreach (XmlNode sli in lights.SelectNodes("spotlight"))
                 s.lights.Add(SpotLight.Parse(sli));
+            foreach (XmlNode ali in lights.SelectNodes("arealight"))
+                s.lights.Add(AreaLight.Parse(ali));
 
             // objects
             XmlNode objects = root.SelectSingleNode("//scene/objects");
