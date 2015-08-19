@@ -1,33 +1,47 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RayTracor.RayTracorLib.Tracing;
 
-namespace RayTracor.RayTracorLib.Utility
+namespace PoissonDisk
 {
     public class PoissonDisk2
     {
         List<Vector2> samples;
 
-        int n;
         double r;
         int k = 30;
+        int ri = 0;
+        List<int> lastRandomSamples;
 
         public Vector2[] Samples { get { return samples.ToArray(); } }
+
+        public Vector2 RandomSample { get { ri = (ri + 1) % samples.Count; return samples[ri]; } }
 
         public PoissonDisk2(double r)
         {
             samples = new List<Vector2>();
+            lastRandomSamples = new List<int>();
             this.r = r;
-
-            Generate();
         }
 
-        private void Generate()
+        public Vector2 GetRandomSample()
         {
+            int rsi = MwcRng.GetInt(samples.Count);
+            while (lastRandomSamples.Contains(rsi))
+                rsi = MwcRng.GetInt(samples.Count);
+            lastRandomSamples.Add(rsi);
+            if (lastRandomSamples.Count > samples.Count / 2)
+                lastRandomSamples.RemoveAt(0);
+            return samples[rsi];
+        }
+
+        public void Generate()
+        {
+            samples.Clear();
+
             Stopwatch sw = Stopwatch.StartNew();
 
             // step0 -> init background grid
@@ -116,6 +130,9 @@ namespace RayTracor.RayTracorLib.Utility
                     active.RemoveAt(i);
             }
             sw.Stop();
+
+            lastRandomSamples.Clear();
+            ri = MwcRng.GetInt(samples.Count);
 
             Console.WriteLine("finished in {0}ms", sw.ElapsedMilliseconds);
         }
