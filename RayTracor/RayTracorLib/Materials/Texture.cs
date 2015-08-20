@@ -5,6 +5,8 @@ using System.Text;
 using System.Drawing;
 using RayTracor.RayTracorLib.Tracing;
 using RayTracor.RayTracorLib.Utility;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace RayTracor.RayTracorLib.Materials
 {
@@ -23,9 +25,23 @@ namespace RayTracor.RayTracorLib.Materials
 
             colors = new Vector3[width*height];
 
+            BitmapData data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            byte[] pixels = new byte[data.Stride * data.Height];
+            Marshal.Copy(data.Scan0, pixels, 0, pixels.Length);
             for (int x = 0; x < width; x++)
+            {
                 for (int y = 0; y < height; y++)
-                    colors[x + y * width] = bmp.GetPixel(x, y).ToVector();
+                {
+                    int i = x * 3 + y * data.Stride;
+                    colors[x + y * width] = new Vector3(
+                        pixels[i + 2],
+                        pixels[i + 1],
+                        pixels[i + 0]
+                        );
+                }
+            }
+
+            bmp.UnlockBits(data);
         }
 
         public Vector3 GetColor(double u, double v)
