@@ -14,12 +14,17 @@
       <strength>1</strength>
     </pointlight>-->
     <arealight>
-      <position x="14" y="15" z="14" />
+      <position x="-4" y="7" z="10" />
       <color>FFFFFFFF</color>
       <strength>1</strength>
-      <size>1</size>
-      <looksat x="0" y="0" z="0"/>
+      <size>0.75</size>
     </arealight>
+  <!--<arealight>
+      <position x="11" y="6" z="0" />
+      <color>FFFFFFFF</color>
+      <strength>1</strength>
+      <size>0.75</size>
+    </arealight>-->
   </lights>
   <objects>
     <!-- box -->

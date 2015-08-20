@@ -149,6 +149,20 @@ namespace RayTracor
                 g.DrawEllipse(Pens.Black, rect);
             }
 
+            if (l is AreaLight)
+            {
+                AreaLight al = l as AreaLight;
+                Vector2 center = new Vector2(al.Position.X, al.Position.Z);
+                double crossSize = 500.0 / areaSize;
+                Vector2 pc = VectorToPixel(center);
+
+                g.DrawLine(Pens.Black, pc.X, pc.Y - crossSize, pc.X, pc.Y + crossSize);
+                g.DrawLine(Pens.Black, pc.X - crossSize, pc.Y, pc.X + crossSize, pc.Y);
+                Rectangle rect = new Rectangle((int)(pc.X - crossSize * 0.6), (int)(pc.Y - crossSize * 0.6), (int)(crossSize * 1.2), (int)(crossSize * 1.2));
+                g.FillEllipse(new SolidBrush(al.Color.ToColor()), rect);
+                g.DrawEllipse(Pens.Black, rect);
+            }
+
             if (l is SpotLight)
             { 
                 SpotLight sl = l as SpotLight;

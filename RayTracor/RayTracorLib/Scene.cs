@@ -12,6 +12,7 @@ using RayTracor.RayTracorLib.Objects;
 using RayTracor.RayTracorLib.Tracing;
 using RayTracor.RayTracorLib.Utility;
 using RayTracor.RayTracorLib.Materials;
+using System.Diagnostics;
 
 namespace RayTracor.RayTracorLib
 {
@@ -34,8 +35,9 @@ namespace RayTracor.RayTracorLib
             camera = new Camera();
             lights = new List<ILight>();
             objects = new List<IObject>();
-            pdisk = new PoissonDisk2(0.1);
+            pdisk = new PoissonDisk2(0.15);
             pdisk.Generate();
+            Console.WriteLine("Radius: {0}, Samples: {1}", pdisk.Radius, pdisk.Samples.Count);
 
             //lights.Add(new Light(new Vector(-30, -10, 20), Color.White, 1));
             //lights.Add(new Light(new Vector(7, 10, 7), Color.White, 1));
@@ -170,7 +172,8 @@ namespace RayTracor.RayTracorLib
 
             camera.SetResolution(width, height);
             
-            Parallel.For(0, height, (y) => 
+            Parallel.For(0, height, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (y) =>
+            //for(int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
@@ -230,9 +233,10 @@ namespace RayTracor.RayTracorLib
 
         public Bitmap RenderGreyScaleDepthMap(int width, int height)
         {
-            double maxDist = 20.0;
+            double maxDist = 30.0;
 
-            return RenderFunc(width, height,  (x,y)=> {
+            return RenderFunc(width, height, (x, y) =>
+            {
                 Intersection res = IntersectScene(camera.CastRay(x, y));
                 if (!res.Intersects || res.Distance > maxDist)
                     return Vector3.Zero;
@@ -262,30 +266,31 @@ namespace RayTracor.RayTracorLib
                     return new Vector3(255.0);
 
                 //MwcRng.SetSeed((uint)GetHashCode());
-                
+
                 //double theta = Math.Atan2(res.Normal.Y, res.Normal.X);
                 //double phi = Math.Acos(res.Normal.Z);
-                
+
                 int notblocked = 0;
                 int castedRays = 0;
                 int tries = 0;
-                while(castedRays < rays)
+                while (castedRays < rays)
                 {
                     Vector3 rand = new Vector3(MwcRng.GetUniformRange(-1, 1), MwcRng.GetUniformRange(-1, 1), MwcRng.GetUniformRange(-1, 1));
 
-                    if (Vector3.DotProduct(rand, res.Normal) < 0.0)
-                    {
-                        if (tries++ > rays * 2)
-                            break;
-                        continue;
-                    }
+                    //if (Vector3.DotProduct(rand, res.Normal) < 0.0)
+                    //{
+                    //    if (tries++ > rays)
+                    //        break;
+                    //    continue;
+                    //}
+                    //tries = 0;
 
                     Ray newray = new Ray(res.Point, rand);
                     Intersection res2 = IntersectSceneExcept(newray, res.Object);
                     if (!res2.Intersects)
                         notblocked++;
                     castedRays++;
-                    
+
                     //    double newtheta = theta + MwcRng.GetUniformRange(-Math.PI / 2.0, Math.PI / 2.0);
                     //    double newphi = phi + MwcRng.GetUniformRange(0, Math.PI * 2.0);
 
@@ -294,7 +299,7 @@ namespace RayTracor.RayTracorLib
                     //    if (!IntersectSceneExcept(newray, res.Object).Intersects)
                     //        notblocked++;
                 }
-                
+
                 //rays = 1;
                 //Ray newRay = new Ray(res.Point, res.Normal);
                 //if (!IntersectSceneExcept(newRay, res.Object).Intersects)
@@ -310,19 +315,19 @@ namespace RayTracor.RayTracorLib
         {
             camera.SetResolution(width, height);
         }
-        
+
         private Vector3 Trace(Ray ray, int depth)
         {
             if (depth > 3)
                 return Vector3.Zero;
-            
+
             Intersection res = IntersectScene(ray);
             if (!res.Intersects)
                 return backgroundColor;
-            
+
             // lights!
             double lambertAmount = 0;
-            foreach (ILight light in lights)
+            foreach (var light in lights)
             {
                 double contribution = 0;
                 if (light is PointLight)
@@ -334,22 +339,26 @@ namespace RayTracor.RayTracorLib
                 if (light is AreaLight)
                 {
                     AreaLight alight = light as AreaLight;
-                    double lambert = Vector3.DotProduct((alight.Position - res.Point).Normalized, res.Normal);
+                    double lambert = Vector3.DotProduct((alight.Position - res.Point).Normalized, res.Normal).Clamp(0, 1);
 
-                    int tests = 16;
+                    int tests = pdisk.Samples.Count;
                     int obstructed = 0;
-                    for(int i = 0; i < tests; i++)
+                    for (int i = 0; i < tests; i++)
                     {
-                        Vector2 uv = pdisk.GetRandomSample();
-                        Vector3 apoint = alight.GetPoint(uv.X * 2.0 - 1.0, uv.Y * 2.0 - 1.0);
-                        Ray testRay = Ray.FromTo(res.Point + res.Normal * 0.001, apoint);
-                        Intersection sec = IntersectSceneExcept(testRay, res.Object);
-                        double dist = (apoint - res.Point).Length;
-                        if (!sec.Intersects)
-                            continue;
-                        if (sec.Distance > dist)
-                            continue;
-                        obstructed++;
+                        Vector2 uv = pdisk[i] * 2.0 - Vector2.One;
+
+                        Vector3 diff = res.Point - alight.Position;
+                        Vector3 normDiff = diff.Normalized;
+
+                        Vector3 right = Vector3.CrossProduct(normDiff, camera.GlobalUp).Normalized;
+                        Vector3 up = Vector3.CrossProduct(right, normDiff).Normalized;
+                        right *= uv.X * alight.Size;
+                        up *= uv.Y * alight.Size;
+
+                        Vector3 apoint = alight.Position + right + up;
+
+                        if (PointObstructed(res.Point, apoint))
+                            obstructed++;
                     }
 
                     double visibility = (tests - obstructed) / (double)tests;
@@ -367,7 +376,7 @@ namespace RayTracor.RayTracorLib
             Vector3 objColor = obj.EvalMaterial(res);
 
             Vector3 resultColor = objColor * mat.Ambient + objColor * lambertAmount * mat.Lambert;
-            
+
             //if (specular != 0.0)
             //{
             //    Ray reflected = ray.Reflect(res.Point, res.Normal);
@@ -379,12 +388,12 @@ namespace RayTracor.RayTracorLib
             //}
             return resultColor;
         }
-        
+
         private Intersection IntersectScene(Ray ray)
         {
             Intersection closestIntersec = Intersection.False;
             closestIntersec.Distance = double.MaxValue;
-            
+
             foreach (var o in objects)
             {
                 Intersection res = o.Intersects(ray);
@@ -400,7 +409,7 @@ namespace RayTracor.RayTracorLib
         {
             Intersection closestIntersec = Intersection.False;
             closestIntersec.Distance = double.MaxValue;
-            
+
             foreach (var o in objects.Except(objs))
             {
                 Intersection res = o.Intersects(ray);
@@ -417,7 +426,7 @@ namespace RayTracor.RayTracorLib
             if (light is PointLight)
             {
                 PointLight plight = light as PointLight;
-                return PointObstructed(point, plight.Position);
+                return !PointObstructed(point, plight.Position);
             }
 
             if (light is SpotLight)
@@ -426,7 +435,7 @@ namespace RayTracor.RayTracorLib
                 if (!slight.PointLighted(point))
                     return false;
 
-                return PointObstructed(point, slight.Position);
+                return !PointObstructed(point, slight.Position);
             }
 
             return false;
@@ -435,16 +444,16 @@ namespace RayTracor.RayTracorLib
         private bool PointObstructed(Vector3 from, Vector3 to)
         {
             Ray ray = Ray.FromTo(from, to);
-            ray.Start += ray.Direction * 0.001;
+            ray.Start += ray.Direction * 0.002;
             double dist = (to - from).Length;
 
             foreach (var o in objects)
             {
                 Intersection res = o.Intersects(ray);
                 if (res.Intersects && res.Distance > -0.0005 && res.Distance < dist)
-                    return false;
+                    return true;
             }
-            return true;
+            return false;
         }
 
         public XmlDocument Serialize()
@@ -492,15 +501,24 @@ namespace RayTracor.RayTracorLib
                 s.lights.Add(AreaLight.Parse(ali));
 
             // objects
+            //Stopwatch sw = Stopwatch.StartNew();
             XmlNode objects = root.SelectSingleNode("//scene/objects");
             foreach (XmlNode n in objects.SelectNodes("sphere"))
                 s.objects.Add(Sphere.Parse(n));
+            //Console.WriteLine("spheres: {0}ms", sw.ElapsedMilliseconds);
+            //sw.Restart();
             foreach (XmlNode n in objects.SelectNodes("plane"))
                 s.objects.Add(Plane.Parse(n));
+            //Console.WriteLine("planes: {0}ms", sw.ElapsedMilliseconds);
+            //sw.Restart();
             foreach (XmlNode n in objects.SelectNodes("triangle"))
                 s.objects.Add(Triangle.Parse(n));
+            //Console.WriteLine("triangles: {0}ms", sw.ElapsedMilliseconds);
+            //sw.Restart();
             foreach (XmlNode n in objects.SelectNodes("quad"))
                 s.objects.Add(Quad.Parse(n));
+            //Console.WriteLine("quads: {0}ms", sw.ElapsedMilliseconds);
+            //sw.Restart();
 
             return s;
         }

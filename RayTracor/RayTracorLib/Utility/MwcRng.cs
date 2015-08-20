@@ -22,7 +22,13 @@ namespace RayTracor.RayTracorLib.Utility
             w = 521288629;
             z = 362436069;
         }
-        
+
+        public static void ResetSeed()
+        {
+            w = 521288629;
+            z = 362436069;
+        }
+
         public static void SetSeed(uint u, uint v)
         {
             if (u != 0) w = u;

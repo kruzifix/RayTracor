@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -81,6 +82,7 @@ namespace RayTracor.RayTracorLib.Objects
 
         public static Quad Parse(XmlNode node)
         {
+            
             Vector3 v0 = Vector3.Parse(node["vertex0"]);
             Vector3 v1 = Vector3.Parse(node["vertex1"]);
             Vector3 v2 = Vector3.Parse(node["vertex2"]);
@@ -90,7 +92,7 @@ namespace RayTracor.RayTracorLib.Objects
                               new Vertex { Position = v1, TexCoord = Vector2.Zero },
                               new Vertex { Position = v2, TexCoord = Vector2.UnitY },
                               new Vertex { Position = v3, TexCoord = Vector2.One }, mat);
-
+            
             return q;
         }
     }

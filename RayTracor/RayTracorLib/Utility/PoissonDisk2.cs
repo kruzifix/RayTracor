@@ -17,9 +17,11 @@ namespace RayTracor.RayTracorLib.Utility
         int ri = 0;
         List<int> lastRandomSamples;
 
-        public Vector2[] Samples { get { return samples.ToArray(); } }
-
+        public List<Vector2> Samples { get { return samples; } }
         public Vector2 RandomSample { get { ri = (ri + 1) % samples.Count; return samples[ri]; } }
+        public double Radius { get { return r; } }
+
+        public Vector2 this[int i] { get { return samples[i % samples.Count]; } }
 
         public PoissonDisk2(double r)
         {
@@ -58,7 +60,7 @@ namespace RayTracor.RayTracorLib.Utility
             List<Vector2> active = new List<Vector2>();
 
             // step1 -> initial sample
-            MwcRng.SeedFromTime();
+            MwcRng.ResetSeed();
 
             Vector2 v0 = new Vector2(MwcRng.GetUniformRange(0, domainSize), MwcRng.GetUniformRange(0, domainSize));
             int x = (int)(v0.X / cellsize);
@@ -134,8 +136,6 @@ namespace RayTracor.RayTracorLib.Utility
 
             lastRandomSamples.Clear();
             ri = MwcRng.GetInt(samples.Count);
-
-            Console.WriteLine("finished in {0}ms", sw.ElapsedMilliseconds);
         }
     }
 }

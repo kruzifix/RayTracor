@@ -14,29 +14,16 @@ namespace RayTracor.RayTracorLib.Lights
     {
         public double Size { get; private set; }
         public Vector3 Position { get; private set; }
-        public Vector3 Direction { get; private set; }
-
-        Vector3 right, up;
-
+        
         public AreaLight() : base() { }
 
-        public AreaLight(Vector3 position, Vector3 direction, double size, Color color, double strength)
+        public AreaLight(Vector3 position, double size, Color color, double strength)
             :base(color, strength)
         {
             Position = position;
-            Direction = direction.Normalized;
             Size = size;
-
-            // TODO: use generic globalup not constant!!
-            right = Vector3.CrossProduct(direction, Vector3.UnitY).Normalized;
-            up = Vector3.CrossProduct(right, direction).Normalized;
         }
-
-        public Vector3 GetPoint(double u, double v)
-        {
-            return Position + right * u * Size + up * v * Size;
-        }
-
+        
         public override void Serialize(XmlDocument doc, XmlNode parent)
         {
             XmlNode lNode = doc.CreateElement("arealight");
@@ -51,20 +38,11 @@ namespace RayTracor.RayTracorLib.Lights
         public static AreaLight Parse(XmlNode li)
         {
             Vector3 pos = Vector3.Parse(li["position"]);
-            Vector3 dir = Vector3.UnitX;
-            try
-            {
-                dir = Vector3.Parse(li["direction"]);
-            }
-            catch { }
             double size = li["size"].ParseDouble();
             Color color = li["color"].ParseColor();
             double strength = li["strength"].ParseDouble();
-
-            if (li["looksat"] != null)
-                dir = (Vector3.Parse(li["looksat"]) - pos).Normalized;
-
-            return new AreaLight(pos, dir, size, color, strength);
+            
+            return new AreaLight(pos, size, color, strength);
         }
     }
 }

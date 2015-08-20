@@ -149,10 +149,14 @@ namespace RayTracor
 
         private void bLoad_Click(object sender, EventArgs e)
         {
+            //Stopwatch sw = Stopwatch.StartNew();
             XmlDocument doc = new XmlDocument();
             doc.Load("scenes/AO_test.xml");
             scene = Scene.Parse(doc);
             scene.ProgressReport = new Progress<int>((i) => progBar.Increment(1));
+
+            //sw.Stop();
+            //Console.WriteLine("scene loaded in {0}ms.", sw.ElapsedMilliseconds);
 
             UpdateRenderControl();
         }
