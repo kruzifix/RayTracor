@@ -46,6 +46,13 @@ namespace RayTracor.RayTracorLib.Tracing
             Z /= len;
         }
 
+        public void Negate()
+        {
+            X = -X;
+            Y = -Y;
+            Z = -Z;
+        }
+
         public Color ToColor()
         {
             return Color.FromArgb(X.ClampToInt(0, 255), Y.ClampToInt(0, 255), Z.ClampToInt(0, 255));
