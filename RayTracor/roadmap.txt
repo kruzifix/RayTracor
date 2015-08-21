@@ -11,13 +11,14 @@
 -depth of field
 -error checking when loading
 -rework lights
--area lights (soft shadows)
 -meshes (.obj loader)
 -different backgrounds (patterns)
 -bsp with aabb
 -vertex serialization
+-replace xml with json!!!
 
 things added:
+-area lights (soft shadows)
 -triangles
 -render depth
 -deterministic supersampling

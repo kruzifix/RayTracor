@@ -21,7 +21,7 @@ namespace RayTracor.RayTracorLib
         public Camera camera;
         public List<ILight> lights;
         public List<IObject> objects;
-        PoissonDisk2 pdisk;
+        PoissonDisk2 pdisk_32, pdisk_64;
 
         //public event EventHandler<int> ProgressChanged;
         public IProgress<int> ProgressReport;
@@ -35,9 +35,13 @@ namespace RayTracor.RayTracorLib
             camera = new Camera();
             lights = new List<ILight>();
             objects = new List<IObject>();
-            pdisk = new PoissonDisk2(0.15);
-            pdisk.Generate();
-            Console.WriteLine("Radius: {0}, Samples: {1}", pdisk.Radius, pdisk.Samples.Count);
+            pdisk_32 = new PoissonDisk2(0.15);
+            pdisk_32.Generate();
+            pdisk_32.Save("pdisk_32.bmp");
+            pdisk_64 = new PoissonDisk2(0.103);
+            pdisk_64.Generate();
+            pdisk_64.Save("pdisk_64.bmp");
+            //Console.WriteLine("Radius: {0}, Samples: {1}", pdisk_64.Radius, pdisk_64.Samples.Count);
 
             //lights.Add(new Light(new Vector(-30, -10, 20), Color.White, 1));
             //lights.Add(new Light(new Vector(7, 10, 7), Color.White, 1));
@@ -267,46 +271,31 @@ namespace RayTracor.RayTracorLib
 
                 //MwcRng.SetSeed((uint)GetHashCode());
 
-                //double theta = Math.Atan2(res.Normal.Y, res.Normal.X);
-                //double phi = Math.Acos(res.Normal.Z);
+                //rays = pdisk_64.Samples.Count;
 
                 int notblocked = 0;
-                int castedRays = 0;
-                int tries = 0;
-                while (castedRays < rays)
+                for(int i = 0; i < rays; i++)
                 {
-                    Vector3 rand = new Vector3(MwcRng.GetUniformRange(-1, 1), MwcRng.GetUniformRange(-1, 1), MwcRng.GetUniformRange(-1, 1));
+                    //Vector2 sample = pdisk_64[i];
+                    double theta = 2 * Math.PI * MwcRng.GetUniform();
+                    double phi = Math.Acos(MwcRng.GetUniform() * 2 - 1);
 
-                    //if (Vector3.DotProduct(rand, res.Normal) < 0.0)
-                    //{
-                    //    if (tries++ > rays)
-                    //        break;
-                    //    continue;
-                    //}
-                    //tries = 0;
+                    Vector3 rand = new Vector3(
+                        Math.Cos(theta) * Math.Sin(phi),
+                        Math.Sin(theta) * Math.Sin(phi),
+                        Math.Cos(phi)
+                        );
+
+                    if (Vector3.DotProduct(rand, res.Normal) < 0.0)
+                        rand.Negate();
 
                     Ray newray = new Ray(res.Point, rand);
                     Intersection res2 = IntersectSceneExcept(newray, res.Object);
                     if (!res2.Intersects)
                         notblocked++;
-                    castedRays++;
-
-                    //    double newtheta = theta + MwcRng.GetUniformRange(-Math.PI / 2.0, Math.PI / 2.0);
-                    //    double newphi = phi + MwcRng.GetUniformRange(0, Math.PI * 2.0);
-
-                    //    Vector newnormal = new Vector(Math.Cos(newtheta), Math.Sin(newtheta), Math.Cos(newphi));
-                    //    Ray newray = new Ray(res.Point, newnormal);
-                    //    if (!IntersectSceneExcept(newray, res.Object).Intersects)
-                    //        notblocked++;
                 }
-
-                //rays = 1;
-                //Ray newRay = new Ray(res.Point, res.Normal);
-                //if (!IntersectSceneExcept(newRay, res.Object).Intersects)
-                //if (!IntersectScene(newRay).Intersects)
-                //        notblocked++;
-
-                int col = (int)(notblocked * 255.0 / castedRays);
+                
+                int col = (int)(notblocked * 255.0 / rays);
                 return new Vector3(col);
             });
         }
@@ -341,11 +330,11 @@ namespace RayTracor.RayTracorLib
                     AreaLight alight = light as AreaLight;
                     double lambert = Vector3.DotProduct((alight.Position - res.Point).Normalized, res.Normal).Clamp(0, 1);
 
-                    int tests = pdisk.Samples.Count;
+                    int tests = pdisk_32.Samples.Count;
                     int obstructed = 0;
                     for (int i = 0; i < tests; i++)
                     {
-                        Vector2 uv = pdisk[i] * 2.0 - Vector2.One;
+                        Vector2 uv = pdisk_32[i] * 2.0 - Vector2.One;
 
                         Vector3 diff = res.Point - alight.Position;
                         Vector3 normDiff = diff.Normalized;
@@ -414,7 +403,7 @@ namespace RayTracor.RayTracorLib
             {
                 Intersection res = o.Intersects(ray);
 
-                if (res.Intersects && res.Distance < closestIntersec.Distance)
+                if (res.Intersects && res.Distance > -0.0005 && res.Distance < closestIntersec.Distance)
                     closestIntersec = res;
             }
 

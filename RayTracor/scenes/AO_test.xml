@@ -27,8 +27,8 @@
     </arealight>-->
   </lights>
   <objects>
-    <!-- box -->
-    <quad> <!-- left --> 
+    <!-- box left/right/back/top-->
+    <quad> 
 			<vertex0 x="-2" y="0" z="-2"/>
       <vertex1 x="-2" y="4" z="-2"/>
       <vertex2 x="-2" y="4" z="2"/>
@@ -42,7 +42,7 @@
         <texture>textures/brickwork.jpg</texture>
 			</material>
 		</quad>
-    <quad> <!--right -->
+    <quad> 
 			<vertex0 x="2" y="0" z="2"/>
       <vertex1 x="2" y="4" z="2"/>
       <vertex2 x="2" y="4" z="-2"/>
@@ -56,7 +56,7 @@
         <texture>textures/brickwork.jpg</texture>
 			</material>
 		</quad>
-    <quad> <!-- back -->
+    <quad> 
 			<vertex0 x="-2" y="0" z="-2"/>
       <vertex1 x="-2" y="4" z="-2"/>
       <vertex2 x="2" y="4" z="-2"/>
@@ -70,7 +70,7 @@
         <texture>textures/brickwork.jpg</texture>
 			</material>
 		</quad>
-    <quad> <!-- top -->
+    <quad>
 			<vertex0 x="-2" y="4" z="-2"/>
       <vertex1 x="2" y="4" z="-2"/>
       <vertex2 x="2" y="4" z="2"/>
@@ -83,7 +83,7 @@
         <textured>true</textured>
         <texture>textures/brickwork.jpg</texture>
 			</material>
-		</quad>-->
+		</quad>
     <!-- /box -->
     <sphere>
       <position x="0" y="1" z="1.75" />
