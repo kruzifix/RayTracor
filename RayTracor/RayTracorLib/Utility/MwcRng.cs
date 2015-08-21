@@ -15,6 +15,8 @@ namespace RayTracor.RayTracorLib.Utility
         private static uint w;
         private static uint z;
 
+        private static object lockObject = new object();
+
         static MwcRng()
         {
             // These values are not magical, just the default values Marsaglia used.
@@ -48,9 +50,14 @@ namespace RayTracor.RayTracorLib.Utility
 
         public static uint GetUint()
         {
-            z = 36969 * (z & 65535) + (z >> 16);
-            w = 18000 * (w & 65535) + (w >> 16);
-            return (z << 16) + w;
+            uint i = 123;
+            lock (lockObject)
+            {
+                z = 36969 * (z & 65535) + (z >> 16);
+                w = 18000 * (w & 65535) + (w >> 16);
+                i = (z << 16) + w;
+            }
+            return i;
         }
 
         public static int GetInt(int exclusiveMax)
