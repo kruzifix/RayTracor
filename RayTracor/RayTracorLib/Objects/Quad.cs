@@ -81,8 +81,7 @@ namespace RayTracor.RayTracorLib.Objects
         }
 
         public static Quad Parse(XmlNode node)
-        {
-            
+        {   
             Vector3 v0 = Vector3.Parse(node["vertex0"]);
             Vector3 v1 = Vector3.Parse(node["vertex1"]);
             Vector3 v2 = Vector3.Parse(node["vertex2"]);

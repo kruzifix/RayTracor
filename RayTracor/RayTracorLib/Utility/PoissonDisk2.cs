@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,11 +15,9 @@ namespace RayTracor.RayTracorLib.Utility
 
         double r;
         int k = 30;
-        int ri = 0;
-        List<int> lastRandomSamples;
+        //List<int> lastRandomSamples;
 
         public List<Vector2> Samples { get { return samples; } }
-        public Vector2 RandomSample { get { ri = (ri + 1) % samples.Count; return samples[ri]; } }
         public double Radius { get { return r; } }
 
         public Vector2 this[int i] { get { return samples[i % samples.Count]; } }
@@ -26,26 +25,40 @@ namespace RayTracor.RayTracorLib.Utility
         public PoissonDisk2(double r)
         {
             samples = new List<Vector2>();
-            lastRandomSamples = new List<int>();
+            //lastRandomSamples = new List<int>();
             this.r = r;
         }
 
-        public Vector2 GetRandomSample()
+        public void Save(string path)
         {
-            int rsi = MwcRng.GetInt(samples.Count);
-            while (lastRandomSamples.Contains(rsi))
-                rsi = MwcRng.GetInt(samples.Count);
-            lastRandomSamples.Add(rsi);
-            while (lastRandomSamples.Count > samples.Count / 2)
-                lastRandomSamples.RemoveAt(0);
-            return samples[rsi];
+            Bitmap bmp = new Bitmap(1000, 1000);
+            Graphics g = Graphics.FromImage(bmp);
+            g.Clear(Color.White);
+            float pointSize = 5f;
+            foreach (Vector2 s in samples)
+                g.FillEllipse(Brushes.Black, (float)s.X * 1000f - pointSize, (float)s.Y * 1000f - pointSize, pointSize * 2, pointSize * 2);
+            g.Flush();
+            g.Dispose();
+            bmp.Save(path);
+            bmp.Dispose();
         }
+
+        //public Vector2 GetRandomSample()
+        //{
+        //    int rsi = MwcRng.GetInt(samples.Count);
+        //    while (lastRandomSamples.Contains(rsi))
+        //        rsi = MwcRng.GetInt(samples.Count);
+        //    lastRandomSamples.Add(rsi);
+        //    while (lastRandomSamples.Count > samples.Count / 2)
+        //        lastRandomSamples.RemoveAt(0);
+        //    return samples[rsi];
+        //}
 
         public void Generate()
         {
             samples.Clear();
 
-            Stopwatch sw = Stopwatch.StartNew();
+            //Stopwatch sw = Stopwatch.StartNew();
 
             // step0 -> init background grid
             double cellsize = r / Math.Sqrt(2);
@@ -132,10 +145,9 @@ namespace RayTracor.RayTracorLib.Utility
                 if (j >= k)
                     active.RemoveAt(i);
             }
-            sw.Stop();
+            //sw.Stop();
 
-            lastRandomSamples.Clear();
-            ri = MwcRng.GetInt(samples.Count);
+            //lastRandomSamples.Clear();
         }
     }
 }

@@ -45,6 +45,8 @@ namespace RayTracor.RayTracorLib.Objects
             if (dis >= 0.0)
             {
                 double t = (-Math.Sqrt(dis) - b) / (2.0 * a);
+                //if (t < 0)
+                //    return Intersection.False;
                 Vector3 point = ray.PointAt(t);
                 return new Intersection(t, point, this, (point - Position).Normalized, null);
             }
