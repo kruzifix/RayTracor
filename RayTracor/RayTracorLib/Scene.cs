@@ -103,7 +103,10 @@ namespace RayTracor.RayTracorLib
             {
                 for (int x = 0; x < width; x++)
                 {
-                    Color pixelColor = func(x, y).ToColor();
+                    Vector3 vec = func(x, y);
+                    Color pixelColor = vec.ToColor();
+                    if (pixelColor.R == 255 && pixelColor.G == 0 && pixelColor.B == 0)
+                        Console.WriteLine("wat");
                     pixels[y * data.Stride + x * 3 + 0] = pixelColor.B;
                     pixels[y * data.Stride + x * 3 + 1] = pixelColor.G;
                     pixels[y * data.Stride + x * 3 + 2] = pixelColor.R;
@@ -165,7 +168,7 @@ namespace RayTracor.RayTracorLib
             {
                 Intersection res = IntersectScene(camera.CastRay(x, y));
                 if (!res.Intersects || res.Distance > maxDist)
-                    return Vector3.Zero;
+                    return new Vector3(0);
                 int col = 255 - (int)(res.Distance / maxDist * 255.0);
                 return new Vector3(col);
             });
@@ -547,6 +550,8 @@ namespace RayTracor.RayTracorLib
             Scene scene = new Scene();
 
             scene.camera = Camera.FromJToken(root["camera"]);
+            if (root["bgcolor"] == null)
+                throw new Exception("Scene: 'bgcolor' not defined.");
             scene.backgroundColor = Utility.ColorFromHexString(root["bgcolor"].ToString()).ToVector();
 
             foreach(JToken tok in root["lights"].Children())
