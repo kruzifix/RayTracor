@@ -46,7 +46,7 @@ namespace RayTracor.RayTracorLib.Objects
                 double t = Vector3.DotProduct(Q, E2) / denom;
                 bool kl = denom < 0.0;
                 if ((u >= 0.0 && u <= 1.0) && (v >= 0.0 && u + v <= 1.0))
-                    return new Intersection(t, ray.PointAt(t), this, kl ? Normal : Normal.Negated, new Vector2(u, v)); // (kl ? v : 1-v) automatic texture flipping
+                    return new Intersection(t, ray.PointAt(t), this, kl ? Normal : Normal.Negated, new Vector2(u, kl ? v : 1 - v)); // (kl ? v : 1-v) automatic texture flipping
             }
             return Intersection.False;
         }
@@ -64,10 +64,12 @@ namespace RayTracor.RayTracorLib.Objects
 
                 Vector2 bary = intersec.BaryCoords;
                 double v0contrib = 1 - bary.X - bary.Y;
-                double v1contrib = 1 - bary.Y;
-                double v2contrib = 1 - bary.X;
+                double v1contrib = 1 - bary.X;
+                double v2contrib = 1 - bary.Y;
+                Vector2 texCoord = Vertex0.TexCoord + (Vertex1.TexCoord - Vertex0.TexCoord) * v1contrib + (Vertex2.TexCoord - Vertex0.TexCoord) * v2contrib;
+                texCoord.X = 1 - texCoord.X;
 
-                return mat.GetTextureColor(Vertex0.TexCoord + (Vertex1.TexCoord - Vertex0.TexCoord) * v1contrib + (Vertex2.TexCoord - Vertex0.TexCoord) * v2contrib);
+                return mat.GetTextureColor(texCoord);
             }
             return mat.Color.ToVector();
         }

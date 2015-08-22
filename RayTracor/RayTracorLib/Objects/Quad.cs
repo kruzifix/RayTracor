@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RayTracor.RayTracorLib.Materials;
 using RayTracor.RayTracorLib.Tracing;
 
@@ -68,7 +70,7 @@ namespace RayTracor.RayTracorLib.Objects
             }
             return T1.EvalMaterial(intersec, mat);
         }
-        
+
         //public override void Serialize(XmlDocument doc, XmlNode parent)
         //{
         //    XmlNode node = doc.CreateElement("quad");
@@ -91,8 +93,55 @@ namespace RayTracor.RayTracorLib.Objects
         //                      new Vertex { Position = v1, TexCoord = Vector2.Zero },
         //                      new Vertex { Position = v2, TexCoord = Vector2.UnitY },
         //                      new Vertex { Position = v3, TexCoord = Vector2.One }, mat);
-            
+
         //    return q;
         //}
+        
+        public static IObject FromJToken(JToken tok)
+        {
+            SerializedQuad sq = JsonConvert.DeserializeObject<SerializedQuad>(tok.ToString());
+
+            if (string.IsNullOrWhiteSpace(sq.material))
+                throw new Exception("Quad: 'material' not defined.");
+            if (sq.vertex0 == null)
+                throw new Exception("Quad: 'vertex0' not defined.");
+            if (sq.vertex1 == null)
+                throw new Exception("Quad: 'vertex1' not defined.");
+            if (sq.vertex2 == null)
+                throw new Exception("Quad: 'vertex2' not defined.");
+            if (sq.vertex3 == null)
+                throw new Exception("Quad: 'vertex3' not defined.");
+
+            return new Quad(
+                VertexFromSerialized(sq.vertex0),
+                VertexFromSerialized(sq.vertex1),
+                VertexFromSerialized(sq.vertex2),
+                VertexFromSerialized(sq.vertex3),
+                sq.material);
+        }
+
+        private static Vertex VertexFromSerialized(SerializedVertex v)
+        {
+            return new Vertex(v.x, v.y, v.z, v.u, v.v);
+        }
+    }
+
+    class SerializedQuad
+    {
+        public string material { get; set; }
+        public SerializedVertex vertex0 { get; set; }
+        public SerializedVertex vertex1 { get; set; }
+        public SerializedVertex vertex2 { get; set; }
+        public SerializedVertex vertex3 { get; set; }
+    }
+
+    class SerializedVertex
+    {
+        public double x { get; set; }
+        public double y { get; set; }
+        public double z { get; set; }
+
+        public double u { get; set; }
+        public double v { get; set; }
     }
 }

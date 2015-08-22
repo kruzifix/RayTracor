@@ -1,23 +1,24 @@
 ﻿{
 	"camera": {
-		"position": {"x": 4, "y": 6, "z": 12},
-		"target": {"x": 0, "y": 2, "z": 2},
-		"globalup": {"x": 0, "y": 1, "z": 0},
+		"position": { "x": 4, "y": 6, "z": 12 },
+		"target": { "x": 0, "y": 2, "z": 2 },
+		"globalup": { "x": 0, "y": 1, "z": 0 },
 		"fov": 45
 	},
+
 	"bgcolor": "FF000000",
 	
 	"lights": [
 		{
 			"type": "arealight",
-			"position": {"x": -4, "y": 7, "z": 10},
+			"position": { "x": -4, "y": 7, "z": 10 },
 			"color": "FFFFFFFF",
 			"strength": 1,
 			"size": 0.75
 		},
 		{
 			"type": "pointlight",
-			"position": {"x": 11, "y": 6, "z": 0},
+			"position": { "x": 11, "y": 6, "z": 0 },
 			"color": "FFFFFFFF",
 			"strength": 0.1
 		}
@@ -35,6 +36,13 @@
 			"color": "FFFFFFFF",
 			"ambient": 0.1,
 			"lambert": 0.7
+		},
+		{
+			"name": "quadMat",
+			"color": "FFFFFFFF",
+			"ambient": 0.2,
+			"lambert": 0.5,
+			"texture": "textures/test.jpg"
 		}
 	],
 
@@ -42,14 +50,46 @@
 		{
 			"type": "sphere",
 			"material": "sphereMat",
-			"position": {"x": 0, "y": 1, "z": 1.75},
+			"position": { "x": 0, "y": 1, "z": 1.75 },
 			"radius": 1
 		},
 		{
 			"type": "plane",
 			"material": "planeMat",
-			"position": {"x": 0, "y": 0, "z": 0},
-			"normal": {"x": 0, "y": 1, "z": 0},
-		}
+			"position": { "x": 0, "y": 0, "z": 0 },
+			"normal": { "x": 0, "y": 1, "z": 0 },
+		},
+		{
+			"type": "quad",
+			"material": "quadMat",
+			"vertex0": { "x": 2, "y": 0, "z": 2, "u": 0, "v": 0 },
+			"vertex1": { "x": 2, "y": 4, "z": 2, "u": 0, "v": 1 },
+			"vertex2": { "x": 2, "y": 4, "z": -2, "u": 1, "v": 1 },
+			"vertex3": { "x": 2, "y": 0, "z": -2, "u": 1, "v": 0 }
+		},
+		{
+			"type": "quad",
+			"material": "quadMat",
+			"vertex0": { "x": -2, "y": 0, "z": -2, "u": 0, "v": 0 },
+			"vertex1": { "x": -2, "y": 4, "z": -2, "u": 0, "v": 1 },
+			"vertex2": { "x": -2, "y": 4, "z": 2, "u": 1, "v": 1 },
+			"vertex3": { "x": -2, "y": 0, "z": 2, "u": 1, "v": 0 }
+		},
+		{
+			"type": "quad",
+			"material": "quadMat",
+			"vertex0": { "x": -2, "y": 0, "z": -2, "u": 0, "v": 0 },
+			"vertex1": { "x": -2, "y": 4, "z": -2, "u": 0, "v": 1 },
+			"vertex2": { "x": 2, "y": 4, "z": -2, "u": 1, "v": 1 },
+			"vertex3": { "x": 2, "y": 0, "z": -2, "u": 1, "v": 0 }
+		},
+		{
+			"type": "quad",
+			"material": "quadMat",
+			"vertex0": { "x": -2, "y": 4, "z": -2, "u": 0, "v": 0 },
+			"vertex1": { "x": 2, "y": 4, "z": -2, "u": 0, "v": 1 },
+			"vertex2": { "x": 2, "y": 4, "z": 2, "u": 1, "v": 1 },
+			"vertex3": { "x": -2, "y": 4, "z": 2, "u": 1, "v": 0 }
+		},
 	]
 }
