@@ -24,46 +24,12 @@ namespace RayTracor.RayTracorLib.Materials
         public Texture Texture { get; set; }
 
         public Material() { }
-
-        //public Vector3 AddAmbientLambert(Vector3 col, double lambert)
-        //{
-        //    return col * lambert * Lambert + col * Ambient;
-        //}
-
+        
         public Vector3 GetTextureColor(Vector2 coords)
         {
             return Texture.GetColor(coords);
         }
-
-        public void Serialize(XmlDocument doc, XmlNode parent)
-        {
-            XmlNode node = doc.CreateElement("material");
-
-            node.AppendChild(Specular.Serialize(doc, "specular"));
-            node.AppendChild(Lambert.Serialize(doc, "lambert"));
-            node.AppendChild(Ambient.Serialize(doc, "ambient"));
-            node.AppendChild(Color.Serialize(doc, "color"));
-            node.AppendChild(Textured.Serialize(doc, "textured"));
-
-            parent.AppendChild(node);
-        }
-
-        public static Material Parse(XmlNode node)
-        {
-            Material mat = new Material();
-
-            mat.Specular = node["specular"].ParseDouble();
-            mat.Lambert = node["lambert"].ParseDouble();
-            mat.Ambient = node["ambient"].ParseDouble();
-            mat.Color = node["color"].ParseColor();
-            mat.Textured = node["textured"].ParseBool();
-
-            if (mat.Textured)
-                mat.Texture = Texture.FromPath(node["texture"].InnerText);
-
-            return mat;
-        }
-
+        
         public static Material FromJToken(JToken tok)
         {
             SerializedMaterial mat = JsonConvert.DeserializeObject<SerializedMaterial>(tok.ToString());

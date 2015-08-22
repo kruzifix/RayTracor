@@ -25,27 +25,6 @@ namespace RayTracor.RayTracorLib.Lights
             Position = position;
             Size = size;
         }
-                
-        //public override void Serialize(XmlDocument doc, XmlNode parent)
-        //{
-        //    XmlNode lNode = doc.CreateElement("arealight");
-
-        //    lNode.AppendChild(Position.Serialize(doc, "position"));
-        //    lNode.AppendChild(Color.Serialize(doc, "color"));
-        //    lNode.AppendChild(Strength.Serialize(doc, "strength"));
-
-        //    parent.AppendChild(lNode);
-        //}
-
-        //public static AreaLight Parse(XmlNode li)
-        //{
-        //    Vector3 pos = Vector3.Parse(li["position"]);
-        //    double size = li["size"].ParseDouble();
-        //    Color color = li["color"].ParseColor();
-        //    double strength = li["strength"].ParseDouble();
-            
-        //    return new AreaLight(pos, size, color, strength);
-        //}
 
         public static AreaLight FromJToken(JToken tok)
         {

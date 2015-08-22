@@ -23,26 +23,7 @@ namespace RayTracor.RayTracorLib.Lights
         {
             Position = position;
         }
-
-        //public override void Serialize(XmlDocument doc, XmlNode parent)
-        //{
-        //    XmlNode lNode = doc.CreateElement("pointlight");
-
-        //    lNode.AppendChild(Position.Serialize(doc, "position"));
-        //    base.Serialize(doc, lNode);
-
-        //    parent.AppendChild(lNode);
-        //}
-
-        //public static PointLight Parse(XmlNode li)
-        //{
-        //    Vector3 pos = Vector3.Parse(li["position"]);
-        //    Color color = li["color"].ParseColor();
-        //    double strength = li["strength"].ParseDouble();
-
-        //    return new PointLight(pos, color, strength);
-        //}
-
+        
         public static PointLight FromJToken(JToken tok)
         {
             SerializedPointLight spl = JsonConvert.DeserializeObject<SerializedPointLight>(tok.ToString());

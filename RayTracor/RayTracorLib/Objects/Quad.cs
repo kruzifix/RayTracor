@@ -70,32 +70,6 @@ namespace RayTracor.RayTracorLib.Objects
             }
             return T1.EvalMaterial(intersec, mat);
         }
-
-        //public override void Serialize(XmlDocument doc, XmlNode parent)
-        //{
-        //    XmlNode node = doc.CreateElement("quad");
-        //    //node.AppendChild(Vertex0.Serialize(doc, "vertex0"));
-        //    //node.AppendChild(Vertex1.Serialize(doc, "vertex1"));
-        //    //node.AppendChild(Vertex2.Serialize(doc, "vertex2"));
-        //    //node.AppendChild(Vertex2.Serialize(doc, "vertex3"));
-        //    base.Serialize(doc, node);
-        //    parent.AppendChild(node);
-        //}
-
-        //public static Quad Parse(XmlNode node)
-        //{   
-        //    Vector3 v0 = Vector3.Parse(node["vertex0"]);
-        //    Vector3 v1 = Vector3.Parse(node["vertex1"]);
-        //    Vector3 v2 = Vector3.Parse(node["vertex2"]);
-        //    Vector3 v3 = Vector3.Parse(node["vertex3"]);
-        //    Material mat = Material.Parse(node["material"]);
-        //    Quad q = new Quad(new Vertex { Position = v0, TexCoord = Vector2.UnitX },
-        //                      new Vertex { Position = v1, TexCoord = Vector2.Zero },
-        //                      new Vertex { Position = v2, TexCoord = Vector2.UnitY },
-        //                      new Vertex { Position = v3, TexCoord = Vector2.One }, mat);
-
-        //    return q;
-        //}
         
         public static IObject FromJToken(JToken tok)
         {

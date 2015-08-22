@@ -63,26 +63,6 @@ namespace RayTracor.RayTracorLib.Objects
 
             return new Plane(pl.position, pl.normal, pl.material);
         }
-
-        //public override void Serialize(XmlDocument doc, XmlNode parent)
-        //{
-        //    XmlNode node = doc.CreateElement("plane");
-
-        //    node.AppendChild(normal.Serialize(doc, "normal"));
-        //    node.AppendChild(position.Serialize(doc, "normal"));
-        //    base.Serialize(doc, node);
-
-        //    parent.AppendChild(node);
-        //}
-
-        //public static Plane Parse(XmlNode node)
-        //{
-        //    Vector3 pos = Vector3.Parse(node["position"]);
-        //    Material mat = Material.Parse(node["material"]);
-        //    Vector3 normal = Vector3.Parse(node["normal"]).Normalized;
-
-        //    return new Plane(pos, normal, mat);
-        //}
     }
 
     class SerializedPlane

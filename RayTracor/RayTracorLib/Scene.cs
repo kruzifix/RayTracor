@@ -99,14 +99,10 @@ namespace RayTracor.RayTracorLib
             camera.SetResolution(width, height);
 
             Parallel.For(0, height, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (y) =>
-            //for(int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
-                    Vector3 vec = func(x, y);
-                    Color pixelColor = vec.ToColor();
-                    if (pixelColor.R == 255 && pixelColor.G == 0 && pixelColor.B == 0)
-                        Console.WriteLine("wat");
+                    Color pixelColor = func(x, y).ToColor();
                     pixels[y * data.Stride + x * 3 + 0] = pixelColor.B;
                     pixels[y * data.Stride + x * 3 + 1] = pixelColor.G;
                     pixels[y * data.Stride + x * 3 + 2] = pixelColor.R;
@@ -214,8 +210,7 @@ namespace RayTracor.RayTracorLib
                 IObject obj = res.Object;
                 Material mat = materials[obj.Material];
                 Vector3 objColor = obj.EvalMaterial(res, mat);
-
-                //Vector3 resultColor = objColor * mat.Ambient + objColor * lambertAmount * mat.Lambert;
+                
                 return objColor * (mat.Ambient * ao + mat.Lambert * lambertAmount);
             });
         }
@@ -475,74 +470,7 @@ namespace RayTracor.RayTracorLib
             }
             return false;
         }
-
-        //public XmlDocument Serialize()
-        //{
-        //    XmlDocument doc = new XmlDocument();
-        //    XmlNode root = doc.CreateElement("scene");
-        //    doc.AppendChild(root);
-
-        //    // background color
-        //    root.AppendChild(backgroundColor.Serialize(doc, "backgroundcolor"));
-
-        //    // camera
-        //    camera.Serialize(doc);
-
-        //    // lights
-        //    XmlNode lightsNode = doc.CreateElement("lights");
-        //    root.AppendChild(lightsNode);
-        //    foreach (ILight l in lights)
-        //        l.Serialize(doc, lightsNode);
-
-        //    // objects
-        //    XmlNode objectsNode = doc.CreateElement("objects");
-        //    root.AppendChild(objectsNode);
-        //    foreach (IObject o in objects)
-        //        o.Serialize(doc, objectsNode);
-
-        //    return doc;
-        //}
-
-        //public static Scene ParseXml(XmlDocument doc)
-        //{
-        //    XmlNode root = doc["scene"];
-        //    Scene s = new Scene();
-        //    Camera cam = Camera.Parse(root["camera"]);
-        //    s.camera = cam;
-        //    s.backgroundColor = root["backgroundcolor"].ParseColor().ToVector();
-
-        //    // lights
-        //    XmlNode lights = root.SelectSingleNode("//scene/lights");
-        //    foreach (XmlNode li in lights.SelectNodes("pointlight"))
-        //        s.lights.Add(PointLight.Parse(li));
-        //    foreach (XmlNode sli in lights.SelectNodes("spotlight"))
-        //        s.lights.Add(SpotLight.Parse(sli));
-        //    foreach (XmlNode ali in lights.SelectNodes("arealight"))
-        //        s.lights.Add(AreaLight.Parse(ali));
-
-        //    // objects
-        //    //Stopwatch sw = Stopwatch.StartNew();
-        //    XmlNode objects = root.SelectSingleNode("//scene/objects");
-        //    foreach (XmlNode n in objects.SelectNodes("sphere"))
-        //        s.objects.Add(Sphere.Parse(n));
-        //    //Console.WriteLine("spheres: {0}ms", sw.ElapsedMilliseconds);
-        //    //sw.Restart();
-        //    foreach (XmlNode n in objects.SelectNodes("plane"))
-        //        s.objects.Add(Plane.Parse(n));
-        //    //Console.WriteLine("planes: {0}ms", sw.ElapsedMilliseconds);
-        //    //sw.Restart();
-        //    foreach (XmlNode n in objects.SelectNodes("triangle"))
-        //        s.objects.Add(Triangle.Parse(n));
-        //    //Console.WriteLine("triangles: {0}ms", sw.ElapsedMilliseconds);
-        //    //sw.Restart();
-        //    foreach (XmlNode n in objects.SelectNodes("quad"))
-        //        s.objects.Add(Quad.Parse(n));
-        //    //Console.WriteLine("quads: {0}ms", sw.ElapsedMilliseconds);
-        //    //sw.Restart();
-
-        //    return s;
-        //}
-
+        
         public static Scene ParseJson(string path)
         {
             JObject root = JObject.Parse(File.ReadAllText(path));

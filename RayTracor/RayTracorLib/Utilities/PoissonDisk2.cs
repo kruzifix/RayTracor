@@ -15,7 +15,6 @@ namespace RayTracor.RayTracorLib.Utilities
 
         double r;
         int k = 30;
-        //List<int> lastRandomSamples;
 
         public List<Vector2> Samples { get { return samples; } }
         public double Radius { get { return r; } }
@@ -25,7 +24,6 @@ namespace RayTracor.RayTracorLib.Utilities
         public PoissonDisk2(double r)
         {
             samples = new List<Vector2>();
-            //lastRandomSamples = new List<int>();
             this.r = r;
         }
 
@@ -42,24 +40,11 @@ namespace RayTracor.RayTracorLib.Utilities
             bmp.Save(path);
             bmp.Dispose();
         }
-
-        //public Vector2 GetRandomSample()
-        //{
-        //    int rsi = MwcRng.GetInt(samples.Count);
-        //    while (lastRandomSamples.Contains(rsi))
-        //        rsi = MwcRng.GetInt(samples.Count);
-        //    lastRandomSamples.Add(rsi);
-        //    while (lastRandomSamples.Count > samples.Count / 2)
-        //        lastRandomSamples.RemoveAt(0);
-        //    return samples[rsi];
-        //}
-
+        
         public void Generate()
         {
             samples.Clear();
-
-            //Stopwatch sw = Stopwatch.StartNew();
-
+            
             // step0 -> init background grid
             double cellsize = r / Math.Sqrt(2);
             double domainSize = 1.0;
@@ -145,9 +130,6 @@ namespace RayTracor.RayTracorLib.Utilities
                 if (j >= k)
                     active.RemoveAt(i);
             }
-            //sw.Stop();
-
-            //lastRandomSamples.Clear();
         }
     }
 }

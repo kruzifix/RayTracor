@@ -73,24 +73,6 @@ namespace RayTracor.RayTracorLib
 
         public Ray CastRay(double x, double y)
         {
-            //double hwr = height / (double)width;
-            //double hw = Math.Tan(FOV / 2.0);
-            //double hh = hwr * hw;
-            //double cw = hw * 2;
-            //double ch = hh * 2;
-            //double pw = cw / (width - 1);
-            //double ph = ch / (height - 1);
-            //return new Ray(pos, dir + right * (x * pw - hw) + up * (y * ph - hh));
-
-            // y * ch / (height - 1) - hh
-            // y * hh * 2 / (height - 1) - hwr * hw
-            // y * hwr * hw * 2 / (height - 1) - height / width * tan
-            // y * height / width * tan * 2 / (height  - 1) - height / width * tan
-            
-            // x * cw / (width-1) - hw
-            // x * hw * 2 / (width - 1) - hw
-            // x * tan * 2 / (width- 1) - tan
-
             double xx = x * xs - 1.0;
             double yy = y * ys - 1.0;
 
@@ -101,33 +83,7 @@ namespace RayTracor.RayTracorLib
         {
             return CastRay(x, y).PointAt(depth);
         }
-
-        public void Serialize(XmlDocument doc)
-        {
-            XmlNode cam = doc.CreateElement("camera");
-
-            cam.AppendChild(Position.Serialize(doc, "position"));
-            cam.AppendChild(Direction.Serialize(doc, "direction"));
-            cam.AppendChild(GlobalUp.Serialize(doc, "globalup"));
-            cam.AppendChild(fov.Serialize(doc, "fov"));
-
-            doc.SelectSingleNode("//scene").AppendChild(cam);
-        }
-
-        public static Camera Parse(XmlNode camNode)
-        {
-            Vector3 pos = Vector3.Parse(camNode["position"]);
-            Vector3 dir = Vector3.UnitX;
-            if (camNode["direction"] != null)
-                dir = Vector3.Parse(camNode["direction"]).Normalized;
-            if (camNode["looksat"] != null)
-                dir = (Vector3.Parse(camNode["looksat"]) - pos).Normalized;
-            Vector3 gup = Vector3.Parse(camNode["globalup"]).Normalized;
-            double fov = camNode["fov"].ParseDouble();
-
-            return new Camera(pos, dir, gup, fov);
-        }
-
+        
         public static Camera FromJToken(JToken token)
         {
             var cam = JsonConvert.DeserializeObject<SerializedCamera>(token.ToString());

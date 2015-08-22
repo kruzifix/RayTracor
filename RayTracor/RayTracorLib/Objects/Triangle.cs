@@ -73,50 +73,5 @@ namespace RayTracor.RayTracorLib.Objects
             }
             return mat.Color.ToVector();
         }
-
-        //public static Intersection Intersect(Ray ray, Vector v0, Vector v1, Vector v2)
-        //{
-        //    Vector E1 = v1 - v0;
-        //    Vector E2 = v2 - v0;
-        //    Vector Normal = Vector.CrossProduct(E1, E2).Normalized;
-
-        //    Vector T = ray.Start - v0;
-        //    Vector P = Vector.CrossProduct(ray.Direction, E2);
-        //    Vector Q = Vector.CrossProduct(T, E1);
-
-        //    double denom = Vector.DotProduct(P, E1);
-        //    if (Math.Abs(denom) > 0.0001)
-        //    {
-        //        double u = Vector.DotProduct(P, T) / denom;
-        //        double v = Vector.DotProduct(Q, ray.Direction) / denom;
-        //        double t = Vector.DotProduct(Q, E2) / denom;
-        //        if ((u >= 0.0 && u <= 1.0) && (v >= 0.0 && u + v <= 1.0))
-        //            return new Intersection(t, ray.PointAt(t), null, denom < 0 ? Normal : Normal.Negated, new Vector2(u, v));
-        //    }
-        //    return Intersection.False;
-        //}
-        
-        //public override void Serialize(XmlDocument doc, XmlNode parent)
-        //{
-        //    XmlNode node = doc.CreateElement("triangle");
-        //    //node.AppendChild(Vertex0.Serialize(doc, "vertex0"));
-        //    //node.AppendChild(Vertex1.Serialize(doc, "vertex1"));
-        //    //node.AppendChild(Vertex2.Serialize(doc, "vertex2"));
-        //    base.Serialize(doc, node);
-        //    parent.AppendChild(node);
-        //}
-
-        //public static Triangle Parse(XmlNode node)
-        //{
-        //    Vector3 v0 = Vector3.Parse(node["vertex0"]);
-        //    Vector3 v1 = Vector3.Parse(node["vertex1"]);
-        //    Vector3 v2 = Vector3.Parse(node["vertex2"]);
-        //    Material mat = Material.Parse(node["material"]);
-
-        //    Triangle t = new Triangle(new Vertex { Position = v0, TexCoord = Vector2.Zero },
-        //                      new Vertex { Position = v1, TexCoord = Vector2.UnitX },
-        //                      new Vertex { Position = v2, TexCoord = Vector2.One }, mat);
-        //    return t;
-        //}
     }
 }

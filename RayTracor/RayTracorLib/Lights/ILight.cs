@@ -26,13 +26,7 @@ namespace RayTracor.RayTracorLib.Lights
             Color = color.ToVector();
             Strength = strength;
         }
-
-        //public virtual void Serialize(XmlDocument doc, XmlNode parent)
-        //{
-        //    parent.AppendChild(Color.ToColor().Serialize(doc, "color"));
-        //    parent.AppendChild(Strength.Serialize(doc, "strength"));
-        //}
-
+        
         public static ILight ParseJToken(JToken tok)
         {
             string type = null;
