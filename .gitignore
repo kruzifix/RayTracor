@@ -44,3 +44,5 @@ obj/
 Network Trash Folder
 Temporary Items
 .apdisk
+*.suo
+.vs/RayTracor/v14/.suo
