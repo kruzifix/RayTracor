@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RayTracor.RayTracorLib.Tracing;
 using RayTracor.RayTracorLib.Utilities;
 
@@ -22,23 +24,46 @@ namespace RayTracor.RayTracorLib.Lights
             Position = position;
         }
 
-        public override void Serialize(XmlDocument doc, XmlNode parent)
+        //public override void Serialize(XmlDocument doc, XmlNode parent)
+        //{
+        //    XmlNode lNode = doc.CreateElement("pointlight");
+
+        //    lNode.AppendChild(Position.Serialize(doc, "position"));
+        //    base.Serialize(doc, lNode);
+
+        //    parent.AppendChild(lNode);
+        //}
+
+        //public static PointLight Parse(XmlNode li)
+        //{
+        //    Vector3 pos = Vector3.Parse(li["position"]);
+        //    Color color = li["color"].ParseColor();
+        //    double strength = li["strength"].ParseDouble();
+
+        //    return new PointLight(pos, color, strength);
+        //}
+
+        public static PointLight FromJToken(JToken tok)
         {
-            XmlNode lNode = doc.CreateElement("pointlight");
+            SerializedPointLight spl = JsonConvert.DeserializeObject<SerializedPointLight>(tok.ToString());
 
-            lNode.AppendChild(Position.Serialize(doc, "position"));
-            base.Serialize(doc, lNode);
+            if (spl.position == null)
+                throw new Exception("PointLight: 'position' not defined.");
+            if (spl.strength <= 0.0)
+                throw new Exception("PointLight: 'strength' has to be greater than 0.");
+            if (string.IsNullOrWhiteSpace(spl.color))
+                throw new Exception("PointLight: 'color' not defined.");
 
-            parent.AppendChild(lNode);
+            Color c = spl.color.ColorFromHexString("Point: Unable to parse 'color'.");
+
+            return new PointLight(spl.position, c, spl.strength);
         }
+    }
 
-        public static PointLight Parse(XmlNode li)
-        {
-            Vector3 pos = Vector3.Parse(li["position"]);
-            Color color = li["color"].ParseColor();
-            double strength = li["strength"].ParseDouble();
-
-            return new PointLight(pos, color, strength);
-        }
+    class SerializedPointLight
+    {
+        public Vector3 position { get; set; }
+        public double strength { get; set; }
+        public string color { get; set; }
     }
 }

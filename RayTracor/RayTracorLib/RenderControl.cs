@@ -13,6 +13,7 @@ using RayTracor.RayTracorLib.Tracing;
 using RayTracor.RayTracorLib.Lights;
 using RayTracor.RayTracorLib.Objects;
 using RayTracor.RayTracorLib.Utilities;
+using RayTracor.RayTracorLib.Materials;
 
 namespace RayTracor
 {
@@ -22,6 +23,7 @@ namespace RayTracor
         public List<Ray> rays = new List<Ray>();
         public List<IObject> objects = new List<IObject>();
         public List<ILight> lights = new List<ILight>();
+        public Dictionary<string, Material> materials = new Dictionary<string, Material>();
 
         double areaSize = 15.0;
         Vector2 offset = new Vector2();
@@ -199,8 +201,8 @@ namespace RayTracor
 
                 double radius = s.Radius * scale.X;
                 Rectangle rect = new Rectangle((int)(pc.X - radius), (int)(pc.Y - radius), (int)(radius * 2.0), (int)(radius * 2.0));
-                g.FillEllipse(new SolidBrush(Color.FromArgb(64, s.Material.Color)), rect);
-                g.DrawEllipse(new Pen(s.Material.Color, 1.5f), rect);
+                g.FillEllipse(new SolidBrush(Color.FromArgb(64, materials[s.Material].Color)), rect);
+                g.DrawEllipse(new Pen(materials[s.Material].Color, 1.5f), rect);
             }
             if (obj is Triangle)
                 DrawTriangle(obj as Triangle);

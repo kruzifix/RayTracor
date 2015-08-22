@@ -20,7 +20,7 @@ namespace RayTracor.RayTracorLib.Objects
         public Triangle T1 { get; private set; }
         public Triangle T2 { get; private set; }
 
-        public Quad(Vertex v0, Vertex v1, Vertex v2, Vertex v3, Material material)
+        public Quad(Vertex v0, Vertex v1, Vertex v2, Vertex v3, string material)
             : base(material)
         {
             Vertex0 = v0;
@@ -56,7 +56,7 @@ namespace RayTracor.RayTracorLib.Objects
             return res;
         }
 
-        public override Vector3 EvalMaterial(Intersection intersec)
+        public override Vector3 EvalMaterial(Intersection intersec, Material mat)
         {
             Vector2 bary = intersec.BaryCoords;
             
@@ -64,35 +64,35 @@ namespace RayTracor.RayTracorLib.Objects
             {
                 intersec.BaryCoords.X = 1.0 - intersec.BaryCoords.X;
                 intersec.BaryCoords.Y = 1.0 - intersec.BaryCoords.Y;
-                return T2.EvalMaterial(intersec);
+                return T2.EvalMaterial(intersec, mat);
             }
-            return T1.EvalMaterial(intersec);
+            return T1.EvalMaterial(intersec, mat);
         }
         
-        public override void Serialize(XmlDocument doc, XmlNode parent)
-        {
-            XmlNode node = doc.CreateElement("quad");
-            //node.AppendChild(Vertex0.Serialize(doc, "vertex0"));
-            //node.AppendChild(Vertex1.Serialize(doc, "vertex1"));
-            //node.AppendChild(Vertex2.Serialize(doc, "vertex2"));
-            //node.AppendChild(Vertex2.Serialize(doc, "vertex3"));
-            base.Serialize(doc, node);
-            parent.AppendChild(node);
-        }
+        //public override void Serialize(XmlDocument doc, XmlNode parent)
+        //{
+        //    XmlNode node = doc.CreateElement("quad");
+        //    //node.AppendChild(Vertex0.Serialize(doc, "vertex0"));
+        //    //node.AppendChild(Vertex1.Serialize(doc, "vertex1"));
+        //    //node.AppendChild(Vertex2.Serialize(doc, "vertex2"));
+        //    //node.AppendChild(Vertex2.Serialize(doc, "vertex3"));
+        //    base.Serialize(doc, node);
+        //    parent.AppendChild(node);
+        //}
 
-        public static Quad Parse(XmlNode node)
-        {   
-            Vector3 v0 = Vector3.Parse(node["vertex0"]);
-            Vector3 v1 = Vector3.Parse(node["vertex1"]);
-            Vector3 v2 = Vector3.Parse(node["vertex2"]);
-            Vector3 v3 = Vector3.Parse(node["vertex3"]);
-            Material mat = Material.Parse(node["material"]);
-            Quad q = new Quad(new Vertex { Position = v0, TexCoord = Vector2.UnitX },
-                              new Vertex { Position = v1, TexCoord = Vector2.Zero },
-                              new Vertex { Position = v2, TexCoord = Vector2.UnitY },
-                              new Vertex { Position = v3, TexCoord = Vector2.One }, mat);
+        //public static Quad Parse(XmlNode node)
+        //{   
+        //    Vector3 v0 = Vector3.Parse(node["vertex0"]);
+        //    Vector3 v1 = Vector3.Parse(node["vertex1"]);
+        //    Vector3 v2 = Vector3.Parse(node["vertex2"]);
+        //    Vector3 v3 = Vector3.Parse(node["vertex3"]);
+        //    Material mat = Material.Parse(node["material"]);
+        //    Quad q = new Quad(new Vertex { Position = v0, TexCoord = Vector2.UnitX },
+        //                      new Vertex { Position = v1, TexCoord = Vector2.Zero },
+        //                      new Vertex { Position = v2, TexCoord = Vector2.UnitY },
+        //                      new Vertex { Position = v3, TexCoord = Vector2.One }, mat);
             
-            return q;
-        }
+        //    return q;
+        //}
     }
 }

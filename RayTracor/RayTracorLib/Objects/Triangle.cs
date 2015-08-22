@@ -20,7 +20,7 @@ namespace RayTracor.RayTracorLib.Objects
         public Vector3 E2 { get; private set; }
         public Vector3 Normal { get; private set; }
 
-        public Triangle(Vertex v0, Vertex v1, Vertex v2, Material material)
+        public Triangle(Vertex v0, Vertex v1, Vertex v2, string material)
             :base(material)
         {
             Vertex0 = v0;
@@ -51,9 +51,9 @@ namespace RayTracor.RayTracorLib.Objects
             return Intersection.False;
         }
 
-        public override Vector3 EvalMaterial(Intersection intersec)
+        public override Vector3 EvalMaterial(Intersection intersec, Material mat)
         {
-            if (Material.Textured)
+            if (mat.Textured)
             {
                 //double scale = 255.0;
                 //int u = (int)Math.Floor(intersec.BaryCoords.X * scale);
@@ -67,9 +67,9 @@ namespace RayTracor.RayTracorLib.Objects
                 double v1contrib = 1 - bary.Y;
                 double v2contrib = 1 - bary.X;
 
-                return Material.GetTextureColor(Vertex0.TexCoord + (Vertex1.TexCoord - Vertex0.TexCoord) * v1contrib + (Vertex2.TexCoord - Vertex0.TexCoord) * v2contrib);
+                return mat.GetTextureColor(Vertex0.TexCoord + (Vertex1.TexCoord - Vertex0.TexCoord) * v1contrib + (Vertex2.TexCoord - Vertex0.TexCoord) * v2contrib);
             }
-            return Material.Color.ToVector();
+            return mat.Color.ToVector();
         }
 
         //public static Intersection Intersect(Ray ray, Vector v0, Vector v1, Vector v2)
@@ -94,27 +94,27 @@ namespace RayTracor.RayTracorLib.Objects
         //    return Intersection.False;
         //}
         
-        public override void Serialize(XmlDocument doc, XmlNode parent)
-        {
-            XmlNode node = doc.CreateElement("triangle");
-            //node.AppendChild(Vertex0.Serialize(doc, "vertex0"));
-            //node.AppendChild(Vertex1.Serialize(doc, "vertex1"));
-            //node.AppendChild(Vertex2.Serialize(doc, "vertex2"));
-            base.Serialize(doc, node);
-            parent.AppendChild(node);
-        }
+        //public override void Serialize(XmlDocument doc, XmlNode parent)
+        //{
+        //    XmlNode node = doc.CreateElement("triangle");
+        //    //node.AppendChild(Vertex0.Serialize(doc, "vertex0"));
+        //    //node.AppendChild(Vertex1.Serialize(doc, "vertex1"));
+        //    //node.AppendChild(Vertex2.Serialize(doc, "vertex2"));
+        //    base.Serialize(doc, node);
+        //    parent.AppendChild(node);
+        //}
 
-        public static Triangle Parse(XmlNode node)
-        {
-            Vector3 v0 = Vector3.Parse(node["vertex0"]);
-            Vector3 v1 = Vector3.Parse(node["vertex1"]);
-            Vector3 v2 = Vector3.Parse(node["vertex2"]);
-            Material mat = Material.Parse(node["material"]);
+        //public static Triangle Parse(XmlNode node)
+        //{
+        //    Vector3 v0 = Vector3.Parse(node["vertex0"]);
+        //    Vector3 v1 = Vector3.Parse(node["vertex1"]);
+        //    Vector3 v2 = Vector3.Parse(node["vertex2"]);
+        //    Material mat = Material.Parse(node["material"]);
 
-            Triangle t = new Triangle(new Vertex { Position = v0, TexCoord = Vector2.Zero },
-                              new Vertex { Position = v1, TexCoord = Vector2.UnitX },
-                              new Vertex { Position = v2, TexCoord = Vector2.One }, mat);
-            return t;
-        }
+        //    Triangle t = new Triangle(new Vertex { Position = v0, TexCoord = Vector2.Zero },
+        //                      new Vertex { Position = v1, TexCoord = Vector2.UnitX },
+        //                      new Vertex { Position = v2, TexCoord = Vector2.One }, mat);
+        //    return t;
+        //}
     }
 }

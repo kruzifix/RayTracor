@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RayTracor.RayTracorLib.Materials;
 using RayTracor.RayTracorLib.Tracing;
 using RayTracor.RayTracorLib.Utilities;
@@ -15,8 +17,8 @@ namespace RayTracor.RayTracorLib.Objects
         public Vector3 Position { get; set; }
         public double Radius { get; set; }
         double radius2;
-        
-        public Sphere(Vector3 position, double radius, Material material)
+
+        public Sphere(Vector3 position, double radius, string material)
             : base(material)
         {
             Position = position;
@@ -88,10 +90,10 @@ namespace RayTracor.RayTracorLib.Objects
             //Vector point = ray.PointAt(t0);
             //return new Intersection(t0, point, this, (point - Position).Normalized, null);
         }
-        
-        public override Vector3 EvalMaterial(Intersection intersec)
+
+        public override Vector3 EvalMaterial(Intersection intersec, Material mat)
         {
-            if (Material.Textured)
+            if (mat.Textured)
             {
                 double xtex = (1 + Math.Atan2(intersec.Normal.Z, intersec.Normal.X) / Math.PI) * 0.5;
                 double ytex = Math.Acos(intersec.Normal.Y) / Math.PI;
@@ -108,27 +110,49 @@ namespace RayTracor.RayTracorLib.Objects
 
                 //col = Extensions.ColorFromHSV(c / 255.0 * 360.0, 0.8, 0.7).ToVector();
             }
-            return Material.Color.ToVector();
+
+            return mat.Color.ToVector();
         }
 
-        public override void Serialize(XmlDocument doc, XmlNode parent)
+        //public override void Serialize(XmlDocument doc, XmlNode parent)
+        //{
+        //    XmlNode node = doc.CreateElement("sphere");
+
+        //    node.AppendChild(Position.Serialize(doc, "position"));
+        //    node.AppendChild(Radius.Serialize(doc, "radius"));
+        //    base.Serialize(doc, node);
+
+        //    parent.AppendChild(node);
+        //}
+
+        //public static Sphere Parse(XmlNode node)
+        //{
+        //    Vector3 pos = Vector3.Parse(node["position"]);
+        //    Material mat = Material.Parse(node["material"]);
+        //    double radius = node["radius"].ParseDouble();
+
+        //    return new Sphere(pos, radius, mat);
+        //}
+
+        public static IObject FromJToken(JToken tok)
         {
-            XmlNode node = doc.CreateElement("sphere");
+            SerializedSphere sp = JsonConvert.DeserializeObject<SerializedSphere>(tok.ToString());
 
-            node.AppendChild(Position.Serialize(doc, "position"));
-            node.AppendChild(Radius.Serialize(doc, "radius"));
-            base.Serialize(doc, node);
-            
-            parent.AppendChild(node);
+            if (sp.position == null)
+                throw new Exception("Sphere: 'position' not defined.");
+            if (string.IsNullOrWhiteSpace(sp.material))
+                throw new Exception("Sphere: 'material' not defined.");
+            if (sp.radius < 0.0)
+                throw new Exception("Sphere: 'radius' has to be greater than 0.");
+
+            return new Sphere(sp.position, sp.radius, sp.material);
         }
+    }
 
-        public static Sphere Parse(XmlNode node)
-        {
-            Vector3 pos = Vector3.Parse(node["position"]);
-            Material mat = Material.Parse(node["material"]);
-            double radius = node["radius"].ParseDouble();
-
-            return new Sphere(pos, radius, mat);
-        }
+    class SerializedSphere
+    {
+        public string material { get; set; }
+        public double radius { get; set; }
+        public Vector3 position { get; set; }
     }
 }

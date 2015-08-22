@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RayTracor.RayTracorLib.Tracing;
 using RayTracor.RayTracorLib.Utilities;
 
@@ -36,7 +38,7 @@ namespace RayTracor.RayTracorLib
             pos = Vector3.Zero; 
             dir = Vector3.UnitX;
             gup = Vector3.UnitY;
-            FOV = Math.PI / 2.0;
+            FOV = 45;
 
             UpdateRightUp();
         }
@@ -126,9 +128,33 @@ namespace RayTracor.RayTracorLib
             return new Camera(pos, dir, gup, fov);
         }
 
+        public static Camera FromJToken(JToken token)
+        {
+            var cam = JsonConvert.DeserializeObject<SerializedCamera>(token.ToString());
+
+            if (cam.position == null)
+                throw new Exception("Camera: Position not defined.");
+            if (cam.globalup == null)
+                throw new Exception("Camera: GlobalUp not defined.");
+            if (cam.fov < 1.0 || cam.fov > 180.0)
+                throw new Exception("Camera: FOV has to be between 1 and 180 degrees.");
+            if (cam.target == null)
+                throw new Exception("Camera: No Target defined.");
+
+            return Camera.CreateLookAt(cam.position, cam.target, cam.globalup, cam.fov);
+        }
+
         public static Camera CreateLookAt(Vector3 position, Vector3 target, Vector3 up, double fov)
         {
             return new Camera(position, (target - position).Normalized, up, fov);
         }
+    }
+
+    public class SerializedCamera
+    {
+        public Vector3 position { get; set; }
+        public Vector3 target { get; set; }
+        public Vector3 globalup { get; set; }
+        public double fov { get; set; }
     }
 }

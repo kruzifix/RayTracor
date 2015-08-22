@@ -37,28 +37,28 @@ namespace RayTracor.RayTracorLib.Lights
             return b < Angle;
         }
 
-        public override void Serialize(XmlDocument doc, XmlNode parent)
-        {
-            XmlNode lNode = doc.CreateElement("spotlight");
+        //public override void Serialize(XmlDocument doc, XmlNode parent)
+        //{
+        //    XmlNode lNode = doc.CreateElement("spotlight");
 
-            lNode.AppendChild(Position.Serialize(doc, "position"));
-            lNode.AppendChild(Direction.Serialize(doc, "direction"));
-            lNode.AppendChild(Angle.ToDegrees().Serialize(doc, "angle"));
-            base.Serialize(doc, lNode);
+        //    lNode.AppendChild(Position.Serialize(doc, "position"));
+        //    lNode.AppendChild(Direction.Serialize(doc, "direction"));
+        //    lNode.AppendChild(Angle.ToDegrees().Serialize(doc, "angle"));
+        //    base.Serialize(doc, lNode);
 
-            parent.AppendChild(lNode);
-        }
+        //    parent.AppendChild(lNode);
+        //}
 
-        public static SpotLight Parse(XmlNode li)
-        {
-            Vector3 dir = Vector3.Parse(li["direction"]).Normalized;
-            double angle = li["angle"].ParseDouble();
+        //public static SpotLight Parse(XmlNode li)
+        //{
+        //    Vector3 dir = Vector3.Parse(li["direction"]).Normalized;
+        //    double angle = li["angle"].ParseDouble();
 
-            //PointLight lbase = PointLight.Parse(li);
-            //SpotLight spl = new SpotLight(lbase, dir, angle);
+        //    //PointLight lbase = PointLight.Parse(li);
+        //    //SpotLight spl = new SpotLight(lbase, dir, angle);
 
-            throw new NotImplementedException();
-        }
+        //    throw new NotImplementedException();
+        //}
 
         public static SpotLight FromTo(Vector3 position, Vector3 point, Color color, double strength, double angle)
         {

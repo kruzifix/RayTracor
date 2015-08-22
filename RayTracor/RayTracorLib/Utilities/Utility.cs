@@ -11,6 +11,11 @@ namespace RayTracor.RayTracorLib.Utilities
 {
     public static class Utility
     {
+        public static bool IsNullOrEmpty(this string str)
+        {
+            return string.IsNullOrWhiteSpace(str);
+        }
+
         public static int Clamp(this int value, int min, int max)
         {
             if (value < min)
@@ -100,6 +105,20 @@ namespace RayTracor.RayTracorLib.Utilities
         public static string ToHexString(this Color color)
         {
             return string.Format("{0:X2}{1:X2}{2:X2}{3:X2}", color.A, color.R, color.G, color.B);
+        }
+
+        public static Color ColorFromHexString(this string s, string excep)
+        {
+            Color c = System.Drawing.Color.Empty;
+            try
+            {
+                c = Utility.ColorFromHexString(s);
+            }
+            catch
+            {
+                throw new Exception(excep);
+            }
+            return c;
         }
 
         public static Color ColorFromHexString(this string s)

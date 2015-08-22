@@ -46,3 +46,5 @@ Temporary Items
 .apdisk
 *.suo
 .vs/RayTracor/v14/.suo
+.vs/RayTracor/v14/.suo
+*.suo
