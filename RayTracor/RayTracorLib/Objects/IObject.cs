@@ -41,6 +41,9 @@ namespace RayTracor.RayTracorLib.Objects
                 case "quad":
                     result = Quad.FromJToken(tok);
                     break;
+                case "mesh":
+                    result = Mesh.FromJToken(tok);
+                    break;
                 default:
                     throw new Exception("Objects: Unknown 'type'.");
             }

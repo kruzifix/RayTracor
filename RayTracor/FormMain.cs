@@ -14,6 +14,7 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Xml;
+using RayTracor.RayTracorLib.Utilities;
 
 namespace RayTracor
 {
@@ -72,7 +73,7 @@ namespace RayTracor
                 File.WriteAllText("renders/renders.txt", "0");
             string number = File.ReadAllText("renders/renders.txt");
             int num = int.Parse(number);
-            string filename = string.Format("renders/{0:000}_render_{1}ms_{2}.bmp", num, ms, type);
+            string filename = string.Format("renders/{0:000}_render_{1}_{2}.bmp", num, ms.ToTimeString(), type);
             bmp.Save(filename);
             File.WriteAllText("renders/renders.txt", (num + 1).ToString());
             return num;
@@ -152,7 +153,7 @@ namespace RayTracor
             //XmlDocument doc = new XmlDocument();
             //doc.Load("scenes/AO_test.xml");
             //scene = Scene.ParseXml(doc);
-            scene = Scene.ParseJson("scenes/json_test.json");
+            scene = Scene.ParseJson("scenes/mesh_test.json");
             scene.ProgressReport = new Progress<int>((i) => progBar.Increment(1));
             
             UpdateRenderControl();
@@ -186,7 +187,7 @@ namespace RayTracor
 
         private void bAO_Click(object sender, EventArgs e)
         {
-            Render("AO", () => scene.RenderAmbientOcclusion(settings.width, settings.height, 16));
+            Render("AO", () => scene.RenderAmbientOcclusion(settings.width, settings.height, 1024));
         }
 
         private void cBoxSuSas_SelectedIndexChanged(object sender, EventArgs e)

@@ -63,6 +63,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RayTracorLib\Lights\AreaLight.cs" />
+    <Compile Include="RayTracorLib\Objects\Mesh.cs" />
     <Compile Include="RayTracorLib\Tracing\AABB.cs" />
     <Compile Include="RayTracorLib\Camera.cs" />
     <Compile Include="RayTracorLib\Lights\ILight.cs" />
@@ -108,6 +109,9 @@
     <EmbeddedResource Include="RayTracorLib\RenderControl.resx">
       <DependentUpon>RenderControl.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="models\cube.obj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -119,6 +123,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <None Include="scenes\json_test.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="scenes\mesh_test.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

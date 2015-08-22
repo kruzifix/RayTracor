@@ -79,7 +79,7 @@ namespace RayTracor.RayTracorLib
         {
             return RenderFunc(width, height, (x, y) =>
             {
-                Vector3 col = Vector3.Zero;
+                Vector3 col = new Vector3();
                 double delta = 1.0 / samples;
                 double offset = samples * 0.5 * delta;
                 for (int i = 0; i < samples; i++)
@@ -203,7 +203,7 @@ namespace RayTracor.RayTracorLib
                 if (!res.Intersects)
                     return backgroundColor;
                 Vector3 col = Trace(ray, 0);
-                double ao = GetAmbientOcclusion(res, 128);
+                double ao = GetAmbientOcclusion(res, 1024);
 
                 double lambertAmount = EvalLights(res);
                 

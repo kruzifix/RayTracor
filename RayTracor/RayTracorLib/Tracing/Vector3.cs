@@ -112,7 +112,12 @@ namespace RayTracor.RayTracorLib.Tracing
         {
             return new Vector3(v1.X * k, v1.Y * k, v1.Z * k);
         }
-        
+
+        public static Vector3 operator *(double k, Vector3 v1)
+        {
+            return new Vector3(v1.X * k, v1.Y * k, v1.Z * k);
+        }
+
         public static Vector3 operator /(Vector3 v1, double k)
         {
             return new Vector3(v1.X / k, v1.Y / k, v1.Z / k);
