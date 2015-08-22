@@ -42,11 +42,13 @@
             this.label3 = new System.Windows.Forms.Label();
             this.cBoxSuSaMode = new System.Windows.Forms.ComboBox();
             this.renderControl = new RayTracor.RenderControl();
+            this.bSSAO = new System.Windows.Forms.Button();
+            this.bRenderAO = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // bRender
             // 
-            this.bRender.Location = new System.Drawing.Point(239, 41);
+            this.bRender.Location = new System.Drawing.Point(193, 41);
             this.bRender.Name = "bRender";
             this.bRender.Size = new System.Drawing.Size(75, 23);
             this.bRender.TabIndex = 1;
@@ -95,7 +97,7 @@
             // 
             // bDepthMap
             // 
-            this.bDepthMap.Location = new System.Drawing.Point(401, 41);
+            this.bDepthMap.Location = new System.Drawing.Point(453, 41);
             this.bDepthMap.Name = "bDepthMap";
             this.bDepthMap.Size = new System.Drawing.Size(75, 23);
             this.bDepthMap.TabIndex = 8;
@@ -105,7 +107,7 @@
             // 
             // bNormalMap
             // 
-            this.bNormalMap.Location = new System.Drawing.Point(320, 41);
+            this.bNormalMap.Location = new System.Drawing.Point(372, 41);
             this.bNormalMap.Name = "bNormalMap";
             this.bNormalMap.Size = new System.Drawing.Size(75, 23);
             this.bNormalMap.TabIndex = 9;
@@ -115,7 +117,7 @@
             // 
             // bAO
             // 
-            this.bAO.Location = new System.Drawing.Point(482, 41);
+            this.bAO.Location = new System.Drawing.Point(534, 41);
             this.bAO.Name = "bAO";
             this.bAO.Size = new System.Drawing.Size(104, 23);
             this.bAO.TabIndex = 10;
@@ -183,11 +185,33 @@
             this.renderControl.TabIndex = 0;
             this.renderControl.Click += new System.EventHandler(this.renderControl_Click);
             // 
+            // bSSAO
+            // 
+            this.bSSAO.Location = new System.Drawing.Point(644, 41);
+            this.bSSAO.Name = "bSSAO";
+            this.bSSAO.Size = new System.Drawing.Size(75, 23);
+            this.bSSAO.TabIndex = 16;
+            this.bSSAO.Text = "SSAO";
+            this.bSSAO.UseVisualStyleBackColor = true;
+            this.bSSAO.Click += new System.EventHandler(this.bSSAO_Click);
+            // 
+            // bRenderAO
+            // 
+            this.bRenderAO.Location = new System.Drawing.Point(274, 41);
+            this.bRenderAO.Name = "bRenderAO";
+            this.bRenderAO.Size = new System.Drawing.Size(92, 23);
+            this.bRenderAO.TabIndex = 17;
+            this.bRenderAO.Text = "Render w/ AO";
+            this.bRenderAO.UseVisualStyleBackColor = true;
+            this.bRenderAO.Click += new System.EventHandler(this.bRenderAO_Click);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(740, 519);
+            this.Controls.Add(this.bRenderAO);
+            this.Controls.Add(this.bSSAO);
             this.Controls.Add(this.cBoxSuSaMode);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.cBoxSuSas);
@@ -225,6 +249,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox cBoxSuSaMode;
+        private System.Windows.Forms.Button bSSAO;
+        private System.Windows.Forms.Button bRenderAO;
     }
 }
 

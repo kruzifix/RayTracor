@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using RayTracor.RayTracorLib.Tracing;
 
-namespace RayTracor.RayTracorLib.Utility
+namespace RayTracor.RayTracorLib.Utilities
 {
     public class PoissonDisk2
     {

@@ -104,7 +104,8 @@ namespace RayTracor
             bDepthMap.Enabled = b;
             bNormalMap.Enabled = b;
             bAO.Enabled = b;
-
+            bRenderAO.Enabled = b;
+            bSSAO.Enabled = b;
             bSave.Enabled = b;
             bLoad.Enabled = b;
         }
@@ -189,7 +190,7 @@ namespace RayTracor
 
         private void bAO_Click(object sender, EventArgs e)
         {
-            Render("AO", () => scene.RenderAmbientOcclusion(settings.width, settings.height, 512));
+            Render("AO", () => scene.RenderAmbientOcclusion(settings.width, settings.height, 16));
         }
 
         private void cBoxSuSas_SelectedIndexChanged(object sender, EventArgs e)
@@ -200,6 +201,16 @@ namespace RayTracor
         private void cBoxSuSaMode_SelectedIndexChanged(object sender, EventArgs e)
         {
             settings.mode = modes[cBoxSuSaMode.SelectedIndex];
+        }
+
+        private void bSSAO_Click(object sender, EventArgs e)
+        {
+            Render("SSAO", () => scene.RenderSSAO(settings.width, settings.height));
+        }
+
+        private void bRenderAO_Click(object sender, EventArgs e)
+        {
+            Render("NoSS+AO", () => scene.RenderWithAO(settings.width, settings.height));
         }
     }
 

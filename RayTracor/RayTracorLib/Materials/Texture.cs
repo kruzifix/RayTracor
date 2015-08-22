@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using RayTracor.RayTracorLib.Tracing;
-using RayTracor.RayTracorLib.Utility;
+using RayTracor.RayTracorLib.Utilities;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 

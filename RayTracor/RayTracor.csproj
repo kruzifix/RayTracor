@@ -66,12 +66,12 @@
     <Compile Include="RayTracorLib\Tracing\AABB.cs" />
     <Compile Include="RayTracorLib\Camera.cs" />
     <Compile Include="RayTracorLib\Lights\ILight.cs" />
-    <Compile Include="RayTracorLib\Utility\PoissonDisk2.cs" />
-    <Compile Include="RayTracorLib\Utility\Utility.cs" />
+    <Compile Include="RayTracorLib\Utilities\PoissonDisk2.cs" />
+    <Compile Include="RayTracorLib\Utilities\Utility.cs" />
     <Compile Include="RayTracorLib\Tracing\Intersection.cs" />
     <Compile Include="RayTracorLib\Lights\PointLight.cs" />
     <Compile Include="RayTracorLib\Materials\Material.cs" />
-    <Compile Include="RayTracorLib\Utility\MwcRng.cs" />
+    <Compile Include="RayTracorLib\Utilities\MwcRng.cs" />
     <Compile Include="RayTracorLib\Objects\IObject.cs" />
     <Compile Include="RayTracorLib\Objects\Plane.cs" />
     <Compile Include="RayTracorLib\Objects\Quad.cs" />

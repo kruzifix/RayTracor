@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RayTracor.RayTracorLib.Utility
+namespace RayTracor.RayTracorLib.Utilities
 {
     /// <summary>
     /// MwcRng is a simple random number generator based on 

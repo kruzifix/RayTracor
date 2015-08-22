@@ -16,8 +16,10 @@
 -bsp with aabb
 -vertex serialization
 -replace xml with json!!!
+-ssao
 
 things added:
+-ambient occlusion (geometry based)
 -area lights (soft shadows)
 -triangles
 -render depth

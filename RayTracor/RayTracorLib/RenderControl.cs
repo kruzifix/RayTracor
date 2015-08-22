@@ -12,7 +12,7 @@ using RayTracor.RayTracorLib;
 using RayTracor.RayTracorLib.Tracing;
 using RayTracor.RayTracorLib.Lights;
 using RayTracor.RayTracorLib.Objects;
-using RayTracor.RayTracorLib.Utility;
+using RayTracor.RayTracorLib.Utilities;
 
 namespace RayTracor
 {

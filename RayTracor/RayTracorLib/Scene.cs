@@ -10,7 +10,7 @@ using System.Xml;
 using RayTracor.RayTracorLib.Lights;
 using RayTracor.RayTracorLib.Objects;
 using RayTracor.RayTracorLib.Tracing;
-using RayTracor.RayTracorLib.Utility;
+using RayTracor.RayTracorLib.Utilities;
 using RayTracor.RayTracorLib.Materials;
 using System.Diagnostics;
 
@@ -18,20 +18,36 @@ namespace RayTracor.RayTracorLib
 {
     public class Scene
     {
+        static Vector2[] poissonSamples = new Vector2[] {
+                new Vector2(-0.94201624, -0.39906216),
+                new Vector2(0.94558609, -0.76890725),
+                new Vector2(-0.094184101, -0.92938870),
+                new Vector2(0.34495938, 0.29387760),
+                new Vector2(-0.91588581, 0.45771432),
+                new Vector2(-0.81544232, -0.87912464),
+                new Vector2(-0.38277543, 0.27676845),
+                new Vector2(0.97484398, 0.75648379),
+                new Vector2(0.44323325, -0.97511554),
+                new Vector2(0.53742981, -0.47373420),
+                new Vector2(-0.26496911, -0.41893023),
+                new Vector2(0.79197514, 0.19090188),
+                new Vector2(-0.24188840, 0.99706507),
+                new Vector2(-0.81409955, 0.91437590),
+                new Vector2(0.19984126, 0.78641367),
+                new Vector2(0.14383161, -0.14100790)
+            };
+
         public Camera camera;
         public List<ILight> lights;
         public List<IObject> objects;
         PoissonDisk2 pdisk_32, pdisk_64;
-
-        //public event EventHandler<int> ProgressChanged;
+        
         public IProgress<int> ProgressReport;
 
         Vector3 backgroundColor;
 
         public Scene()
         {
-            //camera = Camera.CreateLookAt(new Vector(0, 1.8, 10), new Vector(0, 3, 0), new Vector(0,1,0), 45.0);
-            //camera = Camera.CreateLookAt(new Vector(0, 3, 12), new Vector(0, 0, 0), new Vector(0, 1, 0), 45.0);
             camera = new Camera();
             lights = new List<ILight>();
             objects = new List<IObject>();
@@ -42,97 +58,10 @@ namespace RayTracor.RayTracorLib
             pdisk_64.Generate();
             pdisk_64.Save("pdisk_64.bmp");
             //Console.WriteLine("Radius: {0}, Samples: {1}", pdisk_64.Radius, pdisk_64.Samples.Count);
-
-            //lights.Add(new Light(new Vector(-30, -10, 20), Color.White, 1));
-            //lights.Add(new Light(new Vector(7, 10, 7), Color.White, 1));
-            //lights.Add(new SpotLight(new Vector(0, 10, 0), Color.White, 1, new Vector(0, -1, 0), 20.0));
-            //lights.Add(SpotLight.FromTo(new Vector(0, 10, 5), new Vector(0,0,0), Color.White, 1, 20.0));
-
-            //objects.Add(new Sphere(new Vector(0, 3.5, -3), 3,
-            //    new Material
-            //    {
-            //        Ambient = 0.1,
-            //        Specular = 0.2,
-            //        Color = Color.FromArgb(222, 194, 102),
-            //        Lambert = 0.7
-            //    }));
-
-            //objects.Add(new Sphere(new Vector(0, 5, 1), 0.2,
-            //    new Material
-            //    {
-            //        Ambient = 0.0,
-            //        Specular = 0.1,
-            //        Color = Color.FromArgb(88, 123, 237),
-            //        Lambert = 0.9
-            //    }));
-
-            //objects.Add(new Sphere(new Vector(4, 3, -1), 0.1,
-            //    new Material
-            //    {
-            //        Ambient = 0.1,
-            //        Specular = 0.2,
-            //        Color = Color.FromArgb(155, 155, 155),
-            //        Lambert = 0.7
-            //    }));
-
-            //objects.Add(new Sphere(new Vector(0, 1, -4), 2,
-            //    new Material
-            //    {
-            //        Ambient = 0.1,
-            //        Specular = 0.0,
-            //        Color = Color.GreenYellow,
-            //        Lambert = 0.7, Textured = true
-            //    }));
-
-            //int numSpheres = 10;
-            //Random rand = new Random();
-            //for (int i = 0; i < numSpheres; i++)
-            //{
-            //    double x = rand.NextDouble(-3, 3);
-            //    double y = rand.NextDouble(-1, 1);
-            //    double z = rand.NextDouble(-5, 2);
-
-            //    double radius = rand.NextDouble(0.3, 1.3);
-
-            //    objects.Add(new Sphere(new Vector(x, y, z), radius,
-            //        new Material
-            //        {
-            //            Ambient = 0.1,
-            //            Specular = 0.0,
-            //            Color = Extensions.ColorFromHSV(rand.NextDouble() * 360.0, 0.7, 0.8),
-            //            Lambert = 0.7,
-            //            Textured = true
-            //        }));
-            //}
-
-            //Random rand = new Random();
-            //for (int x = 0; x < 5; x++)
-            //{
-            //    for (int y = 0; y < 5; y++)
-            //    {
-            //        for (int z = 0; z < 5; z++)
-            //        {
-            //            objects.Add(new Sphere(
-            //                new Vector(x - 2, y, z - 2), 0.25, new Material
-            //                {
-            //                    Ambient = 0.1, Specular = 0, Color = Extensions.ColorFromHSV(rand.NextDouble() * 360.0, 0.7, 0.8), Lambert = 0.7
-            //                }));
-            //        }
-            //    }
-            //}
-
-            //objects.Add(new Plane(new Vector(0,0,0), new Vector(0,-1,0), new Material { Ambient = 0.1, Specular = 0.0, Color = Color.FromArgb(50, 155, 30), Lambert = 0.7 }));
-            //objects.Add(new Plane(new Vector(0, 0, 0), new Vector(0, 1, 0), new Material { Ambient = 0.1, Specular = 0.4, Color = Color.White, Lambert = 0.7, Textured = false }));
-
+            
             backgroundColor = new Vector3(255.0);
         }
-
-        //private void OnProgressChanged(int p)
-        //{
-        //    if (ProgressChanged != null)
-        //        ProgressChanged(this, p);
-        //}
-
+        
         public Bitmap Render(int width, int height)
         {
             return RenderFunc(width, height, (x, y) => { return Trace(camera.CastRay(x, y), 0); });
@@ -152,22 +81,7 @@ namespace RayTracor.RayTracorLib
                 return col;
             });
         }
-
-        //public Bitmap RenderStochasticSuperSample(int width, int height)
-        //{
-        //    int samples = 64;
-        //    uint hash = (uint)this.GetHashCode();
-        //    MwcRng.SetSeed(hash);
-        //    return RenderFunc(width, height, (x, y) =>
-        //    {
-        //        Vector col = Vector.Zero;
-        //        for (int i = 0; i < samples; i++)
-        //                col += Trace(camera.CastRay(x + MwcRng.GetUniform() - 0.5, y + MwcRng.GetUniform() - 0.5), 0).ToVector();
-        //        col /= samples;
-        //        return col.ToColor();
-        //    });
-        //}
-
+        
         private Bitmap RenderFunc(int width, int height, Func<int, int, Vector3> func)
         {
             Bitmap bmp;
@@ -175,7 +89,7 @@ namespace RayTracor.RayTracorLib
             byte[] pixels = CreateAndLockBitmap(width, height, PixelFormat.Format24bppRgb, out bmp, out data);
 
             camera.SetResolution(width, height);
-            
+
             Parallel.For(0, height, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (y) =>
             //for(int y = 0; y < height; y++)
             {
@@ -269,35 +183,137 @@ namespace RayTracor.RayTracorLib
                 if (!res.Intersects)
                     return new Vector3(255.0);
 
-                //MwcRng.SetSeed((uint)GetHashCode());
-
-                //rays = pdisk_64.Samples.Count;
-
-                int notblocked = 0;
-                for(int i = 0; i < rays; i++)
-                {
-                    //Vector2 sample = pdisk_64[i];
-                    double theta = 2 * Math.PI * MwcRng.GetUniform();
-                    double phi = Math.Acos(MwcRng.GetUniform() * 2 - 1);
-
-                    Vector3 rand = new Vector3(
-                        Math.Cos(theta) * Math.Sin(phi),
-                        Math.Sin(theta) * Math.Sin(phi),
-                        Math.Cos(phi)
-                        );
-
-                    if (Vector3.DotProduct(rand, res.Normal) < 0.0)
-                        rand.Negate();
-
-                    Ray newray = new Ray(res.Point, rand);
-                    Intersection res2 = IntersectSceneExcept(newray, res.Object);
-                    if (!res2.Intersects)
-                        notblocked++;
-                }
-                
-                int col = (int)(notblocked * 255.0 / rays);
+                int col = (int)(255.0 * GetAmbientOcclusion(res, rays));
                 return new Vector3(col);
             });
+        }
+
+        public Bitmap RenderWithAO(int width, int height)
+        {
+            return RenderFunc(width, height, (x, y) => {
+                Ray ray = camera.CastRay(x, y);
+                Intersection res = IntersectScene(ray);
+                if (!res.Intersects)
+                    return backgroundColor;
+                Vector3 col = Trace(ray, 0);
+                double ao = GetAmbientOcclusion(res, 128);
+
+                double lambertAmount = EvalLights(res);
+                
+                IObject obj = res.Object;
+                Material mat = obj.Material;
+                Vector3 objColor = obj.EvalMaterial(res);
+
+                //Vector3 resultColor = objColor * mat.Ambient + objColor * lambertAmount * mat.Lambert;
+                return objColor * (mat.Ambient * ao + mat.Lambert * lambertAmount);
+            });
+        }
+
+        private double GetAmbientOcclusion(Intersection res, int rays)
+        {
+            int notblocked = 0;
+            for (int i = 0; i < rays; i++)
+            {
+                //Vector2 sample = pdisk_64[i];
+                double theta = 2 * Math.PI * MwcRng.GetUniform();
+                double phi = Math.Acos(MwcRng.GetUniform() * 2 - 1);
+
+                Vector3 rand = new Vector3(
+                    Math.Cos(theta) * Math.Sin(phi),
+                    Math.Sin(theta) * Math.Sin(phi),
+                    Math.Cos(phi)
+                    );
+
+                if (Vector3.DotProduct(rand, res.Normal) < 0.0)
+                    rand.Negate();
+
+                Ray newray = new Ray(res.Point, rand);
+                Intersection res2 = IntersectSceneExcept(newray, res.Object);
+                if (!res2.Intersects)
+                    notblocked++;
+            }
+
+            return notblocked * 1.0 / rays;
+        }
+
+        public Bitmap RenderSSAO(int width, int height)
+        {
+            Intersection[] intersecmap = new Intersection[width * height];
+            camera.SetResolution(width, height);
+
+            Parallel.For(0, width, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (x) =>
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    intersecmap[x + y * width] = IntersectScene(camera.CastRay(x, y));
+                }
+            });
+
+            Bitmap bmp;
+            BitmapData data;
+            byte[] pixels = CreateAndLockBitmap(width, height, PixelFormat.Format24bppRgb, out bmp, out data);
+            
+            Vector2 filterRadius = new Vector2(10.0 / width, 10.0 / height);
+            double distanceThreshold = 1.0;
+
+            Parallel.For(0, width, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (x) =>
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    Vector3 pos = intersecmap[x + y * width].Point;
+                    Vector3 normal = intersecmap[x + y * width].Normal;
+
+                    double ambientOcclusion = 0;
+
+                    for (int i = 0; i < poissonSamples.Length; i++)
+                    {
+                        Vector2 coord = new Vector2(x, y) + poissonSamples[i] * filterRadius;
+
+                        int coordX = Math.Floor(coord.X).ClampToInt(0, width);
+                        int coordY = Math.Floor(coord.Y).ClampToInt(0, height);
+                        
+                        double depth = intersecmap[(coordX + 0) + (coordY + 0) * width].Distance;
+                        int depthSamples = 1;
+                        if (coordX < width - 1)
+                        {
+                            depth += intersecmap[(coordX + 1) + (coordY + 0) * width].Distance;
+                            depthSamples++;
+                        }
+                        if (coordY < height - 1)
+                        {
+                            depth += intersecmap[(coordX + 0) + (coordY + 1) * width].Distance;
+                            depthSamples++;
+                        }
+                        if (coordX < width - 1 && coordY < height - 1)
+                        {
+                            depth += intersecmap[(coordX + 1) + (coordY + 1) * width].Distance;
+                            depthSamples++;
+                        }
+                        depth /= depthSamples;
+
+                        Vector3 samplePos = camera.CalcPos(coord.X, coord.Y, depth);
+                        Vector3 sampleDir = (samplePos - pos).Normalized;
+
+                        double dot = Math.Max(Vector3.DotProduct(sampleDir, normal), 0);
+                        double dist = (samplePos - pos).Length;
+
+                        double a = 1.0 - Utility.SmoothStep(distanceThreshold, distanceThreshold * 2.0, dist);
+
+                        ambientOcclusion += a * dot;
+                    }
+
+                    double ao = 255 * (1.0 - ambientOcclusion / poissonSamples.Length);
+                    byte col = (byte)ao.ClampToInt(0, 255);
+                    pixels[y * data.Stride + x * 3 + 0] = col;
+                    pixels[y * data.Stride + x * 3 + 1] = col;
+                    pixels[y * data.Stride + x * 3 + 2] = col;
+                }
+                ProgressReport.Report(1);
+            });
+
+            CopyAndUnLock(bmp, data, pixels);
+            
+            return bmp;
         }
 
         public void SetResolution(int width, int height)
@@ -315,6 +331,28 @@ namespace RayTracor.RayTracorLib
                 return backgroundColor;
 
             // lights!
+            double lambertAmount = EvalLights(res);
+
+            IObject obj = res.Object;
+            Material mat = obj.Material;
+            Vector3 objColor = obj.EvalMaterial(res);
+
+            Vector3 resultColor = objColor * mat.Ambient + objColor * lambertAmount * mat.Lambert;
+
+            //if (specular != 0.0)
+            //{
+            //    Ray reflected = ray.Reflect(res.Point, res.Normal);
+            //    reflected.Start += reflected.Direction * 0.001;
+
+            //    Color? reflectColor = Trace(reflected, depth + 1);
+            //    if (reflectColor.HasValue)
+            //        resultColor += new Vector(reflectColor.Value) * specular;
+            //}
+            return resultColor;
+        }
+
+        private double EvalLights(Intersection res)
+        {
             double lambertAmount = 0;
             foreach (var light in lights)
             {
@@ -357,25 +395,8 @@ namespace RayTracor.RayTracorLib
 
                 lambertAmount += contribution * light.Strength;
             }
-
-            lambertAmount = Math.Min(1, lambertAmount);
-
-            IObject obj = res.Object;
-            Material mat = obj.Material;
-            Vector3 objColor = obj.EvalMaterial(res);
-
-            Vector3 resultColor = objColor * mat.Ambient + objColor * lambertAmount * mat.Lambert;
-
-            //if (specular != 0.0)
-            //{
-            //    Ray reflected = ray.Reflect(res.Point, res.Normal);
-            //    reflected.Start += reflected.Direction * 0.001;
-
-            //    Color? reflectColor = Trace(reflected, depth + 1);
-            //    if (reflectColor.HasValue)
-            //        resultColor += new Vector(reflectColor.Value) * specular;
-            //}
-            return resultColor;
+            
+            return Math.Min(1, lambertAmount);
         }
 
         private Intersection IntersectScene(Ray ray)
@@ -387,7 +408,7 @@ namespace RayTracor.RayTracorLib
             {
                 Intersection res = o.Intersects(ray);
 
-                if (res.Intersects && res.Distance < closestIntersec.Distance)
+                if (res.Intersects && res.Distance > 0.0005 && res.Distance < closestIntersec.Distance)
                     closestIntersec = res;
             }
 
@@ -403,7 +424,7 @@ namespace RayTracor.RayTracorLib
             {
                 Intersection res = o.Intersects(ray);
 
-                if (res.Intersects && res.Distance > -0.0005 && res.Distance < closestIntersec.Distance)
+                if (res.Intersects && res.Distance > 0.0005 && res.Distance < closestIntersec.Distance)
                     closestIntersec = res;
             }
 
@@ -433,13 +454,12 @@ namespace RayTracor.RayTracorLib
         private bool PointObstructed(Vector3 from, Vector3 to)
         {
             Ray ray = Ray.FromTo(from, to);
-            ray.Start += ray.Direction * 0.002;
             double dist = (to - from).Length;
 
             foreach (var o in objects)
             {
                 Intersection res = o.Intersects(ray);
-                if (res.Intersects && res.Distance > -0.0005 && res.Distance < dist)
+                if (res.Intersects && res.Distance > 0.0005 && res.Distance < dist)
                     return true;
             }
             return false;

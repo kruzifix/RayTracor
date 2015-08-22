@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using RayTracor.RayTracorLib.Tracing;
-using RayTracor.RayTracorLib.Utility;
+using RayTracor.RayTracorLib.Utilities;
 
 namespace RayTracor.RayTracorLib.Materials
 {

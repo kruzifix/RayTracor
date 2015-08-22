@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Xml;
-using RayTracor.RayTracorLib.Utility;
+using RayTracor.RayTracorLib.Utilities;
 using RayTracor.RayTracorLib.Tracing;
 
 namespace RayTracor.RayTracorLib.Lights

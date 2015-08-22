@@ -35,8 +35,8 @@
       <vertex3 x="-2" y="0" z="2"/>
 			<material>
 				<specular>0</specular>
-				<lambert>0.7</lambert>
-				<ambient>0.1</ambient>
+				<lambert>0.5</lambert>
+				<ambient>0.2</ambient>
 				<color>FF2BC22D</color>
 				<textured>true</textured>
         <texture>textures/brickwork.jpg</texture>
@@ -47,14 +47,14 @@
       <vertex1 x="2" y="4" z="2"/>
       <vertex2 x="2" y="4" z="-2"/>
       <vertex3 x="2" y="0" z="-2"/>
-			<material>
-				<specular>0</specular>
-				<lambert>0.7</lambert>
-				<ambient>0.1</ambient>
+      <material>
+        <specular>0</specular>
+        <lambert>0.5</lambert>
+        <ambient>0.2</ambient>
         <color>FF2BC22D</color>
         <textured>true</textured>
         <texture>textures/brickwork.jpg</texture>
-			</material>
+      </material>
 		</quad>
     <quad> 
 			<vertex0 x="-2" y="0" z="-2"/>
@@ -63,8 +63,8 @@
       <vertex3 x="2" y="0" z="-2"/>
 			<material>
 				<specular>0</specular>
-				<lambert>0.7</lambert>
-				<ambient>0.1</ambient>
+        <lambert>0.5</lambert>
+        <ambient>0.2</ambient>
 				<color>FF2BC22D</color>
         <textured>true</textured>
         <texture>textures/brickwork.jpg</texture>
@@ -77,8 +77,8 @@
       <vertex3 x="-2" y="4" z="2"/>
 			<material>
 				<specular>0</specular>
-				<lambert>0.7</lambert>
-				<ambient>0.1</ambient>
+        <lambert>0.5</lambert>
+        <ambient>0.2</ambient>
 				<color>FF2BC22D</color>
         <textured>true</textured>
         <texture>textures/brickwork.jpg</texture>
@@ -90,8 +90,8 @@
       <radius>1</radius>
       <material>
         <specular>0</specular>
-        <lambert>0.7</lambert>
-        <ambient>0.1</ambient>
+        <lambert>0.5</lambert>
+        <ambient>0.2</ambient>
         <color>FF2BC22D</color>
         <textured>false</textured>
       </material>
@@ -101,8 +101,8 @@
       <normal x="0" y="1" z="0" />
       <material>
         <specular>0</specular>
-        <lambert>0.7</lambert>
-        <ambient>0.1</ambient>
+        <lambert>0.5</lambert>
+        <ambient>0.2</ambient>
         <color>FFFFFFFF</color>
         <textured>false</textured>
       </material>

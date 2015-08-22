@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using RayTracor.RayTracorLib.Tracing;
 
-namespace RayTracor.RayTracorLib.Utility
+namespace RayTracor.RayTracorLib.Utilities
 {
     public static class Utility
     {
@@ -33,6 +33,14 @@ namespace RayTracor.RayTracorLib.Utility
             if (value > max)
                 return max;
             return value;
+        }
+
+        public static double SmoothStep(double edge0, double edge1, double x)
+        {
+            // Scale, bias and saturate x to 0..1 range
+            x = Clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+            // Evaluate polynomial
+            return x * x * (3 - 2 * x);
         }
 
         public static double ToRadians(this double value)

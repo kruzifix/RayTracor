@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using RayTracor.RayTracorLib.Tracing;
-using RayTracor.RayTracorLib.Utility;
+using RayTracor.RayTracorLib.Utilities;
 
 namespace RayTracor.RayTracorLib
 {
@@ -93,6 +93,11 @@ namespace RayTracor.RayTracorLib
             double yy = y * ys - 1.0;
 
             return new Ray(pos, dir + right * xx * tan - up * yy * tanratio);
+        }
+
+        public Vector3 CalcPos(double x, double y, double depth)
+        {
+            return CastRay(x, y).PointAt(depth);
         }
 
         public void Serialize(XmlDocument doc)
