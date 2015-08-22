@@ -1,6 +1,6 @@
 ﻿{
 	"camera": {
-		"position": { "x": 4, "y": 4, "z": 5 },
+		"position": { "x": 5, "y": 4, "z": 6 },
 		"target": { "x": 0, "y": 1, "z": 0 },
 		"globalup": { "x": 0, "y": 1, "z": 0 },
 		"fov": 45
@@ -10,16 +10,17 @@
 
 	"lights": [
 		{
-			"type": "pointlight",
-			"position": { "x": 3, "y": 4, "z": 6 },
+			"type": "arealight",
+			"position": { "x": 3, "y": 5, "z": 6 },
 			"color": "FFFFFFFF",
-			"strength": 1
+			"strength": 1,
+			"size": 0.75
 		}
 	],
 	"materials": [
 		{
 			"name": "meshMat",
-			"color": "FFFFFFFF",
+			"color": "FF55CC44",
 			"ambient": 0.2,
 			"lambert": 0.5
 		},

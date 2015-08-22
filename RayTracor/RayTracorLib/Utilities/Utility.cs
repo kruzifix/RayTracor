@@ -24,7 +24,7 @@ namespace RayTracor.RayTracorLib.Utilities
                 return string.Format("{0}ms", ms);
             if (min == 0)
                 return string.Format("{0}s{1}ms", sec, ms - sec * 1000);
-            return string.Format("{0}m{1}s{2}ms", min, sec, ms - (sec - min * 60) * 1000);
+            return string.Format("{0}m{1}s{2}ms", min, sec - min * 60, ms - (sec - min * 60) * 1000);
         }
 
         public static int Clamp(this int value, int min, int max)
